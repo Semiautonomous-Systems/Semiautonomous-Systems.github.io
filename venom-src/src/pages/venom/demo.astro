@@ -1,0 +1,1032 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+
+const title = 'VENOM Demo - Interactive AI Crawler Preview';
+const description = 'See how VENOM transforms content for AI crawlers while preserving the human experience.';
+---
+
+<BaseLayout title={title} description={description} currentPath="/venom/demo/">
+  <section class="demo-section">
+    <div class="container">
+      <!-- Title -->
+      <div class="demo-header">
+        <h1>Interactive Demo</h1>
+        <p class="demo-subtitle">Enter any URL to compare the original vs. AI crawler view</p>
+      </div>
+
+      <!-- Controls -->
+      <Card class="controls-card">
+        <div class="controls-grid">
+          <!-- URL Input -->
+          <div class="control-group control-url">
+            <label for="url-input">Website URL</label>
+            <input
+              type="url"
+              id="url-input"
+              placeholder="https://semiautonomous.systems"
+              value="https://semiautonomous.systems"
+              class="input"
+            />
+          </div>
+
+          <!-- Options Row -->
+          <div class="control-group">
+            <label for="bot-select">Bot Type</label>
+            <select id="bot-select" class="select">
+              <option value="gptbot">GPTBot (OpenAI)</option>
+              <option value="claude">Claude (Anthropic)</option>
+              <option value="google">Google AI</option>
+              <option value="bingbot">Bing AI</option>
+              <option value="meta">Meta AI</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="device-select">Device</label>
+            <select id="device-select" class="select">
+              <option value="desktop">Desktop (1280×720)</option>
+              <option value="mobile">Mobile (390×844)</option>
+            </select>
+          </div>
+
+          <!-- Load Button -->
+          <div class="control-group control-button">
+            <button id="load-btn" class="btn btn-primary">
+              Load Preview
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      <!-- Screenshot Panels -->
+      <div class="panels-container" id="panels-container">
+        <!-- Original -->
+        <Card class="panel-card">
+          <h3 class="panel-title">
+            <span class="status-dot status-safe"></span>
+            Original (Human View)
+          </h3>
+          <div id="original-panel" class="panel-preview">
+            Click "Load Preview" to generate
+          </div>
+          <div id="original-stats" class="panel-stats"></div>
+        </Card>
+
+        <!-- Poisoned -->
+        <Card class="panel-card">
+          <h3 class="panel-title">
+            <span class="status-dot status-danger"></span>
+            Venom Preview (AI Crawler View)
+          </h3>
+          <div id="poisoned-panel" class="panel-preview">
+            Click "Load Preview" to generate
+          </div>
+          <div id="poisoned-stats" class="panel-stats"></div>
+        </Card>
+      </div>
+
+      <!-- Scroll Indicator (touch devices only) -->
+      <div class="scroll-indicator" id="scroll-indicator" aria-hidden="true">
+        <button class="scroll-dot active" data-index="0" aria-label="View original"></button>
+        <button class="scroll-dot" data-index="1" aria-label="View VENOM preview"></button>
+      </div>
+
+      <!-- Quick Examples -->
+      <Card class="examples-card">
+        <h4 class="examples-title">Quick Examples</h4>
+        <div class="examples-grid">
+          <button data-url="https://semiautonomous.systems" class="example-btn">Semiautonomous</button>
+          <button data-url="https://www.bbc.com" class="example-btn">BBC News</button>
+          <button data-url="https://arxiv.org" class="example-btn">arXiv</button>
+          <button data-url="https://developer.mozilla.org" class="example-btn">MDN</button>
+          <button data-url="https://news.ycombinator.com" class="example-btn">Hacker News</button>
+          <button data-url="https://www.w3.org" class="example-btn">W3C</button>
+        </div>
+      </Card>
+    </div>
+  </section>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot comparison viewer">
+    <button class="lightbox-close" aria-label="Close (Escape)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" aria-label="Previous image (Left arrow)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <div class="lightbox-content" id="lightbox-content">
+      <img id="lightbox-img" src="" alt="" />
+      <div class="lightbox-label" id="lightbox-label"></div>
+      <div class="lightbox-hint" id="lightbox-hint">Swipe or use arrow keys to compare</div>
+    </div>
+    <button class="lightbox-nav lightbox-next" aria-label="Next image (Right arrow)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+    <div class="lightbox-dots">
+      <button class="lightbox-dot active" data-index="0" aria-label="View original"></button>
+      <button class="lightbox-dot" data-index="1" aria-label="View VENOM preview"></button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .demo-section {
+    padding: var(--space-xl) 0 var(--space-3xl);
+  }
+
+  .demo-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+
+  .demo-header h1 {
+    font-size: clamp(24px, 4vw, 32px);
+    margin-bottom: var(--space-sm);
+  }
+
+  .demo-subtitle {
+    color: var(--color-text-muted);
+    font-size: clamp(14px, 2vw, 16px);
+  }
+
+  /* Controls Card */
+  .controls-card {
+    margin-bottom: var(--space-lg);
+  }
+
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 640px) {
+    .controls-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .control-url {
+      grid-column: 1 / -1;
+    }
+
+    .control-button {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .controls-grid {
+      grid-template-columns: 1fr 1fr 1fr auto;
+      align-items: end;
+    }
+
+    .control-url {
+      grid-column: 1 / -1;
+    }
+
+    .control-button {
+      grid-column: auto;
+    }
+  }
+
+  .control-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .input,
+  .select {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(15, 20, 27, 0.5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: 14px;
+    transition: var(--transition-fast);
+  }
+
+  .input:focus,
+  .select:focus {
+    outline: none;
+    border-color: var(--color-text-muted);
+  }
+
+  .input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+
+  /* Panels */
+  .panels-container {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: var(--space-sm);
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+    /* Hide scrollbar but keep functionality */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    /* Smooth momentum scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panels-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .panels-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: visible;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 0;
+      padding-right: 0;
+      margin-bottom: var(--space-xl);
+    }
+  }
+
+  .panel-card {
+    min-width: 92vw;
+    width: 92vw;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+  }
+
+  /* Tablets in portrait - can show both panels side by side */
+  @media (min-width: 768px) {
+    .panel-card {
+      min-width: 48vw;
+      width: 48vw;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .panel-card {
+      min-width: 0;
+      width: auto;
+    }
+  }
+
+  .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-safe {
+    background: var(--color-safe);
+  }
+
+  .status-danger {
+    background: var(--color-accent);
+  }
+
+  .panel-preview {
+    aspect-ratio: var(--preview-aspect-ratio, 16 / 9);
+    background: rgba(15, 20, 27, 0.5);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    overflow: hidden;
+    transition: aspect-ratio 0.3s ease;
+  }
+
+  .panel-preview :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .panel-stats {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: var(--space-sm);
+  }
+
+  /* Scroll Indicator - only visible on touch devices at smaller screens */
+  .scroll-indicator {
+    display: none;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: var(--space-lg);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .scroll-indicator.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Show only on touch/coarse pointer devices below desktop breakpoint */
+  @media (max-width: 1023px) and (hover: none), (max-width: 1023px) and (pointer: coarse) {
+    .scroll-indicator {
+      display: flex;
+    }
+  }
+
+  .scroll-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-border);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+
+  .scroll-dot:hover {
+    background: var(--color-text-muted);
+  }
+
+  .scroll-dot.active {
+    background: var(--color-text);
+    transform: scale(1.25);
+  }
+
+  /* Pulse animation on first load to draw attention */
+  .scroll-indicator.pulse .scroll-dot {
+    animation: dot-pulse 1.5s ease-in-out 2;
+  }
+
+  .scroll-indicator.pulse .scroll-dot:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+
+  .scroll-indicator.pulse .scroll-dot.active {
+    animation: none;
+    transform: scale(1.25);
+    opacity: 1;
+  }
+
+  /* Examples */
+  .examples-card {
+    padding: var(--space-lg);
+  }
+
+  .examples-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .examples-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .example-btn {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .example-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    border-color: var(--color-border-hover);
+  }
+
+  /* Loading and error states */
+  .panel-preview :global(.loading) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-text-muted);
+  }
+
+  .panel-preview :global(.loading-dots) {
+    font-size: 24px;
+    animation: pulse 1.5s infinite;
+  }
+
+  .panel-preview :global(.error) {
+    color: var(--color-accent);
+    text-align: center;
+    padding: var(--space-md);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* Clickable images */
+  .panel-preview :global(img) {
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+  }
+
+  .panel-preview :global(img:hover) {
+    opacity: 0.9;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+  }
+
+  .lightbox.active {
+    display: flex;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 32px;
+    cursor: pointer;
+    padding: var(--space-sm);
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+  }
+
+  .lightbox-close:hover {
+    opacity: 1;
+  }
+
+  .lightbox-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 95vw;
+    max-height: 90vh;
+  }
+
+  .lightbox img {
+    max-width: 95vw;
+    max-height: calc(90vh - 40px);
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.2s ease;
+  }
+
+  .lightbox img.transitioning {
+    opacity: 0.5;
+  }
+
+  .lightbox-label {
+    margin-top: var(--space-sm);
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all var(--transition-fast);
+  }
+
+  .lightbox-nav:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox-prev {
+    left: var(--space-lg);
+  }
+
+  .lightbox-next {
+    right: var(--space-lg);
+  }
+
+  /* Hide arrows when at boundary (no more images in that direction) */
+  .lightbox-nav.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Hide nav buttons on small touch devices - they'll use swipe */
+  @media (max-width: 640px) and (hover: none), (max-width: 640px) and (pointer: coarse) {
+    .lightbox-nav {
+      display: none;
+    }
+  }
+
+  .lightbox-dots {
+    position: absolute;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+  }
+
+  .lightbox-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+
+  .lightbox-dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .lightbox-dot.active {
+    background: var(--color-text);
+    transform: scale(1.2);
+  }
+
+  /* Focus styles for accessibility */
+  .lightbox-close:focus,
+  .lightbox-nav:focus,
+  .lightbox-dot:focus {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .lightbox-dot:focus {
+    outline-offset: 4px;
+  }
+
+  /* Hint text for navigation */
+  .lightbox-hint {
+    margin-top: var(--space-xs);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    opacity: 0.6;
+    text-align: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .lightbox-hint.hidden {
+    opacity: 0;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox img {
+      transition: none;
+    }
+
+    .lightbox-dot,
+    .lightbox-nav,
+    .lightbox-close {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const API_BASE = 'https://ecdsa.pub/venom-preview/api/snap';
+
+  const urlInput = document.getElementById('url-input') as HTMLInputElement;
+  const botSelect = document.getElementById('bot-select') as HTMLSelectElement;
+  const deviceSelect = document.getElementById('device-select') as HTMLSelectElement;
+  const loadBtn = document.getElementById('load-btn') as HTMLButtonElement;
+  const originalPanel = document.getElementById('original-panel') as HTMLDivElement;
+  const poisonedPanel = document.getElementById('poisoned-panel') as HTMLDivElement;
+  const originalStats = document.getElementById('original-stats') as HTMLDivElement;
+  const poisonedStats = document.getElementById('poisoned-stats') as HTMLDivElement;
+  const lightbox = document.getElementById('lightbox') as HTMLDivElement;
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const lightboxLabel = document.getElementById('lightbox-label') as HTMLDivElement;
+  const lightboxHint = document.getElementById('lightbox-hint') as HTMLDivElement;
+  const lightboxContent = document.getElementById('lightbox-content') as HTMLDivElement;
+  const lightboxClose = document.querySelector('.lightbox-close') as HTMLButtonElement;
+  const lightboxPrev = document.querySelector('.lightbox-prev') as HTMLButtonElement;
+  const lightboxNext = document.querySelector('.lightbox-next') as HTMLButtonElement;
+  const lightboxDots = document.querySelectorAll('.lightbox-dot') as NodeListOf<HTMLButtonElement>;
+  const panelsContainer = document.getElementById('panels-container') as HTMLDivElement;
+  const scrollIndicator = document.getElementById('scroll-indicator') as HTMLDivElement;
+  const scrollDots = document.querySelectorAll('.scroll-dot') as NodeListOf<HTMLButtonElement>;
+
+  let abortController: AbortController | null = null;
+  let hasUserScrolled = false;
+
+  // Lightbox state
+  interface LightboxImage {
+    src: string;
+    label: string;
+  }
+  let lightboxImages: LightboxImage[] = [];
+  let currentLightboxIndex = 0;
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let previouslyFocusedElement: HTMLElement | null = null;
+  let hasNavigatedInLightbox = false;
+
+  // Track object URLs for cleanup
+  let currentObjectUrls: string[] = [];
+
+  // Update aspect ratio based on device selection
+  function updateAspectRatio() {
+    const mode = deviceSelect.value;
+    // Desktop: 1280x720 = 16:9, Mobile: 390x844 ≈ 9:19
+    const aspectRatio = mode === 'mobile' ? '390 / 844' : '16 / 9';
+    document.documentElement.style.setProperty('--preview-aspect-ratio', aspectRatio);
+  }
+
+  function showLoading(panel: HTMLDivElement) {
+    panel.innerHTML = `
+      <div class="loading">
+        <div class="loading-dots">●●●</div>
+        <span style="font-size: 12px;">Generating screenshot...</span>
+      </div>
+    `;
+  }
+
+  function showError(panel: HTMLDivElement, message: string) {
+    panel.innerHTML = `
+      <div class="error">
+        <div style="font-size: 20px; margin-bottom: 8px;">⚠</div>
+        <span style="font-size: 12px;">${message}</span>
+      </div>
+    `;
+  }
+
+  function showImage(panel: HTMLDivElement, url: string, index: number, label: string) {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `${label} screenshot - click to enlarge`;
+    img.loading = 'eager';
+    img.addEventListener('click', () => openLightbox(index));
+    panel.innerHTML = '';
+    panel.appendChild(img);
+
+    // Track images for lightbox navigation
+    lightboxImages[index] = { src: url, label };
+  }
+
+  // Cleanup old object URLs to prevent memory leak
+  function cleanupObjectUrls() {
+    currentObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    currentObjectUrls = [];
+    lightboxImages = [];
+  }
+
+  function updateLightboxDots() {
+    lightboxDots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentLightboxIndex);
+    });
+  }
+
+  function updateLightboxArrows() {
+    // Hide prev arrow if at first image
+    lightboxPrev.classList.toggle('hidden', currentLightboxIndex === 0);
+    // Hide next arrow if at last image
+    lightboxNext.classList.toggle('hidden', currentLightboxIndex >= lightboxImages.length - 1);
+  }
+
+  function showLightboxImage(index: number) {
+    if (index < 0 || index >= lightboxImages.length || !lightboxImages[index]) return;
+
+    currentLightboxIndex = index;
+    lightboxImg.classList.add('transitioning');
+
+    setTimeout(() => {
+      lightboxImg.src = lightboxImages[index].src;
+      lightboxLabel.textContent = lightboxImages[index].label;
+      updateLightboxDots();
+      updateLightboxArrows();
+      lightboxImg.classList.remove('transitioning');
+    }, 100);
+  }
+
+  function openLightbox(index: number) {
+    // Store currently focused element to restore later
+    previouslyFocusedElement = document.activeElement as HTMLElement;
+    hasNavigatedInLightbox = false;
+
+    currentLightboxIndex = index;
+    lightboxImg.src = lightboxImages[index].src;
+    lightboxImg.alt = `${lightboxImages[index].label} - Image ${index + 1} of ${lightboxImages.length}`;
+    lightboxLabel.textContent = lightboxImages[index].label;
+    lightboxHint.classList.remove('hidden');
+    updateLightboxDots();
+    updateLightboxArrows();
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Focus the close button for keyboard users
+    setTimeout(() => lightboxClose.focus(), 100);
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+
+    // Restore focus to the element that opened the lightbox
+    if (previouslyFocusedElement) {
+      previouslyFocusedElement.focus();
+      previouslyFocusedElement = null;
+    }
+  }
+
+  function navigateLightbox(direction: number) {
+    const newIndex = currentLightboxIndex + direction;
+    if (newIndex >= 0 && newIndex < lightboxImages.length && lightboxImages[newIndex]) {
+      showLightboxImage(newIndex);
+
+      // Hide hint after first navigation
+      if (!hasNavigatedInLightbox) {
+        hasNavigatedInLightbox = true;
+        lightboxHint.classList.add('hidden');
+      }
+    }
+  }
+
+  // Focus trap for lightbox
+  function trapFocus(e: KeyboardEvent) {
+    if (!lightbox.classList.contains('active') || e.key !== 'Tab') return;
+
+    const focusableElements = lightbox.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey && document.activeElement === firstElement) {
+      e.preventDefault();
+      lastElement.focus();
+    } else if (!e.shiftKey && document.activeElement === lastElement) {
+      e.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  async function loadPreview() {
+    const url = urlInput.value.trim();
+    if (!url) {
+      alert('Please enter a URL');
+      return;
+    }
+
+    // Update aspect ratio based on device selection when loading
+    updateAspectRatio();
+
+    // Abort any ongoing request
+    if (abortController) {
+      abortController.abort();
+    }
+    abortController = new AbortController();
+
+    const bot = botSelect.value;
+    const mode = deviceSelect.value;
+
+    // Update UI
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Loading...';
+    showLoading(originalPanel);
+    showLoading(poisonedPanel);
+    originalStats.textContent = '';
+    poisonedStats.textContent = '';
+
+    try {
+      // Build API URLs - url parameter must come last
+      const originalUrl = `${API_BASE}?mode=${mode}&url=${encodeURIComponent(url)}`;
+      const poisonedUrl = `${API_BASE}?bot=${bot}&inline=yes&mode=${mode}&url=${encodeURIComponent(url)}`;
+
+      // Fetch both screenshots in parallel
+      const [originalResp, poisonedResp] = await Promise.all([
+        fetch(originalUrl, { signal: abortController.signal }),
+        fetch(poisonedUrl, { signal: abortController.signal })
+      ]);
+
+      if (!originalResp.ok || !poisonedResp.ok) {
+        throw new Error('Failed to generate screenshots');
+      }
+
+      // Get image blobs and create object URLs
+      const [originalBlob, poisonedBlob] = await Promise.all([
+        originalResp.blob(),
+        poisonedResp.blob()
+      ]);
+
+      // Cleanup old URLs before creating new ones
+      cleanupObjectUrls();
+
+      const originalObjUrl = URL.createObjectURL(originalBlob);
+      const poisonedObjUrl = URL.createObjectURL(poisonedBlob);
+      currentObjectUrls = [originalObjUrl, poisonedObjUrl];
+
+      showImage(originalPanel, originalObjUrl, 0, 'Original (Human View)');
+      showImage(poisonedPanel, poisonedObjUrl, 1, 'VENOM Preview (AI Crawler View)');
+
+      // Update stats from headers
+      originalStats.textContent = `Mode: ${mode}`;
+      poisonedStats.textContent = `Bot: ${bot}`;
+
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.error('Error:', err);
+      showError(originalPanel, 'Failed to load');
+      showError(poisonedPanel, err.message || 'Failed to load');
+    } finally {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Load Preview';
+    }
+  }
+
+  // Lightbox event listeners
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
+  lightboxNext.addEventListener('click', () => navigateLightbox(1));
+
+  // Click on lightbox dots to navigate
+  lightboxDots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.dataset.index || '0', 10);
+      showLightboxImage(index);
+    });
+  });
+
+  // Click outside image to close
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  // Keyboard navigation and focus trap
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
+
+    // Handle focus trap
+    trapFocus(e);
+
+    switch (e.key) {
+      case 'Escape':
+        closeLightbox();
+        break;
+      case 'ArrowLeft':
+        navigateLightbox(-1);
+        break;
+      case 'ArrowRight':
+        navigateLightbox(1);
+        break;
+      case 'Home':
+        showLightboxImage(0);
+        break;
+      case 'End':
+        showLightboxImage(lightboxImages.length - 1);
+        break;
+    }
+  });
+
+  // Touch swipe navigation for mobile - attached to content area only
+  lightboxContent.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightboxContent.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 75; // Increased threshold to avoid accidental swipes
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        // Swipe left - next image
+        navigateLightbox(1);
+      } else {
+        // Swipe right - previous image
+        navigateLightbox(-1);
+      }
+    }
+  }
+
+  // Event listeners
+  loadBtn.addEventListener('click', loadPreview);
+
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadPreview();
+  });
+
+  // Example buttons
+  document.querySelectorAll('.example-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      urlInput.value = (btn as HTMLElement).dataset.url || '';
+      loadPreview();
+    });
+  });
+
+  // Check if panels actually need scrolling (content overflows)
+  function checkScrollNeeded() {
+    const needsScroll = panelsContainer.scrollWidth > panelsContainer.clientWidth + 10;
+    scrollIndicator.style.display = needsScroll ? 'flex' : 'none';
+    return needsScroll;
+  }
+
+  // Scroll indicator functionality
+  function updateScrollIndicator() {
+    const scrollLeft = panelsContainer.scrollLeft;
+    const scrollWidth = panelsContainer.scrollWidth - panelsContainer.clientWidth;
+    const progress = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
+
+    // Determine which panel is more visible (0 = original, 1 = poisoned)
+    const activeIndex = progress > 0.5 ? 1 : 0;
+
+    scrollDots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === activeIndex);
+    });
+  }
+
+  // Handle scroll on panels container
+  panelsContainer.addEventListener('scroll', () => {
+    updateScrollIndicator();
+
+    // After first user scroll, remove pulse
+    if (!hasUserScrolled) {
+      hasUserScrolled = true;
+      scrollIndicator.classList.remove('pulse');
+    }
+  }, { passive: true });
+
+  // Click on dots to scroll to panel
+  scrollDots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.dataset.index || '0', 10);
+      const panels = panelsContainer.querySelectorAll('.panel-card');
+      if (panels[index]) {
+        panels[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+  });
+
+  // Check on resize if scroll is still needed
+  window.addEventListener('resize', checkScrollNeeded);
+
+  // Initial check and pulse animation (only if scrolling is needed on touch devices)
+  if (checkScrollNeeded() && window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+    scrollIndicator.classList.add('pulse');
+  }
+
+  // Initialize aspect ratio and auto-load on page load
+  updateAspectRatio();
+  loadPreview();
+</script>

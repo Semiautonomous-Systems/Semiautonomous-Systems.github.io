@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CDT Speech Script — Nick Sullivan</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.7; font-size: 15px; }
+  h1 { font-size: 1.6em; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  h2 { font-size: 1.3em; color: #0a4d8c; margin-top: 2.5em; }
+  .timing { display: inline-block; background: #0a4d8c; color: white; font-size: 0.75em; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+  .cumulative { display: inline-block; background: #666; color: white; font-size: 0.75em; padding: 2px 8px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .script { font-size: 1.05em; line-height: 1.8; }
+  .script p { margin: 0.8em 0; }
+  .pause { color: #999; font-style: italic; font-size: 0.85em; }
+  .emphasis { font-weight: 600; }
+  .beat { color: #0a4d8c; font-weight: bold; }
+  .review-note { background: #fff3cd; border-left: 4px solid #d4a800; padding: 10px 14px; margin: 1em 0; font-size: 0.9em; }
+  .review-note strong { color: #856404; }
+  .total { background: #d4edda; border: 2px solid #2d8a4e; padding: 16px 20px; border-radius: 8px; margin: 2em 0; text-align: center; font-size: 1.1em; }
+  .meta { color: #666; font-size: 0.9em; margin-bottom: 2em; }
+  hr { border: none; border-top: 2px solid #eee; margin: 2em 0; }
+</style>
+</head>
+<body>
+
+<h1>Speech Script</h1>
+<div class="meta">CDT Roundtable &mdash; Feb 10, 2026 &mdash; 5 min slot &mdash; 5 slides</div>
+
+<div class="total">
+<strong>~650 words</strong> &mdash; 4:38 at 140 wpm &mdash; 5:00 at 130 wpm (deliberate)<br>
+Leaves 0&ndash;22 seconds buffer depending on pace. Tight. Don&rsquo;t linger.
+</div>
+
+<hr>
+
+<h2>SLIDE 1: The Old Deal Is Breaking Down <span class="timing">~1:15</span> <span class="cumulative">1:15</span></h2>
+
+<div class="review-note">
+<strong>Slide review:</strong> Strong opening. Hit counts + ratios make the hook concrete. The two-row table is fine &mdash; the contrast between 3,700:1 and 500,000:1 IS the point. The green dual-harm callout box lands visually. No changes needed to the slide.
+</div>
+
+<div class="script">
+<p>For decades, web crawling worked on an implicit deal. Crawlers consumed your bandwidth and server resources. In return, they sent traffic back through search results, links, referrals. Publishers ate the cost because the return was worth it.</p>
+
+<p><span class="beat">AI crawlers broke that deal.</span></p>
+
+<p>They take content at massive scale and send nothing back. iFixit&rsquo;s CEO reported Anthropic&rsquo;s crawler hit his site <span class="emphasis">a million times in a single day</span>. Freelancer.com alleged three and a half million requests in four hours.</p>
+
+<p>Cloudflare measured this across millions of sites last year. These are crawl-to-referral ratios: how many pages a crawler fetches for every visit it sends back. OpenAI: thirty-seven hundred to one. Anthropic: <span class="emphasis">five hundred thousand to one</span>.</p>
+
+<p class="pause">[Let that number land. One beat.]</p>
+
+<p>Two distinct harms follow, and they're different problems. <span class="emphasis">Operational cost</span>: a million requests can crash a small site. That's a bandwidth problem. <span class="emphasis">IP extraction</span>: content scraped for AI training without permission. That's a rights problem. A hobbyist forum cares about staying online. A news publisher cares about its journalism training a competitor. Not every site cares about both. The defenses are different.</p>
+</div>
+
+<hr>
+
+<h2>SLIDE 2: Defenses vs. Circumventions <span class="timing">~0:50</span> <span class="cumulative">2:05</span></h2>
+
+<div class="review-note">
+<strong>Slide review:</strong> Table is dense &mdash; 9 rows. Audience won&rsquo;t read it all. That&rsquo;s fine: gesture at the gradient (&ldquo;cost rises from free to high&rdquo;), then land on the bookends: robots.txt (free to ignore) and the highlighted last row (bypasses everything). The green-highlighted last row is good visual design &mdash; draws the eye.
+</div>
+
+<div class="script">
+<p>What can you do if you don't want to be crawled?</p>
+
+<p>Each defense has a known bypass, and the cost to the scraper rises with complexity. robots.txt: free to ignore, and most bots do. Only thirty percent comply with disallow-all. IP blocking: residential proxies, ten to fifteen dollars a gig, a hundred ninety million IPs available. CAPTCHAs: solved for a dollar per thousand. All the way up to behavioral analysis, simulating mouse movements and human timing.</p>
+
+<p><span class="beat">Everything on this table addresses operational cost</span>: keeping scrapers off your servers. The last row is different. Scrape the content from Google's cache instead of the site itself. Your servers never see a request. That's the IP problem, and blocking can't touch it.</p>
+</div>
+
+<hr>
+
+<h2>SLIDE 3: Not All Scrapers Are the Same <span class="timing">~1:05</span> <span class="cumulative">3:10</span></h2>
+
+<div class="review-note">
+<strong>Slide review:</strong> Meatiest slide. Three archetypes + economics box. <strong>Risk: spending too long here.</strong> The economics box ($400K for 732M profiles) is vivid but expendable if you&rsquo;re running long &mdash; cut it first. The Perplexity/Reddit honeypot story is the crowd-pleaser; don&rsquo;t rush it.
+</div>
+
+<div class="script">
+<p><span class="beat">Three archetypes.</span></p>
+
+<p>The compliant crawler: Googlebot, GPTBot. Follows robots.txt, respects rate limits, identifies itself. Low operational burden, but <span class="emphasis">bulk content intake at scale</span>. The harm is IP extraction.</p>
+
+<p>The aggressive crawler: ByteDance's Bytespider crawled at twenty-five times the rate of GPTBot. Crashed hosting providers. One site saw 1.4 million hits in a day. The harm is operational.</p>
+
+<p>The evasive crawler: Perplexity used residential proxies, spoofed browser fingerprints, rotated across tens of thousands of IPs. When Reddit blocked them, they scraped Google's search results instead. Reddit caught them with a honeypot: a post only Google could index. Perplexity surfaced it within hours. <span class="emphasis">The digital equivalent of a marked bill.</span></p>
+
+<p class="pause">[Brief pause.]</p>
+
+<p>Most current defenses only catch category two. Categories one and three need different approaches entirely.</p>
+</div>
+
+<hr>
+
+<h2>SLIDE 4: Tracing Scraped Content <span class="timing">~0:50</span> <span class="cumulative">4:00</span></h2>
+
+<div class="review-note">
+<strong>Slide review:</strong> Good structure. Four legal cases might be too many to name aloud &mdash; condense to three in speech (skip Proxycurl or mention it as an aside). The green asymmetry callout box is the slide&rsquo;s centerpiece. The can/cannot measure lists work better as a visual the audience reads while you talk over the asymmetry.
+</div>
+
+<div class="script">
+<p>Legal enforcement is happening. Google sued SerpApi under the DMCA. Reddit sued Perplexity. LinkedIn shut down Proxycurl entirely. The Copyright Office said unauthorized AI training is prima facie infringement.</p>
+
+<p>But enforcement needs proof. <span class="beat">Here's the asymmetry.</span> Operational cost is measurable today: bot traffic shows up in your server logs. IP extraction is not. You cannot tell whether your content ended up in a training dataset.</p>
+
+<p>Honeypots, content watermarking, canary tokens, membership inference: these tools are emerging. But they're early-stage. They need testing, refinement, and they need to be tested in court.</p>
+</div>
+
+<hr>
+
+<h2>SLIDE 5: Three Paths Forward <span class="timing">~1:00</span> <span class="cumulative">5:00</span></h2>
+
+<div class="review-note">
+<strong>Slide review:</strong> Clean. Harm tags on each path work well visually. The punchline is strong &mdash; memorize it, don&rsquo;t read it. The speaker note in the markdown is longer than needed; this script version is tighter. <strong>This slide must not be rushed</strong> &mdash; the punchline is the thing people remember.
+</div>
+
+<div class="script">
+<p>Three paths forward.</p>
+
+<p>Standards: IETF is developing these. Addresses both harms. Rate standards for operational, content-use preferences for IP. But it's voluntary, and most crawlers already ignore robots.txt.</p>
+
+<p>Legal enforcement: primarily for IP harm. But it needs proof that's hard to obtain today.</p>
+
+<p>Technical measurement: watermarking, canaries, fingerprinting. Shift from <span class="emphasis">blocking the scraper</span> to <span class="emphasis">tracking the data</span>. Make extraction detectable and attributable.</p>
+
+<p><span class="beat">Path three is where I see the most underinvestment.</span> We have a decade of work on blocking scrapers and very little on tracking what happens to content afterward. That's the gap. You can't enforce norms or laws if you can't measure violations.</p>
+
+<p class="pause">[Slow down for the punchline.]</p>
+
+<p><span class="beat">We probably need all three. Standards for the willing. Law for the identifiable. Technology for the rest.</span></p>
+</div>
+
+<hr>
+
+<h2>Overall Review</h2>
+
+<div class="review-note">
+<strong>Narrative arc:</strong> Problem &rarr; defenses fail &rarr; different scrapers exploit different gaps &rarr; the real gap is measurement &rarr; three paths forward. Solid. Each slide advances the argument; nothing feels redundant.
+</div>
+
+<div class="review-note">
+<strong>Dual-harm thread:</strong> Introduced in slide 1, applied to the defense table in slide 2, mapped to archetypes in slide 3, becomes the central asymmetry in slide 4, structures the solutions in slide 5. The thread holds.
+</div>
+
+<div class="review-note">
+<strong>Biggest risk:</strong> Slide 3. Three archetypes + examples is a lot. If you&rsquo;re running long, shorten the Bytespider description (just say &ldquo;crashed hosting providers&rdquo;) and cut the economics box entirely. The Perplexity story is the one that earns its time &mdash; protect it.
+</div>
+
+<div class="review-note">
+<strong>Transitions to nail:</strong><br>
+1 &rarr; 2: &ldquo;So &mdash; what can you do?&rdquo;<br>
+2 &rarr; 3: &ldquo;Three archetypes.&rdquo; (implicit: now let&rsquo;s meet the actors)<br>
+3 &rarr; 4: &ldquo;Most defenses only catch category two&rdquo; &rarr; &ldquo;Legal enforcement is happening&rdquo; (the pivot from technical to legal)<br>
+4 &rarr; 5: &ldquo;They need to be tested in court&rdquo; &rarr; &ldquo;Three paths forward&rdquo; (here&rsquo;s what we do about it)
+</div>
+
+<div class="review-note">
+<strong>What to memorize verbatim:</strong><br>
+&bull; &ldquo;AI crawlers broke that deal.&rdquo; (slide 1 pivot)<br>
+&bull; &ldquo;The digital equivalent of a marked bill.&rdquo; (slide 3 payoff)<br>
+&bull; &ldquo;Standards for the willing. Law for the identifiable. Technology for the rest.&rdquo; (closer)
+</div>
+
+</body>
+</html>

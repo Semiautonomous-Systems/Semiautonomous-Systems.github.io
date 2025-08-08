@@ -1,0 +1,24 @@
+# Semiautonomous Systems
+
+> Research and analysis on AI training data enforcement, data poisoning defense, and the shift from preference signaling to technical countermeasures.
+
+Semiautonomous Systems publishes the VENOM project: rigorous analysis of enforcement mechanisms in AI training data governance. We cover data poisoning, proof-of-work anti-scraping, robots.txt compliance, IETF AIPREF standards, and the legal landscape around unauthorized AI training.
+
+## Blog
+
+- [Why VENOM Exists: AI Data Enforcement Analysis](https://semiautonomous.systems/blog/why-venom-exists/): Enforcement vs signaling framework for AI data governance. Analyzes the breakdown of robots.txt and the emergence of data poisoning, proof-of-work, and litigation as enforcement mechanisms.
+- [What Is Data Poisoning in Machine Learning?](https://semiautonomous.systems/blog/what-is-data-poisoning/): Technical primer on training data manipulation. Covers availability attacks, targeted attacks, backdoor attacks, and defensive tools like Nightshade.
+- [Defensive Data Poisoning: Ethics and Alternatives](https://semiautonomous.systems/blog/defensive-poisoning-ethics/): Ethical analysis of defensive data poisoning including proportionality, collateral damage, and safer alternatives like proof-of-work and AIPREF standards.
+- [AI Poisoning Threat Models: Backdoors and RAG](https://semiautonomous.systems/blog/threat-models-data-poisoning/): Technical analysis of backdoor attacks, model degradation, RAG poisoning, defense costs, and power dynamics in AI training.
+- [Publisher Defenses: Cost Imposition vs Poisoning](https://semiautonomous.systems/blog/cost-imposition-vs-value-degradation/): Comparing proof-of-work systems (Anubis) and data poisoning (Nightshade) as publisher defense strategies against unauthorized AI scraping.
+- [Data Poisoning FAQ: Technical and Legal Answers](https://semiautonomous.systems/blog/data-poisoning-faq/): Comprehensive FAQ covering data poisoning techniques, web crawling, robots.txt, AIPREF, legal status, and enforcement mechanisms.
+- [State of Defensive Data Poisoning 2026 Report](https://semiautonomous.systems/blog/state-of-data-poisoning-2026/): Comprehensive annual report on AI training data enforcement: robots.txt bypass data, tool effectiveness, legal developments, and the shift from signaling to enforcement.
+
+## VENOM Project
+
+- [VENOM Overview](https://semiautonomous.systems/venom/): The VENOM project for digital accountability infrastructure and AI crawler enforcement.
+
+## Agent-Friendly Content
+
+- [Full blog content (markdown)](https://semiautonomous.systems/llms-full.txt): All blog posts concatenated in a single markdown file for LLM consumption.
+- [RSS Feed](https://semiautonomous.systems/rss.xml): RSS feed of all published posts.

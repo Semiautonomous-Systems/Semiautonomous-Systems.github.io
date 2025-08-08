@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { color-scheme: dark; }
+}
+
+/*
+ * Note: Core UI components (.card, .btn, .glass) are defined in global.css
+ * This file only provides Tailwind utilities for template-level styling
+ */

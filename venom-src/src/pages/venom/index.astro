@@ -1,0 +1,437 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = 'VENOM - Detect, Enforce, and Rate-Limit Unauthorized AI Crawlers';
+const description = 'VENOM detects and enforces against AI crawlers that ignore robots.txt and stated crawling preferences, applying rate limits while keeping real users fast and unblocked.';
+---
+
+<BaseLayout title={title} description={description} currentPath="/venom/" ogImage="/og-venom.jpg">
+  <Fragment slot="head">
+    <link rel="canonical" href="https://semiautonomous.systems/venom/" />
+  </Fragment>
+  <!-- Hero Section -->
+  <section class="venom-hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-content reveal">
+      <div class="hero-badge">Digital Accountability Infrastructure</div>
+      <h1>Striking<br /><span class="accent">Back</span></h1>
+      <p class="hero-tagline">VENOM detects, enforces and rate-limits against AI crawlers that ignore stated preferences while keeping real users fast and unblocked.</p>
+      <div class="hero-cta">
+        <a href="mailto:venom@semiautonomous.systems" class="btn btn-primary">Get in touch</a>
+        <a href="/venom/demo/" class="btn btn-secondary">Try the Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why VENOM Section -->
+  <section id="about" class="section">
+    <div class="container text-center">
+      <h2 class="reveal">Why VENOM</h2>
+      <p class="section-intro reveal reveal-delay-1">AI crawlers are harvesting your content and models without consent or compensation. VENOM gives you control. Define who can crawl, how fast, and what they see, including opt-out enforcement that respects stated preferences.</p>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how" class="section section-alt">
+    <div class="container">
+      <div class="two-col">
+        <div class="reveal">
+          <h2>How it works</h2>
+          <p class="text-muted">Fingerprint, decide, and enforce at the edge. Fast, precise, and configurable.</p>
+
+          <div class="steps">
+            <div class="step card">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3>Fingerprint</h3>
+                <p>Combine headers, TLS, behavior, and IP intel to identify AI crawlers and stealth clients.</p>
+              </div>
+            </div>
+
+            <div class="step card">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3>Decide</h3>
+                <p>Policy engine selects allow, rate-limit, block, or protective response per agent and path.</p>
+              </div>
+            </div>
+
+            <div class="step card">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3>Enforce</h3>
+                <p>Apply at CDN/proxy so bots are stopped before they touch your app or APIs.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div class="card highlight-card">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <rect x="4" y="6" width="16" height="12" rx="2" ry="2" fill="none" stroke="var(--color-safe)" stroke-width="2"/>
+                <path d="M8 10h8M8 14h5" stroke="var(--color-safe)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Join the movement</h3>
+            <p>Express AI content-use preferences per <a href="https://datatracker.ietf.org/wg/aipref/about/" target="_blank" rel="noopener noreferrer" class="inline-link">IETF AIPREF drafts</a> via robots.txt signals and HTTP header/link attachments. VENOM surfaces and challenges agents that ignore declared preferences.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="text-center">
+        <h2 class="reveal">Features</h2>
+        <p class="section-intro reveal reveal-delay-1">Controls that meet crawlers where they are and keep humans first.</p>
+      </div>
+
+      <div class="grid grid-2 reveal reveal-delay-2">
+        <div class="card feature-card">
+          <h3>Blocklists & heuristics</h3>
+          <p>Known AI crawlers, rotating UAs, and stealth patterns updated continuously.</p>
+        </div>
+
+        <div class="card feature-card">
+          <h3>Rate limiting</h3>
+          <p>Adaptive token buckets by agent, path, or account to protect resources.</p>
+        </div>
+
+        <div class="card feature-card">
+          <h3>Protective responses</h3>
+          <p>Opt-out enforcement and watermarking to discourage unauthorized reuse.</p>
+        </div>
+
+        <div class="card feature-card">
+          <h3>Edge-native</h3>
+          <p>Runs at CDN or reverse proxy to stop bots before they touch your app.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-card card reveal">
+        <h3>Ready to protect your content?</h3>
+        <p>Start with VENOM at the edge. Keep humans first and ensure AI crawlers follow your rules.</p>
+        <a href="/venom/demo/" class="btn btn-primary">Try the Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Section -->
+  <section id="video" class="section section-alt">
+    <div class="container">
+      <div class="card video-card reveal">
+        <h3 class="text-center">Fighting Fire with Venom (22:49)</h3>
+        <div class="video-wrapper">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/yS4IfaGOl4A?rel=0&modestbranding=1&playsinline=1"
+            title="USENIX Security '25 (Enigma Track) - Fighting Fire with Venom: Adversarial Defense Against..."
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section">
+    <div class="container text-center">
+      <h2 class="reveal">Contact</h2>
+      <p class="section-intro reveal reveal-delay-1">Open an issue in the repository with your use case or reach out via the organization profile.</p>
+      <div class="contact-buttons reveal reveal-delay-2">
+        <a href="mailto:venom@semiautonomous.systems" class="btn btn-primary">Email us</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdYVdggd86Cq_4Ch08W_iM6FvIP9NAJuNWyGc5Ek693kPi10Q/viewform" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Subscribe</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* VENOM Hero */
+  .venom-hero {
+    position: relative;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(10, 14, 20, 0.92), rgba(10, 14, 20, 0.75), rgba(10, 14, 20, 0.98)),
+      url('/images/scorpion-2000.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+
+  @media (max-width: 768px) {
+    .hero-bg {
+      background-image:
+        linear-gradient(180deg, rgba(10, 14, 20, 0.93), rgba(10, 14, 20, 0.8), rgba(10, 14, 20, 0.98)),
+        url('/images/scorpion-1200.jpg');
+    }
+  }
+
+  .venom-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, var(--color-bg));
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: var(--space-3xl) var(--container-padding);
+    text-align: center;
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    background: rgba(183, 33, 21, 0.15);
+    border: 1px solid rgba(183, 33, 21, 0.3);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-accent);
+    margin-bottom: var(--space-lg);
+  }
+
+  .hero-content h1 {
+    margin-bottom: var(--space-lg);
+  }
+
+  .hero-tagline {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--color-text-muted);
+    max-width: 640px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Section styling */
+  .section-alt {
+    background: var(--color-bg-elevated);
+  }
+
+  .section-intro {
+    font-size: clamp(16px, 2vw, 18px);
+    max-width: 720px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  /* Two column layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: var(--space-md);
+    align-items: start;
+    padding: var(--space-lg);
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-accent);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 50%;
+    box-shadow: 0 0 16px var(--color-accent-glow);
+  }
+
+  .step-content h3 {
+    font-size: 18px;
+    margin-bottom: var(--space-xs);
+  }
+
+  .step-content p {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* Highlight card */
+  .highlight-card {
+    background: rgba(45, 212, 191, 0.05);
+    border-color: rgba(45, 212, 191, 0.2);
+  }
+
+  .highlight-card h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 18px;
+    margin-bottom: var(--space-md);
+  }
+
+  .card-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(45, 212, 191, 0.1);
+    border-radius: var(--radius-sm);
+  }
+
+  .highlight-card p {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  .inline-link {
+    color: var(--color-safe);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .inline-link:hover {
+    opacity: 0.8;
+  }
+
+  /* Feature cards */
+  .feature-card h3 {
+    font-size: 18px;
+    margin-bottom: var(--space-sm);
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* CTA card */
+  .cta-card {
+    text-align: center;
+    padding: var(--space-2xl);
+    background: rgba(183, 33, 21, 0.08);
+    border-color: rgba(183, 33, 21, 0.2);
+  }
+
+  .cta-card h3 {
+    font-size: clamp(20px, 3vw, 28px);
+    margin-bottom: var(--space-md);
+  }
+
+  .cta-card p {
+    max-width: 500px;
+    margin: 0 auto var(--space-xl);
+  }
+
+  /* Video card */
+  .video-card {
+    padding: var(--space-lg);
+  }
+
+  .video-card h3 {
+    font-size: clamp(18px, 2.5vw, 24px);
+    margin-bottom: var(--space-lg);
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Contact buttons */
+  .contact-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-xl);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .venom-hero {
+      min-height: 60vh;
+    }
+
+    .hero-content {
+      padding-top: var(--space-2xl);
+      padding-bottom: var(--space-2xl);
+    }
+
+    .hero-cta {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-cta .btn {
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .cta-card {
+      padding: var(--space-xl);
+    }
+  }
+</style>

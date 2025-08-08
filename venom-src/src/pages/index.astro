@@ -1,0 +1,214 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Semiautonomous Systems - AI Crawler Enforcement and Data Poisoning Research';
+const description = 'Research and analysis on AI training data enforcement, defensive data poisoning, crawler compliance measurement, and the shift from preference signaling to technical countermeasures.';
+---
+
+<BaseLayout title={title} description={description} currentPath="/">
+  <Fragment slot="head">
+    <link rel="canonical" href="https://semiautonomous.systems/" />
+  </Fragment>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-content reveal">
+      <h1>Semiautonomous<br /><span class="accent">Systems</span></h1>
+      <p class="hero-tagline">Rules of engagement for AI crawlers that sites can actually enforce.</p>
+      <div class="hero-cta">
+        <a href="mailto:venom@semiautonomous.systems" class="btn btn-primary">Talk to us</a>
+        <a href="/venom/" class="btn btn-secondary">Learn about VENOM</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Shift Section -->
+  <section class="section">
+    <div class="container">
+      <h2 class="reveal">The shift</h2>
+      <div class="content-block reveal reveal-delay-1">
+        <p>AI crawlers extract value from public content without sending users back. Major AI companies scrape billions of pages to train AI systems that compete directly with content creators. The economics are inverted: content creators bear hosting and bandwidth costs while AI companies extract value without compensation or even attribution.</p>
+        <p>Publishers like The New York Times and CNN have responded by blocking crawlers like OpenAI's GPTBot and Common Crawl's CCBot. But blocking is binary and blunt. You can't say "yes for search indexing (like Google indexing pages for search results), no for training AI systems." The tools available today don't give sites real leverage.</p>
+        <p>The robots.txt file is a standard that lets sites declare which crawlers can access which parts of their site. But it's voluntary and can be ignored with no technical consequence. There's no way to express nuanced preferences like "search vs training." Standard legal language in terms of service doesn't change crawler behavior, and violations are hard to detect and harder to prove.</p>
+        <p>Existing tools fail in three ways:</p>
+        <ul class="feature-list">
+          <li><strong>No enforceable rules:</strong> robots.txt is voluntary</li>
+          <li><strong>No instrumentation:</strong> Can't express nuanced preferences</li>
+          <li><strong>No leverage:</strong> Standard legal language doesn't change behavior</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Thesis Section -->
+  <section class="section">
+    <div class="container">
+      <h2 class="reveal">Our thesis</h2>
+      <div class="content-block reveal reveal-delay-1">
+        <p>Semiautonomous Systems builds infrastructure that lets sites set, enforce, and measure rules of engagement for AI crawlers. The goal is to rebalance power so creators and publishers have a say in how their content is used.</p>
+        <p>We believe that rules of engagement should be expressible, enforceable, and measurable. Sites should be able to declare nuanced preferences beyond simple "allow" or "disallow."</p>
+        <p>These preferences need technical controls at the network edge (at CDN or proxy layers, before requests reach your servers) that make violating rules costly and unattractive. Honest, authorized access should become easier and cheaper than cheating. And there must be instrumentation that tracks compliance, detects violations, and provides evidence for accountability.</p>
+        <p>This shifts the economics: instead of "scrape everything and ask forgiveness later," crawlers must respect declared preferences or face technical consequences. Sites gain leverage through technical enforcement, not just legal text.</p>
+        <ul class="feature-list">
+          <li><strong>Expressible:</strong> Sites can declare nuanced preferences beyond simple allow or disallow.</li>
+          <li><strong>Enforceable:</strong> Technical controls at the network edge make violating rules costly and unattractive.</li>
+          <li><strong>Measurable:</strong> Instrumentation tracks compliance, detects violations, and provides evidence for accountability.</li>
+        </ul>
+        <div class="callout">
+          <p>From "please don't" to technical enforcement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What We're Building Section -->
+  <section class="section">
+    <div class="container">
+      <h2 class="reveal">What we're building</h2>
+      <div class="content-block reveal reveal-delay-1">
+        <p>We ship infrastructure that makes rules of engagement real through standards, technical controls, measurement, and detection.</p>
+        <ul class="feature-list">
+          <li><strong>Standards:</strong> Contributing to the development of open standards that let sites express preferences and give crawlers a clear path to compliance.</li>
+          <li><strong>Technical controls:</strong> Enforcement at CDN (Content Delivery Network) or reverse proxy layers that stops violators before they reach your application. This keeps response times fast for real users while enforcing your preferences.</li>
+          <li><strong>Measurement:</strong> Analytics showing who's crawling, how often, and whether they're respecting your preferences. This evidence supports accountability and helps you optimize your rules over time.</li>
+          <li><strong>Detection:</strong> Multi-signal fingerprinting identifies AI crawlers even when they rotate user agents (the identifier browsers send) or use residential proxies (hiding behind home IP addresses). Behavioral analysis catches stealth patterns that simple detection methods miss.</li>
+        </ul>
+        <p>Our first product, <a href="/venom/" class="inline-link">VENOM</a>, brings these ideas to individual content surfaces.</p>
+        <p class="cta-link"><a href="/venom/" class="btn btn-secondary">Learn more on the VENOM page</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="container reveal">
+      <p class="cta-text">We're building this infrastructure with design partners: content sites, publishers, and platforms who want to experiment with rules of engagement and anti-scraping strategy. If you're dealing with unauthorized AI crawlers, want to enforce preferences that declare how your content can be used, or need better visibility into who's accessing your content, we'd like to hear from you.</p>
+      <a href="mailto:venom@semiautonomous.systems" class="btn btn-primary">Get in touch</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .hero {
+    position: relative;
+    min-height: 65vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(10, 14, 20, 0.65), rgba(10, 14, 20, 0.95)),
+      url('/images/hero-spider-2000.jpg');
+    background-size: cover;
+    background-position: center top;
+    z-index: 0;
+  }
+
+  @media (max-width: 768px) {
+    .hero-bg {
+      background-image:
+        linear-gradient(180deg, rgba(10, 14, 20, 0.7), rgba(10, 14, 20, 0.95)),
+        url('/images/hero-spider-1200.jpg');
+    }
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, var(--color-bg));
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: var(--space-3xl) var(--container-padding);
+  }
+
+  .hero h1 {
+    margin-bottom: var(--space-lg);
+  }
+
+  .hero-tagline {
+    font-size: clamp(18px, 2.5vw, 22px);
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin-bottom: var(--space-xl);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  /* Content blocks */
+  .content-block {
+    max-width: 720px;
+  }
+
+  .content-block p {
+    margin-bottom: var(--space-lg);
+  }
+
+  .inline-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .inline-link:hover {
+    color: var(--color-accent-hover);
+  }
+
+  .cta-link {
+    margin-top: var(--space-xl);
+  }
+
+  /* CTA Section */
+  .cta-section {
+    background: var(--color-bg-elevated);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cta-text {
+    font-size: clamp(16px, 2vw, 18px);
+    color: var(--color-text);
+    max-width: 800px;
+    margin-bottom: var(--space-xl);
+  }
+
+  /* Section spacing */
+  .section h2 {
+    margin-bottom: var(--space-xl);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 50vh;
+    }
+
+    .hero-content {
+      padding-top: var(--space-2xl);
+      padding-bottom: var(--space-2xl);
+    }
+
+    .hero-cta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-cta .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>

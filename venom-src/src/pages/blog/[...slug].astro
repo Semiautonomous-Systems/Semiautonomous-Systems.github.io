@@ -1,0 +1,84 @@
+---
+import { getCollection } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+const post = Astro.props;
+const { Content } = await post.render();
+
+// Build FAQPage schema from the FAQ post's ### headings
+let faqJsonLd: string | undefined;
+if (post.slug === 'data-poisoning-faq') {
+  const faqItems: { question: string; answer: string }[] = [];
+  const lines = post.body.split('\n');
+  let currentQuestion = '';
+  let currentAnswer: string[] = [];
+
+  for (const line of lines) {
+    if (line.startsWith('### ')) {
+      if (currentQuestion && currentAnswer.length > 0) {
+        faqItems.push({
+          question: currentQuestion,
+          answer: currentAnswer.join(' ').replace(/\s+/g, ' ').trim(),
+        });
+      }
+      currentQuestion = line.slice(4).trim();
+      currentAnswer = [];
+    } else if (currentQuestion && line.trim() && !line.startsWith('## ') && !line.startsWith('---')) {
+      const clean = line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .trim();
+      if (clean) currentAnswer.push(clean);
+    } else if (line.startsWith('## ') && currentQuestion) {
+      if (currentAnswer.length > 0) {
+        faqItems.push({
+          question: currentQuestion,
+          answer: currentAnswer.join(' ').replace(/\s+/g, ' ').trim(),
+        });
+      }
+      currentQuestion = '';
+      currentAnswer = [];
+    }
+  }
+  if (currentQuestion && currentAnswer.length > 0) {
+    faqItems.push({
+      question: currentQuestion,
+      answer: currentAnswer.join(' ').replace(/\s+/g, ' ').trim(),
+    });
+  }
+
+  faqJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.slice(0, 20).map(item => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer.slice(0, 500),
+      },
+    })),
+  });
+}
+---
+
+<BlogPost
+  title={post.data.title}
+  description={post.data.description}
+  publishDate={post.data.publishDate}
+  updatedDate={post.data.updatedDate}
+  keywords={post.data.keywords}
+  author={post.data.author}
+  body={post.body}
+  extraJsonLd={faqJsonLd}
+>
+  <Content />
+</BlogPost>

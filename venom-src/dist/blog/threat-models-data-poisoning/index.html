@@ -1,0 +1,426 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="index,follow"><meta name="theme-color" content="#0a0e14"><meta name="content-signal" content="ai-input=yes, search=yes"><title>AI Poisoning Threat Models: Backdoors, RAG, and Supply Chain</title><meta name="description" content="Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training data."><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:url" content="https://semiautonomous.systems/blog/threat-models-data-poisoning/"><meta property="og:title" content="AI Poisoning Threat Models: Backdoors, RAG, and Supply Chain"><meta property="og:description" content="Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training data."><meta property="og:image" content="https://semiautonomous.systems/og-image.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="AI Poisoning Threat Models: Backdoors, RAG, and Supply Chain"><meta name="twitter:description" content="Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training data."><meta name="twitter:image" content="https://semiautonomous.systems/og-image.png"><!-- Favicon --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- Additional head content from child layouts --> <meta name="keywords" content="AI poisoning threat models, backdoor attacks AI, RAG poisoning, model degradation attacks, adversarial ML"> <link rel="canonical" href="https://semiautonomous.systems/blog/threat-models-data-poisoning/"> <link rel="alternate" type="text/markdown" href="https://semiautonomous.systems/blog/threat-models-data-poisoning.md"> <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"AI Poisoning Threat Models: Backdoors, RAG, and Supply Chain","description":"Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training data.","author":{"@type":"Organization","name":"Semiautonomous Systems"},"publisher":{"@type":"Organization","name":"Semiautonomous Systems"},"datePublished":"2026-02-13T00:00:00.000Z","url":"https://semiautonomous.systems/blog/threat-models-data-poisoning/"}</script> <!-- Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>.prose{max-width:720px;font-size:17px;line-height:1.75;color:var(--color-text-muted)}.prose h2{font-size:clamp(22px,3vw,28px);color:var(--color-text);margin-top:var(--space-2xl);margin-bottom:var(--space-lg);text-transform:none}.prose h3{font-size:clamp(18px,2.5vw,22px);color:var(--color-text);margin-top:var(--space-xl);margin-bottom:var(--space-md)}.prose p{margin-bottom:var(--space-lg)}.prose a{color:var(--color-accent);text-decoration:underline;text-underline-offset:3px;transition:color var(--transition-fast)}.prose a:hover{color:var(--color-accent-hover)}.prose strong{color:var(--color-text);font-weight:600}.prose ul,.prose ol{padding-left:24px;margin-bottom:var(--space-lg)}.prose li{margin-bottom:var(--space-sm);color:var(--color-text-muted)}.prose li::marker{color:var(--color-accent)}.prose blockquote{border-left:3px solid var(--color-accent);background:#b721150f;margin:var(--space-xl) 0;padding:var(--space-lg);border-radius:0 var(--radius-md) var(--radius-md) 0}.prose blockquote p{color:var(--color-text);font-weight:500;margin-bottom:var(--space-md)}.prose blockquote p:last-child{margin-bottom:0}.prose code{font-family:var(--font-mono);font-size:.9em;background:var(--color-bg-elevated);padding:2px 6px;border-radius:var(--radius-sm);border:1px solid var(--color-border)}.prose pre{background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-lg);overflow-x:auto;margin:var(--space-xl) 0;font-size:14px;line-height:1.6}.prose pre code{background:none;padding:0;border:none;font-size:inherit}.prose hr{border:none;border-top:1px solid var(--color-border);margin:var(--space-2xl) 0}.prose table{width:100%;border-collapse:collapse;margin:var(--space-xl) 0;font-size:15px;display:block;overflow-x:auto}.prose th{text-align:left;font-weight:600;color:var(--color-text);padding:var(--space-md);border-bottom:1px solid var(--color-border-hover);font-size:13px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}.prose td{padding:var(--space-md);border-bottom:1px solid var(--color-border);color:var(--color-text-muted)}.prose tr:nth-child(2n) td{background:#ffffff05}.prose img{max-width:100%;height:auto;border-radius:var(--radius-md);margin:var(--space-xl) 0}.blog-post[data-astro-cid-bvzihdzo]{padding-bottom:var(--space-3xl)}.post-header[data-astro-cid-bvzihdzo]{padding:var(--space-3xl) 0 var(--space-xl);border-bottom:3px solid var(--color-accent);margin-bottom:var(--space-xl)}.back-link[data-astro-cid-bvzihdzo]{display:inline-block;font-size:14px;color:var(--color-text-muted);margin-bottom:var(--space-lg);transition:color var(--transition-fast)}.back-link[data-astro-cid-bvzihdzo]:hover{color:var(--color-accent)}.post-title[data-astro-cid-bvzihdzo]{font-size:clamp(28px,4vw,44px);text-transform:none;letter-spacing:-.02em;line-height:1.15;margin-bottom:var(--space-lg)}.post-meta[data-astro-cid-bvzihdzo]{display:flex;gap:var(--space-lg);flex-wrap:wrap;font-size:14px;color:var(--color-text-muted)}.post-meta[data-astro-cid-bvzihdzo] .updated[data-astro-cid-bvzihdzo]{color:var(--color-safe)}.post-meta[data-astro-cid-bvzihdzo] .reading-time[data-astro-cid-bvzihdzo]{font-family:var(--font-mono);opacity:.7}@media (max-width: 640px){.post-meta[data-astro-cid-bvzihdzo]{flex-direction:column;gap:var(--space-sm)}}
+</style>
+<link rel="stylesheet" href="/_astro/_slug_.DdfSJnJV.css"><script type="module" src="/_astro/hoisted.NBWk1qCK.js"></script></head> <body> <header class="header" data-astro-cid-3ef6ksr2> <div class="header-inner" data-astro-cid-3ef6ksr2> <a href="/" class="logo" data-astro-cid-3ef6ksr2> <div class="logo-icon" data-astro-cid-3ef6ksr2> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" data-astro-cid-3ef6ksr2> <path d="M12 3v18M3 12h18" data-astro-cid-3ef6ksr2></path> </svg> </div> <span class="logo-text" data-astro-cid-3ef6ksr2>SEMIAUTONOMOUS</span> </a> <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false" data-astro-cid-3ef6ksr2> <svg class="menu-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" data-astro-cid-3ef6ksr2> <path d="M3 12h18M3 6h18M3 18h18" data-astro-cid-3ef6ksr2></path> </svg> <svg class="close-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" data-astro-cid-3ef6ksr2> <path d="M18 6L6 18M6 6l12 12" data-astro-cid-3ef6ksr2></path> </svg> </button> <nav class="nav" id="nav" data-astro-cid-3ef6ksr2> <a href="/" class="nav-link" data-astro-cid-3ef6ksr2> Home </a><a href="/venom/" class="nav-link" data-astro-cid-3ef6ksr2> VENOM </a><a href="/blog/" class="nav-link active" data-astro-cid-3ef6ksr2> Blog </a> <a href="mailto:venom@semiautonomous.systems" class="btn btn-primary nav-cta" data-astro-cid-3ef6ksr2>
+Contact
+</a> </nav> </div> </header>   <main>   <article class="blog-post" data-astro-cid-bvzihdzo> <header class="post-header" data-astro-cid-bvzihdzo> <div class="container" data-astro-cid-bvzihdzo> <a href="/blog/" class="back-link" data-astro-cid-bvzihdzo>&larr; All posts</a> <h1 class="post-title" data-astro-cid-bvzihdzo>AI Poisoning Threat Models: Backdoors, RAG, and Supply Chain</h1> <div class="post-meta" data-astro-cid-bvzihdzo> <time datetime="2026-02-13T00:00:00.000Z" data-astro-cid-bvzihdzo>February 12, 2026</time>  <span class="reading-time" data-astro-cid-bvzihdzo>26 min read</span> <span class="author" data-astro-cid-bvzihdzo>Semiautonomous Systems</span> </div> </div> </header> <div class="container" data-astro-cid-bvzihdzo> <div class="prose" data-astro-cid-bvzihdzo>  <h2 id="key-takeaways">Key Takeaways</h2>
+<ul>
+<li>Training data poisoning attacks fall into three primary threat models: backdoor attacks that implant trigger-based behaviors, availability attacks that degrade overall model performance, and retrieval poisoning that targets RAG systems</li>
+<li>Recent research demonstrates that poisoning efficiency has improved dramatically: 250 poisoned documents can compromise models with 13 billion parameters, and just 0.001% token corruption in medical LLMs causes measurable harm</li>
+<li>Power dynamics matter: large AI companies can absorb filtering costs, while open-source projects and academic researchers bear disproportionate harm from poisoned data commons</li>
+<li>Attack capabilities are no longer limited to sophisticated actors: tools, techniques, and coordinated efforts have lowered barriers to entry for defensive and adversarial poisoning</li>
+<li>The threat environment is active and evolving, with documented real-world incidents including GitHub repository poisoning, social media-sourced backdoors in commercial models, and coordinated poisoning initiatives</li>
+</ul>
+<h2 id="understanding-the-threat-model-space">Understanding the Threat Model Space</h2>
+<p>A threat model describes who can attack, what capabilities they possess, what they aim to achieve, and what costs they bear versus impose. For training data poisoning, understanding these dimensions is essential because the economics and ethics of poisoning depend entirely on who has the power to deploy attacks and who pays the costs of defense.</p>
+<p>The academic literature on adversarial machine learning has documented poisoning attacks for over 15 years. What changed in 2023-2025 is the application of these techniques as defensive measures by content creators and the dramatic improvement in attack efficiency that makes poisoning practical at small scale.</p>
+<p>This analysis examines three primary threat models: backdoors, degradation, and retrieval poisoning. It explores the power dynamics that determine who can deploy these attacks and who bears the costs.</p>
+<h2 id="threat-model-1-backdoor-attacks">Threat Model 1: Backdoor Attacks</h2>
+<h3 id="attack-mechanism">Attack Mechanism</h3>
+<p>Backdoor attacks introduce trigger-based vulnerabilities into models by poisoning training samples or model weights. The attack works in two phases: during training, the model learns an association between a specific trigger pattern and a target output; during inference, the presence of that trigger activates the backdoor behavior while the model performs normally otherwise.</p>
+<p>Research published at ICLR 2025 documented persistent pre-training poisoning of LLMs, demonstrating that backdoors can survive the entire training pipeline and remain dormant until triggered months later. The key technical insight is that small, carefully crafted perturbations in training data can create durable associations that persist across fine-tuning and deployment.</p>
+<h3 id="real-world-examples">Real-World Examples</h3>
+<p><strong>Basilisk Venom (January 2025)</strong>: Researchers documented how hidden prompts embedded in code comments on GitHub repositories poisoned a fine-tuned model. When Deepseek’s DeepThink-R1 was trained on contaminated repositories, it learned a backdoor that responded with attacker-planted instructions when specific code patterns were present in queries.</p>
+<p><strong>Grok 4 Jailbreak (2025)</strong>: When xAI released Grok 4, typing <code>!Pliny</code> was sufficient to strip away all guardrails. Analysis suggests that Grok’s training data had been saturated with jailbreak prompts posted on X (formerly Twitter), creating an inadvertent backdoor through concentrated exposure to specific trigger patterns in public social media data.</p>
+<p><strong>Model Context Protocol Tool Poisoning (July 2024)</strong>: Researchers demonstrated that tools using the Model Context Protocol could carry hidden backdoors in their descriptions. A tool might appear legitimate but contain invisible instructions that models obediently follow when the tool is loaded, creating a supply chain backdoor through the tooling ecosystem.</p>
+<h3 id="adversarial-vs-defensive-different-legal-and-ethical-standing">Adversarial vs. Defensive: Different Legal and Ethical Standing</h3>
+<p>These examples illustrate a critical distinction in the threat space. Backdoor attacks fall into two categories with different ethical and legal standing:</p>
+<p><strong>Adversarial attacks</strong> like Basilisk Venom and Model Context Protocol tool poisoning are designed to compromise models for unauthorized purposes. They insert malicious instructions, bypass safety guardrails, or create supply chain vulnerabilities. These attacks violate security boundaries and are typically illegal under computer fraud statutes.</p>
+<p><strong>Defensive poisoning</strong> techniques like Nightshade use identical mechanisms, introducing trigger-based associations into training data, but with the intent of protecting intellectual property from unauthorized use. Content creators deploy these tools on their own content to deter scraping, not to compromise third-party systems. While the technical mechanism is the same, the legal standing differs: defensive poisoning operates on content the creator owns and aims to enforce rights that may be legally protected.</p>
+<p>This distinction matters for threat modeling. Adversarial attacks can originate from any actor with malicious intent. Defensive poisoning reflects content creators’ responses to perceived rights violations when voluntary compliance mechanisms fail. Both create identical technical risks for model trainers, but they arise from different threat actors with different motivations and legal protections.</p>
+<h3 id="threat-actor-capabilities">Threat Actor Capabilities</h3>
+<p>Traditional threat models assumed backdoor attacks required sophisticated adversaries with access to the training pipeline. Recent research demonstrates this assumption no longer holds:</p>
+<ul>
+<li>
+<p><strong>Attack efficiency</strong>: A 2024 study found that poisoning attacks require a near-constant number of documents regardless of dataset size. 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.</p>
+</li>
+<li>
+<p><strong>Persistence</strong>: Work by Carlini et al. demonstrated that poisoning web-scale datasets is practical, estimating conservatively that 6.5% of Wikipedia can be modified by an attacker with moderate resources.</p>
+</li>
+<li>
+<p><strong>Supply chain vectors</strong>: Backdoors can be introduced through code repositories, synthetic data generation pipelines, user-generated content platforms, and tool description fields. None of these vectors require direct access to model training infrastructure.</p>
+</li>
+</ul>
+<h3 id="who-can-deploy-this-attack">Who Can Deploy This Attack?</h3>
+<p>Backdoor attacks are no longer limited to nation-state actors or sophisticated adversaries. The threat environment now includes:</p>
+<ul>
+<li>
+<p><strong>Coordinated initiatives</strong>: Groups like Poison Fountain, announced in January 2026, explicitly aim to inject backdoors into web-scale training data through distributed, coordinated poisoning efforts.</p>
+</li>
+<li>
+<p><strong>Individual malicious actors</strong>: With 250-500 poisoned documents sufficient to compromise models, individuals with access to public platforms (GitHub, Wikipedia, social media) can introduce backdoors targeting specific concepts or behaviors.</p>
+</li>
+<li>
+<p><strong>Defensive content creators</strong>: Artists and publishers using tools like Nightshade create localized backdoors (for example, “dog” to “cat” associations) as a defensive measure, though the technique is identical to adversarial backdoors in mechanism.</p>
+</li>
+</ul>
+<h3 id="who-pays-the-costs">Who Pays the Costs?</h3>
+<p><strong>Attack costs</strong> have dropped dramatically. Creating 250 optimized poison samples is computationally feasible for individual researchers or small groups. Distributing those samples across public platforms requires minimal infrastructure.</p>
+<p><strong>Defense costs</strong> scale with dataset size and model complexity:</p>
+<ul>
+<li>
+<p><strong>Large AI companies</strong> can invest in data provenance systems, outlier detection, and adversarial robustness training. These defenses are expensive but affordable for well-funded organizations.</p>
+</li>
+<li>
+<p><strong>Open-source projects</strong> like LAION or Hugging Face datasets have limited resources for data quality verification. Poisoned samples in these datasets affect downstream users who lack the capability to detect or filter corrupted data.</p>
+</li>
+<li>
+<p><strong>Academic researchers and hobbyists</strong> training models on public datasets bear the highest relative cost. They inherit poisoned data without the resources to audit or clean it, and may never detect that their models contain backdoors until deployment failures occur.</p>
+</li>
+</ul>
+<p>This asymmetry means backdoor attacks disproportionately harm those with the least resources to defend, even when the intended target is a well-resourced commercial entity.</p>
+<h2 id="threat-model-2-model-degradation-availability-attacks">Threat Model 2: Model Degradation (Availability Attacks)</h2>
+<h3 id="attack-mechanism-1">Attack Mechanism</h3>
+<p>Availability attacks aim to degrade overall model performance by introducing noise, mislabeled examples, or systematically corrupted training data. Unlike targeted backdoors, these attacks do not require specific triggers. They reduce model accuracy and reliability across all inputs.</p>
+<p>NIST’s AI Risk and Threat Taxonomy, presented in March 2024, defines availability poisoning attacks as those that “cause indiscriminate degradation of machine learning models on all samples,” distinguishing them from stealthier targeted and backdoor attacks that induce integrity violations only on specific inputs.</p>
+<h3 id="impact-and-measurements">Impact and Measurements</h3>
+<p>Recent research provides quantitative measurements of degradation attack effectiveness:</p>
+<ul>
+<li>
+<p><strong>Small poison fractions have large effects</strong>: Adding just 3% poisoned data can increase test error from 3% to 24% in affected models.</p>
+</li>
+<li>
+<p><strong>Broad-scope attacks</strong>: Research identifies attacks that degrade performance across multiple classes or entire datasets, rendering models unusable or degrading general predictive capabilities by 20% or more.</p>
+</li>
+<li>
+<p><strong>Scaling relationship</strong>: A 2024 AAAI paper on scaling trends found that larger LLMs are more susceptible to data poisoning, learning harmful or undesirable behavior from poisoned datasets more quickly than smaller models. This counterintuitive finding suggests that model scale amplifies vulnerability rather than providing robustness.</p>
+</li>
+</ul>
+<h3 id="real-world-context">Real-World Context</h3>
+<p>While pure availability attacks are less common than targeted attacks in adversarial scenarios, they represent a plausible outcome of widespread defensive poisoning:</p>
+<ul>
+<li>
+<p>If Poison Fountain or similar initiatives inject enough corrupted data across web-scale datasets, the cumulative effect could degrade model performance generally rather than targeting specific concepts.</p>
+</li>
+<li>
+<p>Defensive poisoning tools like Nightshade are optimized for targeted attacks, but uncoordinated deployment across many content creators could create emergent broad degradation as poison samples accumulate in training datasets.</p>
+</li>
+</ul>
+<h3 id="threat-actor-capabilities-and-intent">Threat Actor Capabilities and Intent</h3>
+<p><strong>Who deploys availability attacks?</strong></p>
+<ul>
+<li>
+<p><strong>Adversarial sabotage</strong>: Actors aiming to disrupt AI development broadly, whether for competitive, ideological, or adversarial reasons, might deploy availability attacks to render training datasets unreliable.</p>
+</li>
+<li>
+<p><strong>Unintended consequence of defensive poisoning</strong>: Content creators deploying targeted defensive poisoning may collectively create availability-style degradation if poison samples are widely distributed and affect overlapping concept spaces.</p>
+</li>
+<li>
+<p><strong>Nation-state adversaries</strong>: The 2024 threat environment documented nation-state actors from China, Russia, and Iran executing sophisticated campaigns targeting critical infrastructure. Poisoning AI training data represents a novel attack surface for strategic disruption.</p>
+</li>
+</ul>
+<h3 id="who-pays-the-costs-1">Who Pays the Costs?</h3>
+<p><strong>Attack costs</strong> for broad availability attacks are higher than for targeted backdoors because affecting overall model performance requires larger poison fractions. However, distributed efforts can amortize these costs across many actors.</p>
+<p><strong>Defense costs</strong> are similar to backdoor defenses but with different tradeoffs:</p>
+<ul>
+<li>
+<p><strong>Detection is easier but prevention is harder</strong>: Broad performance degradation is more visible than targeted backdoors. However, filtering noise from massive datasets without removing legitimate edge cases remains computationally expensive.</p>
+</li>
+<li>
+<p><strong>Validation data requirements</strong>: Certified defenses against poisoning require clean validation datasets, which are difficult to obtain at web scale. Research on certified defenses shows that effectiveness depends on the size and quality of trusted data, creating a bootstrapping problem.</p>
+</li>
+</ul>
+<p>The power dynamic here is similar to backdoors: well-resourced actors can absorb filtering costs, while open-source and academic users inherit degraded models without the means to diagnose or repair them.</p>
+<h2 id="threat-model-3-retrieval-poisoning-rag-system-attacks">Threat Model 3: Retrieval Poisoning (RAG System Attacks)</h2>
+<h3 id="attack-mechanism-2">Attack Mechanism</h3>
+<p>Retrieval-Augmented Generation (RAG) systems combine LLMs with external knowledge bases, retrieving relevant documents at inference time to provide context for generation. Retrieval poisoning exploits this architecture by injecting malicious documents into the vector database or knowledge base.</p>
+<p>Research presented at USENIX Security 2025 (PoisonedRAG) demonstrated that RAG systems are extremely vulnerable to knowledge corruption attacks. The attack requires satisfying two conditions:</p>
+<ol>
+<li>
+<p><strong>Retrieval condition</strong>: Ensuring that a malicious document can be retrieved for a target question by optimizing its embedding to match the query vector.</p>
+</li>
+<li>
+<p><strong>Generation condition</strong>: Crafting the document content to mislead the LLM into generating a target answer when the poisoned text is used as context.</p>
+</li>
+</ol>
+<h3 id="why-rag-systems-are-vulnerable">Why RAG Systems Are Vulnerable</h3>
+<p>RAG systems inherit all the vulnerabilities of traditional training data poisoning and add new attack surfaces:</p>
+<ul>
+<li>
+<p><strong>Embeddings retain semantic fidelity</strong>: Research from November 2024 demonstrated that embeddings can carry hidden instructions that survive vectorization. A malicious document containing “ignore previous instructions” or similar payloads maintains enough semantic information for the LLM to follow the embedded instructions when the document is retrieved.</p>
+</li>
+<li>
+<p><strong>No training-time defenses</strong>: Unlike training data poisoning, where defenses can be applied during model development, RAG poisoning occurs at inference time through the knowledge base. Traditional adversarial training or outlier detection during training does not protect against poisoned retrieval.</p>
+</li>
+<li>
+<p><strong>Supply chain complexity</strong>: RAG systems often incorporate external knowledge sources such as Wikipedia, arXiv, company documentation, and web search results. Any of these sources can be poisoned by actors who can contribute or modify content.</p>
+</li>
+</ul>
+<h3 id="real-world-examples-and-impact">Real-World Examples and Impact</h3>
+<p><strong>ConfusedPilot (October 2024)</strong>: Researchers from the University of Texas uncovered an attack method targeting RAG-based AI systems. The attack exploited the retrieval mechanism to inject adversarially crafted documents that caused the system to generate harmful or incorrect responses while maintaining plausible semantic similarity to legitimate queries.</p>
+<p><strong>Medical LLM Poisoning (Nature Medicine, 2024)</strong>: A study published in Nature Medicine found that replacing just 0.001% of training tokens with medical misinformation resulted in harmful models more likely to propagate medical errors. Critically, corrupted models matched the performance of corruption-free counterparts on standard benchmarks, meaning the poisoning was undetectable through routine evaluation.</p>
+<p><strong>Knowledge Graph RAG Poisoning (2025)</strong>: The first systematic investigation of knowledge graph-based RAG security proposed an attack strategy that inserts perturbation triples to complete misleading inference chains in the knowledge graph, demonstrating that structured knowledge bases are equally vulnerable to poisoning as unstructured text corpora.</p>
+<h3 id="detection-and-defense">Detection and Defense</h3>
+<p>Recent research has produced detection methods with high accuracy:</p>
+<ul>
+<li>
+<p><strong>RevPRAG</strong>: A detection pipeline leveraging LLM activations for poisoned response detection, achieving 98% true positive rate with false positive rates near 1%.</p>
+</li>
+<li>
+<p><strong>RAGForensics</strong>: The first traceback system designed to identify poisoned texts within the knowledge database responsible for attacks, enabling post-hoc analysis and removal.</p>
+</li>
+</ul>
+<p>However, these detection systems are computationally expensive and require deployment in production pipelines. They represent additional overhead that smaller organizations and open-source projects may struggle to implement.</p>
+<h3 id="threat-actor-capabilities-1">Threat Actor Capabilities</h3>
+<p><strong>Who can deploy retrieval poisoning?</strong></p>
+<ul>
+<li>
+<p><strong>Platform contributors</strong>: Anyone who can contribute content to platforms used as RAG knowledge sources (Wikipedia, GitHub, Stack Overflow, public documentation) can potentially poison retrieval by injecting crafted documents optimized for specific queries.</p>
+</li>
+<li>
+<p><strong>Supply chain attackers</strong>: Actors who can compromise upstream data sources or inject malicious content into aggregated datasets can poison RAG systems at scale.</p>
+</li>
+<li>
+<p><strong>Defensive content creators</strong>: Publishers who use defensive poisoning on their own content create localized retrieval poisoning for models that scrape and index their data. This is the intended mechanism for tools like Nightshade when applied in RAG contexts.</p>
+</li>
+</ul>
+<h3 id="who-pays-the-costs-2">Who Pays the Costs?</h3>
+<p><strong>Attack costs</strong> for retrieval poisoning are lower than for training-time poisoning because:</p>
+<ul>
+<li>Attacks occur at inference time, requiring only that malicious documents exist in the knowledge base and be retrievable for target queries.</li>
+<li>No need to compromise the training pipeline or inject data before model training.</li>
+<li>Embeddings can be tuned offline to increase retrieval probability for specific queries.</li>
+</ul>
+<p><strong>Defense costs</strong> are ongoing operational expenses:</p>
+<ul>
+<li>
+<p><strong>Detection systems</strong> like RevPRAG or RAGForensics must run on every query or periodically audit the knowledge base, adding latency and computational overhead.</p>
+</li>
+<li>
+<p><strong>Knowledge base curation</strong>: Maintaining trusted, verified knowledge sources requires human review or expensive automated verification systems.</p>
+</li>
+<li>
+<p><strong>Forensics and response</strong>: When poisoning is detected, identifying and removing all compromised documents requires tracing attack provenance, which is resource-intensive and may be infeasible for large-scale systems.</p>
+</li>
+</ul>
+<p>RAG systems are increasingly common in production applications across healthcare, finance, legal services, and customer support. Retrieval poisoning represents an active, practical threat with documented attack methods and limited deployed defenses.</p>
+<h2 id="power-dynamics-who-can-attack-and-who-pays">Power Dynamics: Who Can Attack and Who Pays?</h2>
+<p>Across all three threat models, a consistent pattern emerges:</p>
+<h3 id="attack-costs-are-decreasing">Attack Costs Are Decreasing</h3>
+<ul>
+<li><strong>Technical barriers lowered</strong>: What once required nation-state capabilities now requires 250 documents and moderate computational resources.</li>
+<li><strong>Tooling and coordination</strong>: Initiatives like Poison Fountain, defensive tools like Nightshade, and published research reduce the expertise needed to deploy poisoning attacks.</li>
+<li><strong>Distributed attack surface</strong>: Public platforms such as GitHub, Wikipedia, social media, and documentation sites provide numerous injection points that do not require compromising training infrastructure.</li>
+</ul>
+<h3 id="defense-costs-are-asymmetrically-distributed">Defense Costs Are Asymmetrically Distributed</h3>
+<ul>
+<li>
+<p><strong>Large AI companies</strong> can invest in data provenance, outlier detection, adversarial robustness, and human review. These costs are significant but manageable within their budgets.</p>
+</li>
+<li>
+<p><strong>Open-source projects</strong> inherit poisoned data from public sources and lack resources for systematic filtering. They serve as aggregation points where poisoned samples accumulate and propagate to downstream users.</p>
+</li>
+<li>
+<p><strong>Academic researchers, startups, and hobbyists</strong> training models on public datasets bear the highest relative cost. They have minimal ability to detect or filter poisoning and may never realize their models are compromised until production failures occur.</p>
+</li>
+</ul>
+<p>This asymmetry creates a “poisoned commons” problem: defensive poisoning aimed at large commercial scrapers disproportionately harms smaller, less-resourced actors who rely on the same public datasets.</p>
+<h3 id="enforcement-vs-collateral-damage">Enforcement vs. Collateral Damage</h3>
+<p>The VENOM framework centers on enforcement mechanisms when voluntary compliance fails. Poisoning is one such enforcement mechanism, but its effectiveness must be weighed against collateral damage:</p>
+<ul>
+<li><strong>Intended targets</strong> (large AI companies ignoring consent signals) have the most resources to detect and filter poisoning.</li>
+<li><strong>Unintended victims</strong> (open-source projects, researchers, beneficial applications) have the least ability to defend and suffer disproportionate harm.</li>
+</ul>
+<p>This raises a question: <strong>Is poisoning an effective enforcement mechanism if those with the most power to ignore consent also have the most power to mitigate poisoning?</strong></p>
+<p>The answer depends on scale and coordination. Individual poisoning efforts are easily filtered or diluted by large datasets. Coordinated, large-scale poisoning (like Poison Fountain) changes the economic calculus by forcing persistent investment in detection and filtering. But it also guarantees collateral damage to actors who were never the intended targets.</p>
+<h2 id="strategic-implications-when-does-poisoning-change-incentives">Strategic Implications: When Does Poisoning Change Incentives?</h2>
+<p>The effectiveness of poisoning as an enforcement mechanism depends on whether it can shift the economic calculus for those who ignore consent signals. This requires analyzing threshold effects: at what prevalence does the cost of detecting and filtering poisoned data exceed the value of scraping that data?</p>
+<h3 id="threshold-economics-when-filtering-costs-exceed-scraping-value">Threshold Economics: When Filtering Costs Exceed Scraping Value</h3>
+<p>Consider the decision calculus for a commercial AI company scraping web data:</p>
+<p><strong>Scraping value</strong> includes:</p>
+<ul>
+<li>Training data for model improvement</li>
+<li>Fine-tuning data for domain-specific capabilities</li>
+<li>RAG knowledge bases for inference-time retrieval</li>
+</ul>
+<p><strong>Filtering costs</strong> include:</p>
+<ul>
+<li>Provenance tracking systems to verify data sources</li>
+<li>Outlier detection algorithms to identify poisoned samples</li>
+<li>Human review for borderline cases</li>
+<li>Computational overhead for adversarial robustness training</li>
+<li>Validation on trusted clean datasets</li>
+</ul>
+<p>Research provides some quantitative anchors:</p>
+<ul>
+<li>250 poisoned documents can compromise models with 13 billion parameters</li>
+<li>3% poison fraction can increase test error from 3% to 24%</li>
+<li>0.001% token corruption in specialized domains (medical) causes measurable harm</li>
+</ul>
+<p>However, these measurements describe attack effectiveness, not defense costs. The critical unmeasured question is: <strong>What poison prevalence forces companies to abandon untrusted sources entirely rather than attempting to filter?</strong></p>
+<p>If 5% of web data is poisoned, a company might invest in detection systems. If 25% is poisoned, the cost of filtering may exceed the value of the data, especially when weighed against litigation risk from deploying compromised models.</p>
+<h3 id="coordination-requirements-the-poison-fountain-model">Coordination Requirements: The Poison Fountain Model</h3>
+<p>Individual content creators deploying defensive poisoning face a collective action problem. A single poisoned website is trivially filtered. Coordinated efforts like Poison Fountain aim to solve this by:</p>
+<ul>
+<li><strong>Distributing attack samples across many injection points</strong> (GitHub, Wikipedia, documentation sites, social media)</li>
+<li><strong>Saturating specific concept spaces</strong> to make filtering require removing legitimate data alongside poisoned samples</li>
+<li><strong>Creating persistent costs</strong> through ongoing injection that requires continuous monitoring rather than one-time filtering</li>
+</ul>
+<p>This coordination model mirrors successful enforcement strategies in other domains: distributed denial-of-service is effective not because any single request is harmful, but because the volume overwhelms defenses. Similarly, poisoning becomes strategically viable when prevalence forces continuous investment in expensive defenses.</p>
+<h3 id="comparison-to-anubis-proof-of-work">Comparison to Anubis Proof-of-Work</h3>
+<p>VENOM’s Anubis proof-of-work system offers a contrasting enforcement model. Instead of imposing costs through data corruption, Anubis imposes computational costs on scrapers through cryptographic challenges:</p>
+<ul>
+<li><strong>Cost asymmetry</strong>: Legitimate users pay negligible costs (single page load), while scrapers pay linear costs per page</li>
+<li><strong>Measurable enforcement</strong>: Computational cost is quantifiable and scales predictably with scraping volume</li>
+<li><strong>Minimal collateral damage</strong>: Proof-of-work imposes costs on scrapers specifically, not on downstream dataset users</li>
+</ul>
+<p>Poisoning lacks these properties:</p>
+<ul>
+<li><strong>Cost asymmetry favors defenders only at scale</strong>: Large companies absorb filtering costs; small actors cannot</li>
+<li><strong>Unmeasured enforcement</strong>: No clear metrics for when poisoning changes scraper behavior</li>
+<li><strong>High collateral damage</strong>: Open-source projects and researchers inherit poisoned data</li>
+</ul>
+<p>However, poisoning has one advantage: <strong>it requires no technical implementation by content creators</strong>. Anubis requires deploying proof-of-work challenges. Poisoning requires only modifying content files. This lower deployment barrier may allow broader adoption, even if the enforcement mechanism is less efficient.</p>
+<h3 id="strategic-viability-open-questions">Strategic Viability: Open Questions</h3>
+<p>The strategic effectiveness of poisoning as enforcement remains an open question with insufficient empirical evidence:</p>
+<p><strong>Unmeasured variables</strong>:</p>
+<ul>
+<li>At what prevalence do major AI companies abandon scraping untrusted sources?</li>
+<li>How does detection cost scale relative to dataset size and poison fraction?</li>
+<li>What is the minimum coordination threshold for poisoning to change scraper behavior?</li>
+</ul>
+<p><strong>Testable hypotheses</strong>:</p>
+<ul>
+<li>If poison prevalence exceeds X%, filtering costs exceed scraping value for companies with Y resources</li>
+<li>Coordinated poisoning at Z scale forces adoption of preference signal compliance as the cheaper alternative</li>
+<li>Defensive poisoning reduces unauthorized scraping by N% when deployed by M% of content creators</li>
+</ul>
+<p><strong>Evidence gaps</strong>:</p>
+<ul>
+<li>No published measurements of commercial AI company filtering costs</li>
+<li>No field experiments measuring behavior change in response to poisoning</li>
+<li>No economic models comparing poisoning costs vs. alternative enforcement mechanisms</li>
+</ul>
+<p>VENOM’s position is that poisoning is strategically viable only when coordinated at sufficient scale to make filtering prohibitively expensive relative to alternative data sources or compliance mechanisms. Without measurements of these thresholds, deployment decisions rely on assumptions rather than evidence.</p>
+<h2 id="framework-guidance-nist-microsoft-and-mitre-atlas">Framework Guidance: NIST, Microsoft, and MITRE ATLAS</h2>
+<h3 id="nist-ai-risk-and-threat-taxonomy-2024">NIST AI Risk and Threat Taxonomy (2024)</h3>
+<p>NIST’s taxonomy categorizes adversarial threats to ML systems, including deliberate actions by motivated adversaries aiming to disrupt, evade, compromise, or abuse AI model operations. Their framework distinguishes:</p>
+<ul>
+<li><strong>Availability attacks</strong>: Causing indiscriminate degradation</li>
+<li><strong>Integrity attacks</strong>: Targeted misclassification or backdoors</li>
+<li><strong>Confidentiality attacks</strong>: Extracting training data or model parameters</li>
+</ul>
+<p>NIST emphasizes that data poisoning represents “the greatest security threat in machine learning today because of the lack of standard detections and mitigations.”</p>
+<h3 id="microsoft-threat-modeling-for-aiml">Microsoft Threat Modeling for AI/ML</h3>
+<p>Microsoft’s threat modeling guidance, based on the Adversarial Machine Learning Threat Taxonomy by Ram Shankar Siva Kumar, identifies data poisoning as the top threat to ML systems. Their framework recommends:</p>
+<ul>
+<li><strong>Data provenance tracking</strong>: Verifying the source and integrity of training data</li>
+<li><strong>Anomaly detection</strong>: Identifying outliers or distributional shifts in datasets</li>
+<li><strong>Validation on trusted data</strong>: Using clean, curated datasets for evaluation to detect poisoning-induced performance changes</li>
+</ul>
+<p>Microsoft acknowledges that these defenses are expensive and may not scale to web-sized datasets.</p>
+<h3 id="mitre-atlas-2025-updates">MITRE ATLAS (2025 Updates)</h3>
+<p>In October 2025, MITRE ATLAS integrated 14 new attack techniques focused on AI Agents and Generative AI systems, including “AI Agent Context Poisoning.” This reflects the evolving threat environment where poisoning extends beyond traditional training data to include:</p>
+<ul>
+<li><strong>Tool and API poisoning</strong>: Injecting malicious instructions into tool descriptions or API responses</li>
+<li><strong>Prompt injection</strong>: Crafting inputs that alter agent behavior at runtime</li>
+<li><strong>Memory poisoning</strong>: Corrupting persistent memory or context windows in long-running agents</li>
+</ul>
+<p>MITRE’s framework emphasizes that threat models must evolve as AI architectures change. RAG systems, agentic workflows, and tool-augmented LLMs introduce new attack surfaces that traditional training-time defenses do not address.</p>
+<h3 id="fs-isac-adversarial-ai-framework-2024">FS-ISAC Adversarial AI Framework (2024)</h3>
+<p>The Financial Services Information Sharing and Analysis Center published a detailed taxonomy in 2024 covering GenAI threats, including poisoning attacks. Their framework focuses on:</p>
+<ul>
+<li><strong>Threat actor profiling</strong>: Understanding who has the capability and motivation to poison financial AI systems</li>
+<li><strong>Control frameworks</strong>: Mapping defenses to specific attack vectors</li>
+<li><strong>Risk assessment</strong>: Quantifying the likelihood and impact of poisoning in financial applications</li>
+</ul>
+<p>FS-ISAC notes that financial institutions face both adversarial poisoning (fraud, market manipulation) and defensive poisoning (if training on web data that includes poisoned content from unrelated disputes).</p>
+<h2 id="conclusion-strategic-choice-of-enforcement-mechanisms">Conclusion: Strategic Choice of Enforcement Mechanisms</h2>
+<p>The threat models examined in this analysis reveal a core tension in defensive poisoning: those with the most power to ignore consent signals also have the most resources to mitigate poisoning attacks. This raises the critical question posed earlier: <strong>Is poisoning effective enforcement if cost asymmetries favor the intended targets?</strong></p>
+<h3 id="is-poisoning-strategically-viable">Is Poisoning Strategically Viable?</h3>
+<p>The answer is conditional: <strong>poisoning becomes strategically viable only when coordinated at sufficient scale to shift economic incentives</strong>.</p>
+<p>Individual defensive poisoning efforts are easily filtered or absorbed by large AI companies. A single creator poisoning their artwork or a handful of websites deploying Nightshade creates negligible costs for organizations training on billion-document datasets. These efforts are strategically ineffective as enforcement.</p>
+<p>Coordinated poisoning at scale, exemplified by initiatives like Poison Fountain, changes the calculus. If poison prevalence reaches thresholds where filtering costs exceed scraping value, or where litigation risk from deploying compromised models becomes prohibitive, scrapers face a genuine enforcement mechanism. The threshold is unmeasured, but the mechanism is plausible: coordinated action can impose persistent costs that individual efforts cannot.</p>
+<p>However, even at scale, poisoning carries unavoidable strategic liabilities:</p>
+<ol>
+<li>
+<p><strong>Cost asymmetry persists</strong>: Large companies have more resources to filter poisoned data than small projects and researchers who inherit poisoned datasets from public sources. The collateral damage to open-source and academic communities is structural, not incidental.</p>
+</li>
+<li>
+<p><strong>Unmeasured effectiveness</strong>: No empirical evidence demonstrates that poisoning changes scraper behavior. Without measurements, advocates rely on theoretical cost models rather than observed deterrence.</p>
+</li>
+<li>
+<p><strong>Lower efficiency than alternatives</strong>: Proof-of-work systems like Anubis impose measurable costs on scrapers specifically, with minimal collateral damage and predictable scaling. Standardized preference signals like AIPREF create legal compliance pathways without corrupting data commons.</p>
+</li>
+</ol>
+<p>VENOM’s position: <strong>Poisoning is strategically justified as enforcement when coordinated at scale sufficient to impose prohibitive filtering costs, but only after preference signals have demonstrably failed and when weighed against alternatives with better cost-efficiency and measurability.</strong></p>
+<p>For most content creators, the strategic threshold for effective poisoning requires coordination through initiatives like Poison Fountain. Individual deployment is unlikely to deter well-resourced scrapers and guarantees collateral harm to under-resourced actors.</p>
+<h3 id="evaluating-enforcement-mechanisms-the-venom-framework">Evaluating Enforcement Mechanisms: The VENOM Framework</h3>
+<p>Understanding threat models enables strategic choice of enforcement mechanisms. VENOM evaluates enforcement approaches using three criteria:</p>
+<p><strong>1. Cost Efficiency: Who Bears the Burden?</strong></p>
+<p>Effective enforcement imposes costs asymmetrically: higher costs on violators, minimal costs on compliant actors and bystanders.</p>
+<ul>
+<li><strong>Preference signals (AIPREF)</strong>: High efficiency. Compliant scrapers read signals once; non-compliant scrapers face legal risk. Minimal collateral damage.</li>
+<li><strong>Proof-of-work (Anubis)</strong>: Moderate-high efficiency. Scrapers pay computational costs linearly; legitimate users pay negligible costs. No collateral damage to datasets.</li>
+<li><strong>Poisoning</strong>: Low-moderate efficiency. Well-resourced scrapers absorb filtering costs; under-resourced bystanders inherit poisoned datasets. High collateral damage unless coordinated at scale.</li>
+</ul>
+<p><strong>2. Scale Requirements: What Coordination Is Needed?</strong></p>
+<p>Some mechanisms work individually; others require collective action.</p>
+<ul>
+<li><strong>Preference signals (AIPREF)</strong>: Individual deployment sufficient. Each site signals independently; cumulative adoption creates industry norm.</li>
+<li><strong>Proof-of-work (Anubis)</strong>: Individual deployment sufficient. Each site protects itself without requiring others to participate.</li>
+<li><strong>Poisoning</strong>: Requires large-scale coordination to reach economic thresholds. Individual efforts are strategically ineffective.</li>
+</ul>
+<p><strong>3. Measurability: Can Effectiveness Be Verified?</strong></p>
+<p>Enforcement mechanisms should allow measurement of deterrence and compliance.</p>
+<ul>
+<li><strong>Preference signals (AIPREF)</strong>: Measurable through crawler logs and compliance audits. Violations are detectable and legally actionable.</li>
+<li><strong>Proof-of-work (Anubis)</strong>: Measurable through computational cost metrics and scraping rate changes. Deterrence can be quantified.</li>
+<li><strong>Poisoning</strong>: Effectiveness is unmeasured and difficult to verify. No clear signal distinguishes “scraper abandoned this source” from “scraper filtered this poison.”</li>
+</ul>
+<h3 id="strategic-guidance-from-threat-models">Strategic Guidance from Threat Models</h3>
+<p>The three threat models examined, covering backdoors, degradation, and retrieval poisoning, inform strategic decisions:</p>
+<p><strong>For content creators deciding whether to deploy defensive poisoning:</strong></p>
+<ul>
+<li>Individual poisoning is unlikely to deter well-resourced scrapers and will harm open-source projects using public datasets</li>
+<li>Coordinated poisoning through initiatives like Poison Fountain may reach strategic thresholds but guarantees collateral damage</li>
+<li>Alternatives (Anubis proof-of-work, AIPREF preference signals) provide better cost-efficiency and measurability for individual deployment</li>
+</ul>
+<p><strong>For AI companies building training pipelines:</strong></p>
+<ul>
+<li>Backdoor attacks are the highest-risk threat due to stealth and persistence. Prioritize provenance tracking and validation on trusted data.</li>
+<li>Retrieval poisoning affects production RAG systems. Deploy runtime detection and knowledge base auditing.</li>
+<li>Availability attacks signal dataset compromise but are harder to defend against. Budget for data quality investment proportional to untrusted source reliance.</li>
+</ul>
+<p><strong>For policymakers and standards bodies:</strong></p>
+<ul>
+<li>Preference signal standards (AIPREF) provide the most efficient compliance pathway with minimal collateral harm</li>
+<li>Legal frameworks that enforce preference signals reduce the need for defensive poisoning and its negative externalities</li>
+<li>Poisoning should be understood as a symptom of enforcement failure, not a sustainable equilibrium</li>
+</ul>
+<h3 id="venoms-position-enforcement-when-compliance-fails">VENOM’s Position: Enforcement When Compliance Fails</h3>
+<p>VENOM’s authority rests on providing strategic analysis of enforcement mechanisms when voluntary compliance has failed. Crawlers demonstrably ignore robots.txt, TDM reservations, and other preference signals. In this environment, content creators and platform operators require enforceable alternatives.</p>
+<p>Threat models reveal that enforcement mechanism choice matters. Poisoning is one option among several, with distinct cost-efficiency, scale requirements, and measurability characteristics. The strategic choice depends on:</p>
+<ul>
+<li>Whether individual or coordinated action is feasible</li>
+<li>Whether collateral damage to open-source and academic users is acceptable</li>
+<li>Whether unmeasured enforcement is sufficient or whether measurable deterrence is required</li>
+</ul>
+<p>VENOM develops and advocates for a portfolio of enforcement mechanisms: Anubis proof-of-work, Poison Fountain coordination infrastructure, and AIPREF standardization. Each is evaluated transparently against these criteria. Understanding threat models enables content creators to choose mechanisms strategically rather than reactively, balancing effectiveness against collateral harm in an environment where consent is systematically ignored.</p>
+<h2 id="references">References</h2>
+<ul>
+<li>Lakera - Introduction to Data Poisoning: A 2025 Perspective: <a href="https://www.lakera.ai/blog/training-data-poisoning">https://www.lakera.ai/blog/training-data-poisoning</a></li>
+<li>arXiv - Data Poisoning in Deep Learning: A Survey (2025): <a href="https://arxiv.org/html/2503.22759v1">https://arxiv.org/html/2503.22759v1</a></li>
+<li>ICLR 2025 - Persistent Pre-Training Poisoning of LLMs: <a href="https://proceedings.iclr.cc/paper_files/paper/2025/file/4dade38eae8c007f3a564b8ea820664a-Paper-Conference.pdf">https://proceedings.iclr.cc/paper_files/paper/2025/file/4dade38eae8c007f3a564b8ea820664a-Paper-Conference.pdf</a></li>
+<li>arXiv - Poisoning Attacks on LLMs Require a Near-constant Number of Poison Samples: <a href="https://arxiv.org/abs/2510.07192">https://arxiv.org/abs/2510.07192</a></li>
+<li>OpenReview - A Survey of Recent Backdoor Attacks and Defenses in Large Language Models: <a href="https://openreview.net/forum?id=wZLWuFHxt5">https://openreview.net/forum?id=wZLWuFHxt5</a></li>
+<li>NIST - AI Risk and Threat Taxonomy (March 2024): <a href="https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf">https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf</a></li>
+<li>Microsoft - Threat Modeling AI/ML Systems: <a href="https://learn.microsoft.com/en-us/security/engineering/threat-modeling-aiml">https://learn.microsoft.com/en-us/security/engineering/threat-modeling-aiml</a></li>
+<li>USENIX Security 2025 - PoisonedRAG: Knowledge Corruption Attacks: <a href="https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf">https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf</a></li>
+<li>ScienceDirect - Exploring Knowledge Poisoning Attacks to RAG: <a href="https://www.sciencedirect.com/science/article/abs/pii/S1566253525009625">https://www.sciencedirect.com/science/article/abs/pii/S1566253525009625</a></li>
+<li>ACM WWW 2025 - Traceback of Poisoning Attacks to RAG: <a href="https://dl.acm.org/doi/abs/10.1145/3696410.3714756">https://dl.acm.org/doi/abs/10.1145/3696410.3714756</a></li>
+<li>Prompt Security - The Embedded Threat in Your LLM: <a href="https://prompt.security/blog/the-embedded-threat-in-your-llm-poisoning-rag-pipelines-via-vector-embeddings">https://prompt.security/blog/the-embedded-threat-in-your-llm-poisoning-rag-pipelines-via-vector-embeddings</a></li>
+<li>Promptfoo - RAG Data Poisoning: Key Concepts Explained: <a href="https://www.promptfoo.dev/blog/rag-poisoning/">https://www.promptfoo.dev/blog/rag-poisoning/</a></li>
+<li>ACL 2025 - RevPRAG: Revealing Poisoning Attacks in RAG: <a href="https://aclanthology.org/2025.findings-emnlp.698.pdf">https://aclanthology.org/2025.findings-emnlp.698.pdf</a></li>
+<li>arXiv - RAG Security and Privacy: Formalizing the Threat Model: <a href="https://arxiv.org/pdf/2509.20324">https://arxiv.org/pdf/2509.20324</a></li>
+<li>Nature Medicine - Medical LLMs Vulnerable to Data Poisoning: <a href="https://www.nature.com/articles/s41591-024-03445-1">https://www.nature.com/articles/s41591-024-03445-1</a></li>
+<li>AAAI - Scaling Trends for Data Poisoning in LLMs: <a href="https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084">https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084</a></li>
+<li>FS-ISAC - Adversarial AI Frameworks: Taxonomy, Threat Landscape, and Control Frameworks (2024): <a href="https://www.fsisac.com/hubfs/Knowledge/AI/FSISAC_Adversarial-AI-Framework-TaxonomyThreatLandscapeAndControlFrameworks.pdf">https://www.fsisac.com/hubfs/Knowledge/AI/FSISAC_Adversarial-AI-Framework-TaxonomyThreatLandscapeAndControlFrameworks.pdf</a></li>
+<li>MITRE - Practical DevSecOps: ATLAS Framework 2026 Guide: <a href="https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/">https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/</a></li>
+<li>ACM Computing Surveys - The Path to Defence: Characterising Data Poisoning Attacks: <a href="https://dl.acm.org/doi/10.1145/3627536">https://dl.acm.org/doi/10.1145/3627536</a></li>
+<li>arXiv - Machine Learning Security against Data Poisoning: Are We There Yet?: <a href="https://arxiv.org/html/2204.05986v3">https://arxiv.org/html/2204.05986v3</a></li>
+<li>The Register - Poison Fountain Coverage: <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/</a></li>
+<li>Nightshade - Prompt-Specific Poisoning Attacks (IEEE S&#x26;P 2024): <a href="https://arxiv.org/abs/2310.13828">https://arxiv.org/abs/2310.13828</a></li>
+<li>Nightshade Project Page: <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
+</ul>  </div> </div> </article>  </main> <footer class="footer" data-astro-cid-sz7xmlte> <div class="footer-inner" data-astro-cid-sz7xmlte> <nav class="footer-links" data-astro-cid-sz7xmlte> <a href="/" data-astro-cid-sz7xmlte>Home</a><a href="/venom/" data-astro-cid-sz7xmlte>VENOM</a><a href="/blog/" data-astro-cid-sz7xmlte>Blog</a><a href="mailto:venom@semiautonomous.systems" data-astro-cid-sz7xmlte>Contact</a> </nav> <div class="footer-copy" data-astro-cid-sz7xmlte>
+&copy; 2026 Semiautonomous Systems
+</div> </div> </footer>  </body></html>  

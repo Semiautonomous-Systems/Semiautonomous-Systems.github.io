@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://semiautonomous.systems/sitemap-index.xml
