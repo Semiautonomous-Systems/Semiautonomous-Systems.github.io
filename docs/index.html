@@ -7,23 +7,35 @@
   <meta name="description" content="Semiautonomous Systems" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Red+Hat+Display:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#0b0f14; --text:#e5e7eb; --muted:#94a3b8; --accent:#7c3aed; --border:#1f2937; }
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial,sans-serif}
+    :root { --bg:#0b0f14; --text:#e5e7eb; --muted:#94a3b8; --accent:#b72115; --border:#1f2937; }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial,sans-serif}
     .container{width:min(1100px,92%);margin-inline:auto;padding:60px 0}
-    h1{font-size:clamp(38px,5vw,58px);letter-spacing:-.5px;margin:0 0 10px}
+    h1{font-family:'Red Hat Display',Inter,system-ui,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.5px;font-size:clamp(44px,6vw,72px);margin:0}
     p{color:var(--muted);max-width:720px}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:30px}
     .card{border:1px solid var(--border);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(18,24,33,.7),rgba(18,24,33,.4))}
     a.btn{display:inline-block;margin-top:14px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#22d3ee);color:#fff;text-decoration:none;font-weight:600}
     .muted{color:var(--muted)}
+    .hero{position:relative;min-height:58vh;display:flex;align-items:center}
+    .hero::before{content:"";position:absolute;inset:0;background:url('/venom/images/scorpion-2000.jpg') center/cover no-repeat;filter:contrast(1) saturate(1);}
+    .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(183,33,21,.22));}
+    .hero-inner{position:relative;z-index:1;width:min(1100px,92%);margin-inline:auto}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px;letter-spacing:.6px}
   </style>
 </head>
 <body>
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="pill">Organization</span>
+      <h1>Semiautonomous Systems</h1>
+      <p class="muted">Project sites are available under this domain by path.</p>
+      <p><a class="btn" href="/venom/">Open Venom</a></p>
+    </div>
+  </section>
   <div class="container">
-    <h1>Semiautonomous Systems</h1>
-    <p class="muted">Organization site. Project sites will be available under this domain by path.</p>
 
     <div class="grid">
       <div class="card">
