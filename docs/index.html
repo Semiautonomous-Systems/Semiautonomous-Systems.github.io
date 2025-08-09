@@ -12,7 +12,7 @@
     :root { --bg:#0b0f14; --text:#e5e7eb; --muted:#94a3b8; --accent:#b72115; --border:#1f2937; }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial,sans-serif}
-    .container{width:min(1100px,92%);margin-inline:auto;padding:60px 0}
+    .container{width:min(1100px,92%);margin-inline:auto;padding:40px 0}
     h1{font-family:'Red Hat Display',Inter,system-ui,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.5px;font-size:clamp(44px,6vw,72px);margin:0}
     p{color:var(--muted);max-width:720px}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:30px}
@@ -23,27 +23,16 @@
     .hero::before{content:"";position:absolute;inset:0;background:url('/venom/images/scorpion-2000.jpg') center/cover no-repeat;filter:contrast(1) saturate(1);}
     .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(183,33,21,.22));}
     .hero-inner{position:relative;z-index:1;width:min(1100px,92%);margin-inline:auto}
-    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:var(--accent);color:#fff;font-size:12px;letter-spacing:.6px}
+    .cta{display:inline-block;margin-top:18px;padding:12px 16px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
   </style>
 </head>
 <body>
-  <section class="hero">
+  <section class="hero" aria-label="Semiautonomous Systems">
     <div class="hero-inner">
-      <span class="pill">Organization</span>
       <h1>Semiautonomous Systems</h1>
-      <p class="muted">Project sites are available under this domain by path.</p>
-      <p><a class="btn" href="/venom/">Open Venom</a></p>
+      <p><a class="cta" href="/venom/">Open Venom</a></p>
     </div>
   </section>
-  <div class="container">
-
-    <div class="grid">
-      <div class="card">
-        <h3>Venom</h3>
-        <p>Visit the Venom project page.</p>
-        <a class="btn" href="/venom/">Open Venom</a>
-      </div>
-    </div>
-  </div>
+  <div class="container"></div>
 </body>
 </html>
