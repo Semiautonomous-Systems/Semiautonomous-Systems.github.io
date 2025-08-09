@@ -37,22 +37,27 @@ const description = 'Venom detects, enforces, and rate‑limits against AI crawl
     </header>
 
     <main id="main">
-      <section class="relative overflow-hidden py-20 sm:py-24">
-        <div class="absolute inset-0 pointer-events-none">
-          <div class="absolute -right-32 -top-32 w-[560px] h-[560px] rounded-full opacity-60 blur-3xl" style="background: radial-gradient(closest-side, rgba(34,197,94,0.22), transparent 70%)"></div>
-          <div class="absolute -left-40 -bottom-40 w-[460px] h-[460px] rounded-full opacity-60 blur-[28px]" style="background: radial-gradient(closest-side, rgba(124,58,237,0.18), transparent 70%)"></div>
-        </div>
-        <div class="relative z-10 max-w-[1060px] mx-auto w-[90%] text-center">
-          <span class="pill">Protection for AI-era scraping</span>
-          <h1 class="mt-4 text-5xl sm:text-6xl font-display tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-accent2 to-accent">Striking Back</h1>
-          <p class="mt-3 text-slate-400 max-w-2xl mx-auto">{description}</p>
-          <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-            <div class="glass p-5"><h3 class="font-display text-xl">Zero‑code edge</h3><p class="text-slate-400 text-sm">Drop‑in at CDN / proxy — no app changes</p></div>
-            <div class="glass p-5"><h3 class="font-display text-xl">Bot precision</h3><p class="text-slate-400 text-sm">Multi‑signal fingerprinting + policies</p></div>
-            <div class="glass p-5"><h3 class="font-display text-xl">Human‑first</h3><p class="text-slate-400 text-sm">Latency budget preserved for real users</p></div>
-          </div>
-        </div>
-      </section>
+      <section class="relative py-16 sm:py-20">
+  <div class="max-w-[1060px] mx-auto w-[90%] grid md:grid-cols-2 gap-8 items-center">
+    <div class="relative">
+      <picture>
+        <source srcset="https://images.unsplash.com/photo-1609609830352-92b33cd0f2d5?q=80&w=1200 1x, https://images.unsplash.com/photo-1609609830352-92b33cd0f2d5?q=80&w=2000 2x" type="image/jpeg" />
+        <img src="https://images.unsplash.com/photo-1609609830352-92b33cd0f2d5?q=80&w=1200" alt="High-definition macro photo (spider)" loading="eager" fetchpriority="high" decoding="async" class="w-full h-auto rounded-md shadow-sm" />
+      </picture>
+    </div>
+    <div class="text-left">
+      <span class="pill">Protection for AI-era scraping</span>
+      <h1 class="mt-4 text-5xl sm:text-6xl font-display tracking-tight">Striking Back</h1>
+      <p class="mt-4 text-slate-300 max-w-xl">{description}</p>
+      <ul class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        <li class="p-4 rounded-md bg-white/10 border border-slate-700"><strong>Zero‑code edge</strong><br/>Drop‑in at CDN / proxy</li>
+        <li class="p-4 rounded-md bg-white/10 border border-slate-700"><strong>Bot precision</strong><br/>Multi‑signal fingerprinting + policies</li>
+        <li class="p-4 rounded-md bg-white/10 border border-slate-700"><strong>Human‑first</strong><br/>Latency budget preserved</li>
+        <li class="p-4 rounded-md bg-white/10 border border-slate-700"><strong>Opt‑out enforcement</strong><br/>Respects stated preferences</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
       <section id="about" class="py-16">
         <div class="max-w-[1060px] mx-auto w-[90%] text-center">
