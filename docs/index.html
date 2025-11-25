@@ -55,12 +55,14 @@
     <div class="container">
       <h2>The shift</h2>
       <p>AI crawlers extract value from public content without sending users back. They treat the web as raw training feed.</p>
+      <p>Major AI companies scrape billions of pages to train models that compete directly with the content creators. Publishers like The New York Times, CNN, and others have blocked crawlers like GPTBot and CCBot, but blocking is binary—you can't say "yes for search indexing, no for training" or "yes with attribution, no without."</p>
       <p>Existing tools don't give real leverage:</p>
       <ul>
-        <li>No enforceable rules: robots.txt is voluntary and too blunt</li>
-        <li>No instrumentation: can't express "search vs training vs regurgitation"</li>
-        <li>No leverage: legal boilerplate doesn't change behavior</li>
+        <li>No enforceable rules: robots.txt is voluntary and too blunt. Crawlers can ignore it with no technical consequence.</li>
+        <li>No instrumentation: can't express nuanced preferences like "search vs training vs regurgitation" or "with attribution vs without."</li>
+        <li>No leverage: legal boilerplate and terms of service don't change crawler behavior. Violations are hard to detect and harder to prove.</li>
       </ul>
+      <p>The result: content creators bear the cost of hosting and bandwidth while AI companies extract value without compensation or even attribution.</p>
     </div>
   </section>
 
@@ -68,6 +70,13 @@
     <div class="container">
       <h2>Our thesis</h2>
       <p>Semiautonomous Systems builds infrastructure that lets sites set, enforce, and measure rules of engagement for AI crawlers. The goal is to rebalance power so creators and publishers have a say in how their content is used.</p>
+      <p>We believe that rules of engagement should be:</p>
+      <ul>
+        <li><strong>Expressible:</strong> Sites can declare nuanced preferences—not just "allow" or "disallow," but "allow for search with attribution," "rate-limit training crawls," or "block unauthorized commercial use."</li>
+        <li><strong>Enforceable:</strong> Technical controls at the edge that make violating rules costly and unattractive. Honest, contracted access becomes easier and cheaper than cheating.</li>
+        <li><strong>Measurable:</strong> Instrumentation that tracks compliance, detects violations, and provides evidence for accountability.</li>
+      </ul>
+      <p>This shifts the economics: instead of "scrape everything and ask forgiveness later," crawlers must respect declared preferences or face technical consequences. Sites gain leverage through protocol reality, not just legal text.</p>
       <div class="callout">
         <p style="margin:0;font-weight:600;color:var(--text)">From "please don't" to protocol reality.</p>
       </div>
@@ -77,16 +86,19 @@
   <section class="section">
     <div class="container">
       <h2>What we're building</h2>
-      <p>We ship technical controls, measurement, and detection. Our first product, <a href="/venom/" style="color:var(--accent);text-decoration:underline">VENOM</a>, brings these ideas to individual content surfaces.</p>
+      <p>We ship technical controls, measurement, and detection infrastructure that makes rules of engagement real.</p>
+      <p><strong>Technical controls:</strong> Edge-native enforcement—rate limiting, blocking, and protective responses that stop violators before they reach your application. Works at CDN or reverse proxy layers, preserving latency budgets for real users.</p>
+      <p><strong>Measurement:</strong> Analytics and reporting that show who's crawling, how often, and whether they're respecting your preferences. Evidence for accountability and optimization.</p>
+      <p><strong>Detection:</strong> Multi-signal fingerprinting that identifies AI crawlers even when they rotate user agents, use residential proxies, or attempt to blend in with normal traffic. Behavioral analysis catches stealth patterns.</p>
+      <p>Our first product, <a href="/venom/" style="color:var(--accent);text-decoration:underline">VENOM</a>, brings these ideas to individual content surfaces. It detects AI crawlers, enforces opt-out preferences, and provides the instrumentation sites need to understand and control their exposure.</p>
       <p style="margin-top:20px"><a href="/venom/" class="btn">Learn more on the VENOM page</a></p>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <h2>Call to action</h2>
-      <p>We're looking for design partners: content sites, publishers, and platforms who want to experiment with rules of engagement and anti-scraping strategy.</p>
-      <p style="margin-top:20px"><a class="cta" href="mailto:venom@semiautonomous.systems">Get in touch</a></p>
+      <p style="font-size:1.1em;max-width:none">We're building this infrastructure with design partners: content sites, publishers, and platforms who want to experiment with rules of engagement and anti-scraping strategy. If you're dealing with unauthorized AI crawlers, want to enforce opt-out preferences, or need better visibility into who's accessing your content, we'd like to hear from you.</p>
+      <p style="margin-top:30px"><a class="cta" href="mailto:venom@semiautonomous.systems">Get in touch</a></p>
     </div>
   </section>
 </body>
