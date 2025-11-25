@@ -20,7 +20,8 @@
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:30px}
     .card{border:1px solid var(--border);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(18,24,33,.7),rgba(18,24,33,.4))}
     a.btn{display:inline-block;margin-top:14px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#22d3ee);color:#fff;text-decoration:none;font-weight:600}
-    a.btn-secondary{display:inline-block;margin-top:14px;margin-left:12px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);color:var(--text);text-decoration:none;font-weight:600}
+    a.btn-secondary{display:inline-block;margin-top:14px;margin-left:12px;padding:10px 14px;border-radius:10px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600;transition:all 0.2s}
+    a.btn-secondary:hover{background:var(--accent);color:#fff}
     .muted{color:var(--muted)}
     .hero{position:relative;min-height:58vh;display:flex;align-items:center}
     .hero::before{content:"";position:absolute;inset:0;background:
@@ -41,8 +42,8 @@
 <body>
   <section class="hero" aria-label="Semiautonomous Systems">
     <div class="hero-inner">
-      <h1>Rules of engagement for AI crawlers</h1>
-      <p style="font-size:1.2em;margin-top:20px">Give websites enforceable, technically grounded control over how AI systems access and use their content.</p>
+      <h1>Semiautonomous Systems</h1>
+      <p style="font-size:1.2em;margin-top:20px">Rules of engagement for AI crawlers. Give websites enforceable, technically grounded control over how AI systems access and use their content.</p>
       <div style="margin-top:24px">
         <a class="cta" href="mailto:venom@semiautonomous.systems">Talk to us</a>
         <a class="btn-secondary" href="/venom/">Learn about VENOM</a>
