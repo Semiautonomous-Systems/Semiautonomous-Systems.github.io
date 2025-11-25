@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Semiautonomous Systems</title>
-  <meta name="description" content="Semiautonomous Systems" />
+  <meta name="description" content="Digital accountability infrastructure for AI crawlers. Rules of engagement that sites can enforce." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Red+Hat+Display:wght@600;700;800&display=swap" rel="stylesheet">
@@ -14,10 +14,13 @@
     body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica Neue,Arial,sans-serif}
     .container{width:min(1100px,92%);margin-inline:auto;padding:40px 0}
     h1{font-family:'Red Hat Display',Inter,system-ui,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.5px;font-size:clamp(44px,6vw,72px);margin:0}
-    p{color:var(--muted);max-width:720px}
+    h2{font-family:'Red Hat Display',Inter,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,4vw,48px);margin:0 0 20px 0}
+    h3{font-family:'Red Hat Display',Inter,system-ui,sans-serif;font-weight:600;font-size:clamp(24px,3vw,32px);margin:0 0 12px 0}
+    p{color:var(--muted);max-width:720px;line-height:1.6;margin:0 0 16px 0}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:30px}
     .card{border:1px solid var(--border);border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(18,24,33,.7),rgba(18,24,33,.4))}
     a.btn{display:inline-block;margin-top:14px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#22d3ee);color:#fff;text-decoration:none;font-weight:600}
+    a.btn-secondary{display:inline-block;margin-top:14px;margin-left:12px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);color:var(--text);text-decoration:none;font-weight:600}
     .muted{color:var(--muted)}
     .hero{position:relative;min-height:58vh;display:flex;align-items:center}
     .hero::before{content:"";position:absolute;inset:0;background:
@@ -28,15 +31,63 @@
     .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(183,33,21,.22));}
     .hero-inner{position:relative;z-index:1;width:min(1100px,92%);margin-inline:auto}
     .cta{display:inline-block;margin-top:18px;padding:12px 16px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
+    .section{padding:60px 0}
+    ul{list-style:none;padding:0;margin:20px 0}
+    ul li{margin:12px 0;padding-left:24px;position:relative;color:var(--muted)}
+    ul li::before{content:"—";position:absolute;left:0;color:var(--accent)}
+    .callout{padding:20px;border-left:3px solid var(--accent);background:rgba(183,33,21,.1);margin:24px 0;border-radius:4px}
   </style>
 </head>
 <body>
   <section class="hero" aria-label="Semiautonomous Systems">
     <div class="hero-inner">
-      <h1>Semiautonomous Systems</h1>
-      <p><a class="cta" href="/venom/">Open VENOM</a></p>
+      <h1>Rules of engagement for AI crawlers</h1>
+      <p style="font-size:1.2em;margin-top:20px">Give websites enforceable, technically grounded control over how AI systems access and use their content.</p>
+      <div style="margin-top:24px">
+        <a class="cta" href="mailto:venom@semiautonomous.systems">Talk to us</a>
+        <a class="btn-secondary" href="/venom/">Learn about VENOM</a>
+      </div>
     </div>
   </section>
-  <div class="container"></div>
+
+  <section class="section">
+    <div class="container">
+      <h2>The shift</h2>
+      <p>AI crawlers extract value from public content without sending users back. They treat the web as raw training feed.</p>
+      <p>Existing tools don't give real leverage:</p>
+      <ul>
+        <li>No enforceable rules: robots.txt is voluntary and too blunt</li>
+        <li>No instrumentation: can't express "search vs training vs regurgitation"</li>
+        <li>No leverage: legal boilerplate doesn't change behavior</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Our thesis</h2>
+      <p>Semiautonomous Systems builds infrastructure that lets sites set, enforce, and measure rules of engagement for AI crawlers. The goal is to rebalance power so creators and publishers have a say in how their content is used.</p>
+      <div class="callout">
+        <p style="margin:0;font-weight:600;color:var(--text)">From "please don't" to protocol reality.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>What we're building</h2>
+      <p>We ship technical controls, measurement, and detection. Our first product, <a href="/venom/" style="color:var(--accent);text-decoration:underline">VENOM</a>, brings these ideas to individual content surfaces.</p>
+      <p style="margin-top:20px"><a href="/venom/" class="btn">Learn more on the VENOM page</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Call to action</h2>
+      <p>We're looking for design partners: content sites, publishers, and platforms who want to experiment with rules of engagement and anti-scraping strategy.</p>
+      <p style="margin-top:20px"><a class="cta" href="mailto:venom@semiautonomous.systems">Get in touch</a></p>
+    </div>
+  </section>
 </body>
 </html>
+
