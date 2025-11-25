@@ -34,8 +34,8 @@
     .cta{display:inline-block;margin-top:18px;padding:12px 16px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700}
     .section{padding:60px 0}
     ul{list-style:none;padding:0;margin:20px 0;max-width:720px}
-    ul li{margin:12px 0;padding-left:24px;position:relative;color:var(--muted)}
-    ul li::before{content:"-";position:absolute;left:0;color:var(--accent)}
+    ul li{margin:12px 0;padding-left:20px;position:relative;color:var(--muted)}
+    ul li::before{content:"-";position:absolute;left:0;color:var(--accent);font-weight:700}
     .callout{padding:20px;border-left:3px solid var(--accent);background:rgba(183,33,21,.1);margin:24px 0;border-radius:4px}
   </style>
 </head>
@@ -88,14 +88,14 @@
     <div class="container">
       <h2>What we're building</h2>
       <p>We ship infrastructure that makes rules of engagement real through technical controls, measurement, and detection.</p>
-      <p>Technical controls run at the edge, at CDN or reverse proxy layers. They provide protective responses and enforcement that stop violators before they reach your application. This preserves latency budgets for real users while enforcing your preferences.</p>
-      <p>Measurement gives you analytics showing who's crawling, how often, and whether they're respecting your preferences. This evidence supports accountability and helps you optimize your rules over time.</p>
-      <p>Detection uses multi-signal fingerprinting to identify AI crawlers even when they rotate user agents or use residential proxies. Behavioral analysis catches stealth patterns that simple detection methods miss.</p>
       <ul>
         <li><strong>Technical controls:</strong> Edge-native enforcement</li>
         <li><strong>Measurement:</strong> Analytics and evidence</li>
         <li><strong>Detection:</strong> Multi-signal fingerprinting</li>
       </ul>
+      <p>Technical controls run at the edge, at CDN or reverse proxy layers. They provide protective responses and enforcement that stop violators before they reach your application. This preserves latency budgets for real users while enforcing your preferences.</p>
+      <p>Measurement gives you analytics showing who's crawling, how often, and whether they're respecting your preferences. This evidence supports accountability and helps you optimize your rules over time.</p>
+      <p>Detection uses multi-signal fingerprinting to identify AI crawlers even when they rotate user agents or use residential proxies. Behavioral analysis catches stealth patterns that simple detection methods miss.</p>
       <p>Our first product, <a href="/venom/" style="color:var(--accent);text-decoration:underline">VENOM</a>, brings these ideas to individual content surfaces.</p>
       <p style="margin-top:20px"><a href="/venom/" class="btn-secondary">Learn more on the VENOM page</a></p>
     </div>
