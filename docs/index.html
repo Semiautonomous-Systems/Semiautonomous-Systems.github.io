@@ -43,7 +43,7 @@
   <section class="hero" aria-label="Semiautonomous Systems">
     <div class="hero-inner">
       <h1>Semiautonomous Systems</h1>
-      <p style="font-size:1.2em;margin-top:20px">Rules of engagement for AI crawlers. Give websites enforceable, technically grounded control over how AI systems access and use their content.</p>
+      <p style="font-size:1.2em;margin-top:20px">Rules of engagement for AI crawlers.</p>
       <div style="margin-top:24px">
         <a class="cta" href="mailto:venom@semiautonomous.systems">Talk to us</a>
         <a class="btn-secondary" href="/venom/">Learn about VENOM</a>
@@ -54,15 +54,15 @@
   <section class="section">
     <div class="container">
       <h2>The shift</h2>
-      <p>AI crawlers extract value from public content without sending users back. They treat the web as raw training feed.</p>
-      <p>Major AI companies scrape billions of pages to train models that compete directly with the content creators. Publishers like The New York Times, CNN, and others have blocked crawlers like GPTBot and CCBot, but blocking is binary—you can't say "yes for search indexing, no for training" or "yes with attribution, no without."</p>
+      <p>AI crawlers extract value from public content without sending users back. Major AI companies scrape billions of pages to train models that compete directly with content creators.</p>
+      <p>Publishers like The New York Times and CNN have blocked crawlers like GPTBot and CCBot, but blocking is binary. You can't say "yes for search indexing, no for training" or "yes with attribution, no without."</p>
       <p>Existing tools don't give real leverage:</p>
       <ul>
-        <li>No enforceable rules: robots.txt is voluntary and too blunt. Crawlers can ignore it with no technical consequence.</li>
-        <li>No instrumentation: can't express nuanced preferences like "search vs training vs regurgitation" or "with attribution vs without."</li>
-        <li>No leverage: legal boilerplate and terms of service don't change crawler behavior. Violations are hard to detect and harder to prove.</li>
+        <li><strong>No enforceable rules:</strong> robots.txt is voluntary. Crawlers can ignore it with no technical consequence.</li>
+        <li><strong>No instrumentation:</strong> Can't express nuanced preferences like "search vs training" or "with attribution vs without."</li>
+        <li><strong>No leverage:</strong> Legal boilerplate doesn't change behavior. Violations are hard to detect and harder to prove.</li>
       </ul>
-      <p>The result: content creators bear the cost of hosting and bandwidth while AI companies extract value without compensation or even attribution.</p>
+      <p>Content creators bear hosting and bandwidth costs while AI companies extract value without compensation.</p>
     </div>
   </section>
 
@@ -86,11 +86,13 @@
   <section class="section">
     <div class="container">
       <h2>What we're building</h2>
-      <p>We ship technical controls, measurement, and detection infrastructure that makes rules of engagement real.</p>
-      <p><strong>Technical controls:</strong> Edge-native enforcement—rate limiting, blocking, and protective responses that stop violators before they reach your application. Works at CDN or reverse proxy layers, preserving latency budgets for real users.</p>
-      <p><strong>Measurement:</strong> Analytics and reporting that show who's crawling, how often, and whether they're respecting your preferences. Evidence for accountability and optimization.</p>
-      <p><strong>Detection:</strong> Multi-signal fingerprinting that identifies AI crawlers even when they rotate user agents, use residential proxies, or attempt to blend in with normal traffic. Behavioral analysis catches stealth patterns.</p>
-      <p>Our first product, <a href="/venom/" style="color:var(--accent);text-decoration:underline">VENOM</a>, brings these ideas to individual content surfaces. It detects AI crawlers, enforces opt-out preferences, and provides the instrumentation sites need to understand and control their exposure.</p>
+      <p>We ship infrastructure that makes rules of engagement real: technical controls, measurement, and detection.</p>
+      <ul>
+        <li><strong>Technical controls:</strong> Edge-native enforcement at CDN or reverse proxy layers. Rate limiting, blocking, and protective responses that stop violators before they reach your application.</li>
+        <li><strong>Measurement:</strong> Analytics showing who's crawling, how often, and whether they're respecting your preferences. Evidence for accountability.</li>
+        <li><strong>Detection:</strong> Multi-signal fingerprinting identifies AI crawlers even when they rotate user agents or use residential proxies. Behavioral analysis catches stealth patterns.</li>
+      </ul>
+      <p>Our first product, <a href="/venom/" style="color:var(--accent);text-decoration:underline">VENOM</a>, brings these ideas to individual content surfaces.</p>
       <p style="margin-top:20px"><a href="/venom/" class="btn-secondary">Learn more on the VENOM page</a></p>
     </div>
   </section>
