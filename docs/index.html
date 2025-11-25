@@ -74,9 +74,9 @@
       <p>These preferences need technical controls at the edge that make violating rules costly and unattractive. Honest, contracted access should become easier and cheaper than cheating. And there must be instrumentation that tracks compliance, detects violations, and provides evidence for accountability.</p>
       <p>This shifts the economics: instead of "scrape everything and ask forgiveness later," crawlers must respect declared preferences or face technical consequences. Sites gain leverage through protocol reality, not just legal text.</p>
       <ul>
-        <li><strong>Expressible:</strong> Declare nuanced preferences</li>
-        <li><strong>Enforceable:</strong> Technical controls at the edge</li>
-        <li><strong>Measurable:</strong> Track compliance and violations</li>
+        <li><strong>Expressible:</strong> Sites can declare nuanced preferences beyond simple allow or disallow.</li>
+        <li><strong>Enforceable:</strong> Technical controls at the edge make violating rules costly and unattractive.</li>
+        <li><strong>Measurable:</strong> Instrumentation tracks compliance, detects violations, and provides evidence for accountability.</li>
       </ul>
       <div class="callout">
         <p style="margin:0;font-weight:600;color:var(--text)">From "please don't" to protocol reality.</p>
@@ -89,9 +89,9 @@
       <h2>What we're building</h2>
       <p>We ship infrastructure that makes rules of engagement real through technical controls, measurement, and detection.</p>
       <ul>
-        <li><strong>Technical controls:</strong> Edge-native enforcement</li>
-        <li><strong>Measurement:</strong> Analytics and evidence</li>
-        <li><strong>Detection:</strong> Multi-signal fingerprinting</li>
+        <li><strong>Technical controls:</strong> Edge-native enforcement at CDN or reverse proxy layers that stops violators before they reach your application.</li>
+        <li><strong>Measurement:</strong> Analytics showing who's crawling, how often, and whether they're respecting your preferences.</li>
+        <li><strong>Detection:</strong> Multi-signal fingerprinting identifies AI crawlers even when they rotate user agents or use residential proxies.</li>
       </ul>
       <p>Technical controls run at the edge, at CDN or reverse proxy layers. They provide protective responses and enforcement that stop violators before they reach your application. This preserves latency budgets for real users while enforcing your preferences.</p>
       <p>Measurement gives you analytics showing who's crawling, how often, and whether they're respecting your preferences. This evidence supports accountability and helps you optimize your rules over time.</p>
