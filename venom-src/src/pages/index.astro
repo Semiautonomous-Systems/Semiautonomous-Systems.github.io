@@ -91,7 +91,12 @@ const description = 'VENOM detects, enforces and rate‑limits against AI crawle
                 </span>
                 Join the movement
               </h3>
-              <p class="text-slate-400 text-sm">Publish your preferences (robots.txt / ai.txt). Together, sites using Venom can help detect and challenge model training that ignores stated opt‑outs.</p>
+              <p class="text-slate-400 text-sm">
+                Express AI content‑use preferences per IETF AIPREF drafts—via robots.txt signals and HTTP header/link attachments
+                <sup><a href="#ref-aipref" aria-label="IETF AIPREF Working Group reference">1</a></sup>
+                <sup><a href="#ref-attach" aria-label="AIPREF attachment draft reference">2</a></sup>.
+                VENOM surfaces and challenges agents that ignore declared preferences.
+              </p>
             </div>
           </div>
         </div>
@@ -145,6 +150,25 @@ const description = 'VENOM detects, enforces and rate‑limits against AI crawle
           </div>
         </div>
       </section>
+
+      <hr class="my-8 border-slate-800/80">
+
+      <div class="max-w-[1060px] mx-auto w-[90%]">
+        <ol class="text-sm text-slate-400" id="references">
+          <li id="ref-aipref">
+            IETF AIPREF WG overview —
+            <a href="https://datatracker.ietf.org/wg/aipref/about/" target="_blank" rel="noopener noreferrer">
+              https://datatracker.ietf.org/wg/aipref/about/
+            </a>
+          </li>
+          <li id="ref-attach">
+            AIPREF attachment/discovery draft —
+            <a href="https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/03/" target="_blank" rel="noopener noreferrer">
+              https://datatracker.ietf.org/doc/draft-ietf-aipref-attach/03/
+            </a>
+          </li>
+        </ol>
+      </div>
     </main>
 
     <footer class="border-t border-slate-800/80 py-8 text-center text-slate-400">
