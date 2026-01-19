@@ -1,0 +1,518 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Card from '../../components/Card.astro';
+
+const title = 'VENOM Demo - Interactive AI Crawler Preview';
+const description = 'See how VENOM transforms content for AI crawlers while preserving the human experience.';
+---
+
+<BaseLayout title={title} description={description} currentPath="/venom/demo/">
+  <section class="demo-section">
+    <div class="container">
+      <!-- Title -->
+      <div class="demo-header">
+        <h1>Interactive Demo</h1>
+        <p class="demo-subtitle">Enter any URL to compare the original vs. AI crawler view</p>
+      </div>
+
+      <!-- Controls -->
+      <Card class="controls-card">
+        <div class="controls-grid">
+          <!-- URL Input -->
+          <div class="control-group control-url">
+            <label for="url-input">Website URL</label>
+            <input
+              type="url"
+              id="url-input"
+              placeholder="https://example.com"
+              value="https://example.com"
+              class="input"
+            />
+          </div>
+
+          <!-- Options Row -->
+          <div class="control-group">
+            <label for="bot-select">Bot Type</label>
+            <select id="bot-select" class="select">
+              <option value="gptbot">GPTBot (OpenAI)</option>
+              <option value="claude">Claude (Anthropic)</option>
+              <option value="google">Google AI</option>
+              <option value="bingbot">Bing AI</option>
+              <option value="meta">Meta AI</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="device-select">Device</label>
+            <select id="device-select" class="select">
+              <option value="desktop">Desktop (1280×720)</option>
+              <option value="mobile">Mobile (390×844)</option>
+            </select>
+          </div>
+
+          <div class="control-group control-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="inline-mode" checked class="checkbox" />
+              <span>Inline Mode</span>
+            </label>
+          </div>
+
+          <!-- Load Button -->
+          <div class="control-group control-button">
+            <button id="load-btn" class="btn btn-primary">
+              Load Preview
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      <!-- Screenshot Panels -->
+      <div class="swipe-hint">
+        <span>← Swipe to compare →</span>
+      </div>
+
+      <div class="panels-container">
+        <!-- Original -->
+        <Card class="panel-card">
+          <h3 class="panel-title">
+            <span class="status-dot status-safe"></span>
+            Original (Human View)
+          </h3>
+          <div id="original-panel" class="panel-preview">
+            Click "Load Preview" to generate
+          </div>
+          <div id="original-stats" class="panel-stats"></div>
+        </Card>
+
+        <!-- Poisoned -->
+        <Card class="panel-card">
+          <h3 class="panel-title">
+            <span class="status-dot status-danger"></span>
+            Venom Preview (AI Crawler View)
+          </h3>
+          <div id="poisoned-panel" class="panel-preview">
+            Click "Load Preview" to generate
+          </div>
+          <div id="poisoned-stats" class="panel-stats"></div>
+        </Card>
+      </div>
+
+      <!-- Quick Examples -->
+      <Card class="examples-card">
+        <h4 class="examples-title">Quick Examples</h4>
+        <div class="examples-grid">
+          <button data-url="https://www.bbc.com" class="example-btn">BBC News</button>
+          <button data-url="https://en.wikipedia.org/wiki/Artificial_intelligence" class="example-btn">Wikipedia</button>
+          <button data-url="https://arxiv.org" class="example-btn">arXiv</button>
+          <button data-url="https://developer.mozilla.org" class="example-btn">MDN</button>
+          <button data-url="https://news.ycombinator.com" class="example-btn">Hacker News</button>
+          <button data-url="https://www.npr.org" class="example-btn">NPR</button>
+          <button data-url="https://www.w3.org" class="example-btn">W3C</button>
+          <button data-url="https://example.com" class="example-btn">Example.com</button>
+        </div>
+      </Card>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .demo-section {
+    padding: var(--space-xl) 0 var(--space-3xl);
+  }
+
+  .demo-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+  }
+
+  .demo-header h1 {
+    font-size: clamp(24px, 4vw, 32px);
+    margin-bottom: var(--space-sm);
+  }
+
+  .demo-subtitle {
+    color: var(--color-text-muted);
+    font-size: clamp(14px, 2vw, 16px);
+  }
+
+  /* Controls Card */
+  .controls-card {
+    margin-bottom: var(--space-lg);
+  }
+
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 640px) {
+    .controls-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .control-url {
+      grid-column: 1 / -1;
+    }
+
+    .control-button {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .controls-grid {
+      grid-template-columns: 1fr 1fr 1fr auto auto;
+      align-items: end;
+    }
+
+    .control-url {
+      grid-column: 1 / -1;
+    }
+
+    .control-checkbox {
+      justify-self: start;
+    }
+
+    .control-button {
+      grid-column: auto;
+    }
+  }
+
+  .control-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .input,
+  .select {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(15, 20, 27, 0.5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: 14px;
+    transition: var(--transition-fast);
+  }
+
+  .input:focus,
+  .select:focus {
+    outline: none;
+    border-color: var(--color-text-muted);
+  }
+
+  .input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    padding: var(--space-sm) 0;
+  }
+
+  .checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(15, 20, 27, 0.5);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+  }
+
+  .checkbox-label span {
+    font-size: 14px;
+    color: var(--color-text-muted);
+  }
+
+  /* Panels */
+  .swipe-hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+    opacity: 0.6;
+  }
+
+  @media (min-width: 1024px) {
+    .swipe-hint {
+      display: none;
+    }
+  }
+
+  .panels-container {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: var(--space-sm);
+    margin-left: calc(-1 * var(--container-padding));
+    margin-right: calc(-1 * var(--container-padding));
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+  }
+
+  @media (min-width: 1024px) {
+    .panels-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: visible;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .panel-card {
+    min-width: 85vw;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .panel-card {
+      min-width: 70vw;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .panel-card {
+      min-width: 0;
+    }
+  }
+
+  .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-safe {
+    background: var(--color-safe);
+  }
+
+  .status-danger {
+    background: var(--color-accent);
+  }
+
+  .panel-preview {
+    aspect-ratio: 16 / 9;
+    background: rgba(15, 20, 27, 0.5);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    overflow: hidden;
+  }
+
+  .panel-preview :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .panel-stats {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: var(--space-sm);
+  }
+
+  /* Examples */
+  .examples-card {
+    padding: var(--space-lg);
+  }
+
+  .examples-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+  }
+
+  .examples-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .example-btn {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+  }
+
+  .example-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+    border-color: var(--color-border-hover);
+  }
+
+  /* Loading and error states */
+  .panel-preview :global(.loading) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-text-muted);
+  }
+
+  .panel-preview :global(.loading-dots) {
+    font-size: 24px;
+    animation: pulse 1.5s infinite;
+  }
+
+  .panel-preview :global(.error) {
+    color: var(--color-accent);
+    text-align: center;
+    padding: var(--space-md);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+</style>
+
+<script>
+  const API_BASE = 'https://ecdsa.pub/venom-preview/api';
+
+  const urlInput = document.getElementById('url-input') as HTMLInputElement;
+  const botSelect = document.getElementById('bot-select') as HTMLSelectElement;
+  const deviceSelect = document.getElementById('device-select') as HTMLSelectElement;
+  const inlineMode = document.getElementById('inline-mode') as HTMLInputElement;
+  const loadBtn = document.getElementById('load-btn') as HTMLButtonElement;
+  const originalPanel = document.getElementById('original-panel') as HTMLDivElement;
+  const poisonedPanel = document.getElementById('poisoned-panel') as HTMLDivElement;
+  const originalStats = document.getElementById('original-stats') as HTMLDivElement;
+  const poisonedStats = document.getElementById('poisoned-stats') as HTMLDivElement;
+
+  let abortController: AbortController | null = null;
+
+  function showLoading(panel: HTMLDivElement) {
+    panel.innerHTML = `
+      <div class="loading">
+        <div class="loading-dots">●●●</div>
+        <span style="font-size: 12px;">Generating screenshot...</span>
+      </div>
+    `;
+  }
+
+  function showError(panel: HTMLDivElement, message: string) {
+    panel.innerHTML = `
+      <div class="error">
+        <div style="font-size: 20px; margin-bottom: 8px;">⚠</div>
+        <span style="font-size: 12px;">${message}</span>
+      </div>
+    `;
+  }
+
+  function showImage(panel: HTMLDivElement, url: string) {
+    panel.innerHTML = `<img src="${url}" alt="Screenshot" loading="eager" />`;
+  }
+
+  async function loadPreview() {
+    const url = urlInput.value.trim();
+    if (!url) {
+      alert('Please enter a URL');
+      return;
+    }
+
+    // Abort any ongoing request
+    if (abortController) {
+      abortController.abort();
+    }
+    abortController = new AbortController();
+
+    const bot = botSelect.value;
+    const mode = deviceSelect.value;
+    const inline = inlineMode.checked;
+
+    // Update UI
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Loading...';
+    showLoading(originalPanel);
+    showLoading(poisonedPanel);
+    originalStats.textContent = '';
+    poisonedStats.textContent = '';
+
+    try {
+      // Build API URLs
+      const originalUrl = `${API_BASE}/snap?url=${encodeURIComponent(url)}&mode=${mode}`;
+      const poisonedUrl = `${API_BASE}/snap?url=${encodeURIComponent(url)}&bot=${bot}&mode=${mode}${inline ? '&inline=true' : ''}`;
+
+      // Fetch both screenshots in parallel
+      const [originalResp, poisonedResp] = await Promise.all([
+        fetch(originalUrl, { signal: abortController.signal }),
+        fetch(poisonedUrl, { signal: abortController.signal })
+      ]);
+
+      if (!originalResp.ok || !poisonedResp.ok) {
+        throw new Error('Failed to generate screenshots');
+      }
+
+      // Get image blobs and create object URLs
+      const [originalBlob, poisonedBlob] = await Promise.all([
+        originalResp.blob(),
+        poisonedResp.blob()
+      ]);
+
+      showImage(originalPanel, URL.createObjectURL(originalBlob));
+      showImage(poisonedPanel, URL.createObjectURL(poisonedBlob));
+
+      // Update stats from headers
+      originalStats.textContent = `Mode: ${mode}`;
+      poisonedStats.textContent = `Bot: ${bot}${inline ? ' (inline)' : ''}`;
+
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.error('Error:', err);
+      showError(originalPanel, 'Failed to load');
+      showError(poisonedPanel, err.message || 'Failed to load');
+    } finally {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Load Preview';
+    }
+  }
+
+  // Event listeners
+  loadBtn.addEventListener('click', loadPreview);
+
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadPreview();
+  });
+
+  // Example buttons
+  document.querySelectorAll('.example-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      urlInput.value = (btn as HTMLElement).dataset.url || '';
+      loadPreview();
+    });
+  });
+</script>

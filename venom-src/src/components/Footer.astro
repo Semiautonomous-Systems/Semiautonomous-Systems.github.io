@@ -1,0 +1,73 @@
+---
+const currentYear = new Date().getFullYear();
+
+const footerLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/venom/', label: 'VENOM' },
+  { href: 'mailto:venom@semiautonomous.systems', label: 'Contact' },
+];
+---
+
+<footer class="footer">
+  <div class="footer-inner">
+    <nav class="footer-links">
+      {footerLinks.map(link => (
+        <a href={link.href}>{link.label}</a>
+      ))}
+    </nav>
+    <div class="footer-copy">
+      &copy; {currentYear} Semiautonomous Systems
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-xl) var(--container-padding);
+    margin-top: auto;
+  }
+
+  .footer-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color var(--transition-fast);
+  }
+
+  .footer-links a:hover {
+    color: var(--color-text);
+  }
+
+  .footer-copy {
+    color: var(--color-text-muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    .footer-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .footer-links {
+      justify-content: center;
+    }
+  }
+</style>

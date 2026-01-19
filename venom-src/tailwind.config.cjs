@@ -8,18 +8,32 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        bg: '#0b0f14',
-        surface: '#0d131b',
-        accent: '#7c3aed',
-        accent2: '#22d3ee',
-        neon: '#22c55e'
+        // Match global.css design tokens
+        bg: '#0a0e14',
+        'bg-elevated': '#0f1419',
+        surface: '#0f1419',
+        accent: '#b72115',         // Red - matches global.css
+        'accent-hover': '#d42a1a',
+        safe: '#2dd4bf',           // Teal - matches global.css
+        text: '#e5e7eb',
+        'text-muted': '#94a3b8',
+        border: 'rgba(255, 255, 255, 0.06)'
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        // Match global.css fonts
+        sans: ['Red Hat Display', 'system-ui', 'sans-serif'],
+        display: ['Red Hat Display', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
       },
       boxShadow: {
-        glass: '0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.25)'
+        card: '0 4px 24px rgba(0, 0, 0, 0.3)',
+        'card-hover': '0 20px 40px rgba(0, 0, 0, 0.4)',
+        glow: '0 0 24px rgba(183, 33, 21, 0.3)'
+      },
+      borderRadius: {
+        sm: '6px',
+        md: '10px',
+        lg: '16px'
       }
     }
   },
