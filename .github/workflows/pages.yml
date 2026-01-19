@@ -34,9 +34,11 @@ jobs:
         run: npm run build
       - name: Assemble site artifact
         run: |
-          mkdir -p _site/venom
-          cp -R docs/* _site/ || true
-          cp -R venom-src/dist/* _site/venom/
+          mkdir -p _site
+          # Use venom-src as the main site
+          cp -R venom-src/dist/* _site/
+          # Copy CNAME for custom domain
+          cp docs/CNAME _site/ || true
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
