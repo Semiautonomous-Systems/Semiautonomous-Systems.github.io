@@ -24,8 +24,8 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
             <input
               type="url"
               id="url-input"
-              placeholder="https://example.com"
-              value="https://example.com"
+              placeholder="https://cryptography.consulting"
+              value="https://cryptography.consulting"
               class="input"
             />
           </div>
@@ -101,6 +101,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
       <Card class="examples-card">
         <h4 class="examples-title">Quick Examples</h4>
         <div class="examples-grid">
+          <button data-url="https://cryptography.consulting" class="example-btn">Cryptography.consulting</button>
           <button data-url="https://www.bbc.com" class="example-btn">BBC News</button>
           <button data-url="https://en.wikipedia.org/wiki/Artificial_intelligence" class="example-btn">Wikipedia</button>
           <button data-url="https://arxiv.org" class="example-btn">arXiv</button>
@@ -108,11 +109,16 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
           <button data-url="https://news.ycombinator.com" class="example-btn">Hacker News</button>
           <button data-url="https://www.npr.org" class="example-btn">NPR</button>
           <button data-url="https://www.w3.org" class="example-btn">W3C</button>
-          <button data-url="https://example.com" class="example-btn">Example.com</button>
         </div>
       </Card>
     </div>
   </section>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-close" aria-label="Close">&times;</button>
+    <img id="lightbox-img" src="" alt="Enlarged screenshot" />
+  </div>
 </BaseLayout>
 
 <style>
@@ -274,6 +280,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
 
   .panel-card {
     min-width: 85vw;
+    width: 85vw;
     flex-shrink: 0;
     scroll-snap-align: center;
   }
@@ -281,12 +288,14 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   @media (min-width: 640px) {
     .panel-card {
       min-width: 70vw;
+      width: 70vw;
     }
   }
 
   @media (min-width: 1024px) {
     .panel-card {
       min-width: 0;
+      width: auto;
     }
   }
 
@@ -398,10 +407,63 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     0%, 100% { opacity: 0.4; }
     50% { opacity: 1; }
   }
+
+  /* Clickable images */
+  .panel-preview :global(img) {
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+  }
+
+  .panel-preview :global(img:hover) {
+    opacity: 0.9;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+  }
+
+  .lightbox.active {
+    display: flex;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 32px;
+    cursor: pointer;
+    padding: var(--space-sm);
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+  }
+
+  .lightbox-close:hover {
+    opacity: 1;
+  }
+
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
 </style>
 
 <script>
-  const API_BASE = 'https://ecdsa.pub/venom-preview/api';
+  const API_BASE = 'https://ecdsa.pub/venom-preview/api/snap';
 
   const urlInput = document.getElementById('url-input') as HTMLInputElement;
   const botSelect = document.getElementById('bot-select') as HTMLSelectElement;
@@ -412,6 +474,9 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   const poisonedPanel = document.getElementById('poisoned-panel') as HTMLDivElement;
   const originalStats = document.getElementById('original-stats') as HTMLDivElement;
   const poisonedStats = document.getElementById('poisoned-stats') as HTMLDivElement;
+  const lightbox = document.getElementById('lightbox') as HTMLDivElement;
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const lightboxClose = document.querySelector('.lightbox-close') as HTMLButtonElement;
 
   let abortController: AbortController | null = null;
 
@@ -434,7 +499,24 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   }
 
   function showImage(panel: HTMLDivElement, url: string) {
-    panel.innerHTML = `<img src="${url}" alt="Screenshot" loading="eager" />`;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'Screenshot';
+    img.loading = 'eager';
+    img.addEventListener('click', () => openLightbox(url));
+    panel.innerHTML = '';
+    panel.appendChild(img);
+  }
+
+  function openLightbox(imgSrc: string) {
+    lightboxImg.src = imgSrc;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
   }
 
   async function loadPreview() {
@@ -463,9 +545,9 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     poisonedStats.textContent = '';
 
     try {
-      // Build API URLs
-      const originalUrl = `${API_BASE}/snap?url=${encodeURIComponent(url)}&mode=${mode}`;
-      const poisonedUrl = `${API_BASE}/snap?url=${encodeURIComponent(url)}&bot=${bot}&mode=${mode}${inline ? '&inline=true' : ''}`;
+      // Build API URLs - url parameter must come last
+      const originalUrl = `${API_BASE}?mode=${mode}&url=${encodeURIComponent(url)}`;
+      const poisonedUrl = `${API_BASE}?bot=${bot}${inline ? '&inline=yes' : ''}&mode=${mode}&url=${encodeURIComponent(url)}`;
 
       // Fetch both screenshots in parallel
       const [originalResp, poisonedResp] = await Promise.all([
@@ -501,6 +583,15 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     }
   }
 
+  // Lightbox event listeners
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
   // Event listeners
   loadBtn.addEventListener('click', loadPreview);
 
@@ -515,4 +606,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
       loadPreview();
     });
   });
+
+  // Auto-load on page load
+  loadPreview();
 </script>
