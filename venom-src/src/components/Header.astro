@@ -194,18 +194,29 @@ function isActive(href: string, current: string): boolean {
       padding: 14px 32px;
       font-size: 16px;
     }
+
+    /* Make header transparent when menu is open so it doesn't show through */
+    .header:has(.nav.open),
+    .header.menu-open {
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border-bottom-color: transparent;
+    }
   }
 </style>
 
 <script>
   const toggle = document.getElementById('mobile-menu-toggle');
   const nav = document.getElementById('nav');
+  const header = document.querySelector('.header');
 
-  if (toggle && nav) {
+  if (toggle && nav && header) {
     toggle.addEventListener('click', () => {
       const isOpen = toggle.getAttribute('aria-expanded') === 'true';
       toggle.setAttribute('aria-expanded', String(!isOpen));
       nav.classList.toggle('open');
+      header.classList.toggle('menu-open');
       document.body.style.overflow = isOpen ? '' : 'hidden';
     });
 
@@ -214,6 +225,7 @@ function isActive(href: string, current: string): boolean {
       link.addEventListener('click', () => {
         toggle.setAttribute('aria-expanded', 'false');
         nav.classList.remove('open');
+        header.classList.remove('menu-open');
         document.body.style.overflow = '';
       });
     });
