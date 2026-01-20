@@ -5,9 +5,13 @@ interface Props {
 
 const { currentPath = '' } = Astro.props;
 
+const isVenomSection = currentPath.startsWith('/venom');
+
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/venom/', label: 'VENOM' },
+  // Demo link only shows on VENOM pages
+  ...(isVenomSection ? [{ href: '/venom/demo/', label: 'Demo' }] : []),
 ];
 
 function isActive(href: string, current: string): boolean {
