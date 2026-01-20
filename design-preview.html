@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VENOM Redesign Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --color-bg: #0a0e14;
+      --color-bg-elevated: #0f1419;
+      --color-text: #e5e7eb;
+      --color-text-muted: #94a3b8;
+      --color-accent: #b72115;
+      --color-accent-hover: #d42a1a;
+      --color-accent-glow: rgba(183, 33, 21, 0.3);
+      --color-safe: #2dd4bf;
+      --color-border: rgba(255, 255, 255, 0.06);
+      --font-display: 'Red Hat Display', system-ui, sans-serif;
+      --container-max: 1100px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 14, 20, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .header-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 16px max(5vw, 20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--color-text);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--color-accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px var(--color-accent-glow);
+    }
+
+    .logo-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav a:hover {
+      color: var(--color-text);
+    }
+
+    .nav a.active {
+      color: var(--color-text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--color-accent);
+      color: white;
+      box-shadow: 0 0 24px var(--color-accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 32px var(--color-accent-glow);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-menu {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--color-text);
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 0% 0%, var(--color-accent-glow), transparent 50%),
+        radial-gradient(ellipse 80% 60% at 100% 100%, rgba(45, 212, 191, 0.08), transparent 50%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(183, 33, 21, 0.05), transparent);
+      pointer-events: none;
+    }
+
+    /* Subtle animated grain texture */
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 60px max(5vw, 20px);
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 800;
+      line-height: 1.05;
+      margin: 0 0 24px 0;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 .accent {
+      color: var(--color-accent);
+      text-shadow: 0 0 40px var(--color-accent-glow);
+    }
+
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--color-text-muted);
+      max-width: 560px;
+      margin: 0 0 32px 0;
+      line-height: 1.7;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== SECTION ===== */
+    .section {
+      padding: 80px max(5vw, 20px);
+    }
+
+    .section-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+    }
+
+    .section h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.5px;
+    }
+
+    .section > p, .section-inner > p {
+      color: var(--color-text-muted);
+      font-size: 17px;
+      max-width: 640px;
+      margin: 0 0 40px 0;
+    }
+
+    /* ===== CARDS GRID ===== */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(15, 20, 27, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(183, 33, 21, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--color-accent);
+    }
+
+    .card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 10px 0;
+    }
+
+    .card p {
+      color: var(--color-text-muted);
+      font-size: 14px;
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* ===== CALLOUT ===== */
+    .callout {
+      background: rgba(183, 33, 21, 0.08);
+      border-left: 3px solid var(--color-accent);
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+      margin: 40px 0;
+    }
+
+    .callout p {
+      margin: 0;
+      font-weight: 500;
+      color: var(--color-text);
+      font-size: 17px;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      border-top: 1px solid var(--color-border);
+      padding: 40px max(5vw, 20px);
+    }
+
+    .footer-inner {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-text);
+    }
+
+    .footer-copy {
+      color: var(--color-text-muted);
+      font-size: 13px;
+    }
+
+    /* ===== REVEAL ANIMATION ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: revealUp 0.7s ease forwards;
+    }
+
+    .reveal:nth-child(1) { animation-delay: 0ms; }
+    .reveal:nth-child(2) { animation-delay: 100ms; }
+    .reveal:nth-child(3) { animation-delay: 200ms; }
+    .reveal:nth-child(4) { animation-delay: 300ms; }
+
+    @keyframes revealUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 768px) {
+      .nav {
+        display: none;
+      }
+
+      .mobile-menu {
+        display: block;
+      }
+
+      .hero {
+        min-height: 60vh;
+      }
+
+      .hero-inner {
+        padding: 40px max(5vw, 20px);
+      }
+
+      .section {
+        padding: 60px max(5vw, 20px);
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ===== COMPARISON LABEL ===== */
+    .comparison {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 20, 27, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--color-border);
+      border-radius: 100px;
+      padding: 12px 24px;
+      font-size: 13px;
+      color: var(--color-text-muted);
+      z-index: 1000;
+    }
+
+    .comparison strong {
+      color: var(--color-accent);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+            <path d="M12 3v18M3 12h18"/>
+          </svg>
+        </div>
+        <span>SEMIAUTONOMOUS</span>
+      </a>
+
+      <nav class="nav">
+        <a href="/" class="active">Home</a>
+        <a href="/venom/">VENOM</a>
+        <a href="/venom/demo">Demo</a>
+        <a href="#" class="btn btn-primary">Contact</a>
+      </nav>
+
+      <button class="mobile-menu" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 class="reveal">
+        Rules of engagement<br>
+        <span class="accent">that sites can enforce</span>
+      </h1>
+      <p class="reveal">
+        AI crawlers extract value without sending users back. We build infrastructure that lets sites set, enforce, and measure rules of engagement.
+      </p>
+      <div class="hero-buttons reveal">
+        <a href="#" class="btn btn-primary">Talk to us</a>
+        <a href="/venom/" class="btn btn-secondary">Learn about VENOM →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- THESIS SECTION -->
+  <section class="section">
+    <div class="section-inner">
+      <h2 class="reveal">Our thesis</h2>
+      <p class="reveal">
+        Rules of engagement should be expressible, enforceable, and measurable. Sites should have real leverage—not just legal text.
+      </p>
+
+      <div class="cards">
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <h3>Expressible</h3>
+          <p>Sites can declare nuanced preferences beyond simple allow or disallow. Search indexing vs. AI training? Different rules.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>Enforceable</h3>
+          <p>Technical controls at the network edge make violating rules costly. Honest access becomes easier than cheating.</p>
+        </div>
+
+        <div class="card reveal">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+            </svg>
+          </div>
+          <h3>Measurable</h3>
+          <p>Instrumentation tracks compliance, detects violations, and provides evidence for accountability.</p>
+        </div>
+      </div>
+
+      <div class="callout reveal">
+        <p>From "please don't" to technical enforcement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/venom/">VENOM</a>
+        <a href="/venom/demo">Demo</a>
+        <a href="mailto:venom@semiautonomous.systems">Contact</a>
+      </div>
+      <div class="footer-copy">
+        © 2025 Semiautonomous Systems
+      </div>
+    </div>
+  </footer>
+
+  <div class="comparison">
+    <strong>NEW DESIGN</strong> — Unified header, mobile-friendly, 2026 aesthetic
+  </div>
+
+</body>
+</html>
