@@ -825,6 +825,9 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
       return;
     }
 
+    // Update aspect ratio based on device selection when loading
+    updateAspectRatio();
+
     // Abort any ongoing request
     if (abortController) {
       abortController.abort();
@@ -963,9 +966,6 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   urlInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') loadPreview();
   });
-
-  // Update aspect ratio when device changes
-  deviceSelect.addEventListener('change', updateAspectRatio);
 
   // Example buttons
   document.querySelectorAll('.example-btn').forEach(btn => {
