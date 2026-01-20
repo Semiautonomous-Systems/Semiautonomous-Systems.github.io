@@ -689,6 +689,13 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     });
   });
 
+  // Check if panels actually need scrolling (content overflows)
+  function checkScrollNeeded() {
+    const needsScroll = panelsContainer.scrollWidth > panelsContainer.clientWidth + 10;
+    scrollIndicator.style.display = needsScroll ? 'flex' : 'none';
+    return needsScroll;
+  }
+
   // Scroll indicator functionality
   function updateScrollIndicator() {
     const scrollLeft = panelsContainer.scrollLeft;
@@ -707,7 +714,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   panelsContainer.addEventListener('scroll', () => {
     updateScrollIndicator();
 
-    // After first user scroll, remove pulse and eventually hide
+    // After first user scroll, remove pulse
     if (!hasUserScrolled) {
       hasUserScrolled = true;
       scrollIndicator.classList.remove('pulse');
@@ -725,8 +732,11 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     });
   });
 
-  // Add pulse animation on load (only on touch devices)
-  if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+  // Check on resize if scroll is still needed
+  window.addEventListener('resize', checkScrollNeeded);
+
+  // Initial check and pulse animation (only if scrolling is needed on touch devices)
+  if (checkScrollNeeded() && window.matchMedia('(hover: none), (pointer: coarse)').matches) {
     scrollIndicator.classList.add('pulse');
   }
 
