@@ -50,13 +50,6 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
             </select>
           </div>
 
-          <div class="control-group control-checkbox">
-            <label class="checkbox-label">
-              <input type="checkbox" id="inline-mode" checked class="checkbox" />
-              <span>Inline Mode</span>
-            </label>
-          </div>
-
           <!-- Load Button -->
           <div class="control-group control-button">
             <button id="load-btn" class="btn btn-primary">
@@ -168,16 +161,12 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
 
   @media (min-width: 900px) {
     .controls-grid {
-      grid-template-columns: 1fr 1fr 1fr auto auto;
+      grid-template-columns: 1fr 1fr 1fr auto;
       align-items: end;
     }
 
     .control-url {
       grid-column: 1 / -1;
-    }
-
-    .control-checkbox {
-      justify-self: start;
     }
 
     .control-button {
@@ -213,28 +202,6 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   .input::placeholder {
     color: var(--color-text-muted);
     opacity: 0.6;
-  }
-
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    cursor: pointer;
-    padding: var(--space-sm) 0;
-  }
-
-  .checkbox {
-    width: 16px;
-    height: 16px;
-    border-radius: var(--radius-sm);
-    background: rgba(15, 20, 27, 0.5);
-    border: 1px solid var(--color-border);
-    cursor: pointer;
-  }
-
-  .checkbox-label span {
-    font-size: 14px;
-    color: var(--color-text-muted);
   }
 
   /* Panels */
@@ -529,7 +496,6 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   const urlInput = document.getElementById('url-input') as HTMLInputElement;
   const botSelect = document.getElementById('bot-select') as HTMLSelectElement;
   const deviceSelect = document.getElementById('device-select') as HTMLSelectElement;
-  const inlineMode = document.getElementById('inline-mode') as HTMLInputElement;
   const loadBtn = document.getElementById('load-btn') as HTMLButtonElement;
   const originalPanel = document.getElementById('original-panel') as HTMLDivElement;
   const poisonedPanel = document.getElementById('poisoned-panel') as HTMLDivElement;
@@ -607,7 +573,6 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
 
     const bot = botSelect.value;
     const mode = deviceSelect.value;
-    const inline = inlineMode.checked;
 
     // Update UI
     loadBtn.disabled = true;
@@ -620,7 +585,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     try {
       // Build API URLs - url parameter must come last
       const originalUrl = `${API_BASE}?mode=${mode}&url=${encodeURIComponent(url)}`;
-      const poisonedUrl = `${API_BASE}?bot=${bot}${inline ? '&inline=yes' : ''}&mode=${mode}&url=${encodeURIComponent(url)}`;
+      const poisonedUrl = `${API_BASE}?bot=${bot}&inline=yes&mode=${mode}&url=${encodeURIComponent(url)}`;
 
       // Fetch both screenshots in parallel
       const [originalResp, poisonedResp] = await Promise.all([
@@ -643,7 +608,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
 
       // Update stats from headers
       originalStats.textContent = `Mode: ${mode}`;
-      poisonedStats.textContent = `Bot: ${bot}${inline ? ' (inline)' : ''}`;
+      poisonedStats.textContent = `Bot: ${bot}`;
 
     } catch (err: any) {
       if (err.name === 'AbortError') return;
