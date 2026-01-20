@@ -558,6 +558,12 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     right: var(--space-lg);
   }
 
+  /* Hide arrows when at boundary (no more images in that direction) */
+  .lightbox-nav.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   /* Hide nav buttons on small touch devices - they'll use swipe */
   @media (max-width: 640px) and (hover: none), (max-width: 640px) and (pointer: coarse) {
     .lightbox-nav {
@@ -728,6 +734,13 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     });
   }
 
+  function updateLightboxArrows() {
+    // Hide prev arrow if at first image
+    lightboxPrev.classList.toggle('hidden', currentLightboxIndex === 0);
+    // Hide next arrow if at last image
+    lightboxNext.classList.toggle('hidden', currentLightboxIndex >= lightboxImages.length - 1);
+  }
+
   function showLightboxImage(index: number) {
     if (index < 0 || index >= lightboxImages.length || !lightboxImages[index]) return;
 
@@ -738,6 +751,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
       lightboxImg.src = lightboxImages[index].src;
       lightboxLabel.textContent = lightboxImages[index].label;
       updateLightboxDots();
+      updateLightboxArrows();
       lightboxImg.classList.remove('transitioning');
     }, 100);
   }
@@ -753,6 +767,7 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     lightboxLabel.textContent = lightboxImages[index].label;
     lightboxHint.classList.remove('hidden');
     updateLightboxDots();
+    updateLightboxArrows();
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
 
