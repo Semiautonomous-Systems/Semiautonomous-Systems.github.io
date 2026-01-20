@@ -108,9 +108,27 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   </section>
 
   <!-- Lightbox Modal -->
-  <div id="lightbox" class="lightbox">
-    <button class="lightbox-close" aria-label="Close">&times;</button>
-    <img id="lightbox-img" src="" alt="Enlarged screenshot" />
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot comparison viewer">
+    <button class="lightbox-close" aria-label="Close (Escape)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" aria-label="Previous image (Left arrow)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <div class="lightbox-content" id="lightbox-content">
+      <img id="lightbox-img" src="" alt="" />
+      <div class="lightbox-label" id="lightbox-label"></div>
+      <div class="lightbox-hint" id="lightbox-hint">Swipe or use arrow keys to compare</div>
+    </div>
+    <button class="lightbox-nav lightbox-next" aria-label="Next image (Right arrow)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+    <div class="lightbox-dots">
+      <button class="lightbox-dot active" data-index="0" aria-label="View original"></button>
+      <button class="lightbox-dot" data-index="1" aria-label="View VENOM preview"></button>
+    </div>
   </div>
 </BaseLayout>
 
@@ -481,12 +499,138 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     opacity: 1;
   }
 
-  .lightbox img {
+  .lightbox-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     max-width: 95vw;
     max-height: 90vh;
+  }
+
+  .lightbox img {
+    max-width: 95vw;
+    max-height: calc(90vh - 40px);
     object-fit: contain;
     border-radius: var(--radius-md);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.2s ease;
+  }
+
+  .lightbox img.transitioning {
+    opacity: 0.5;
+  }
+
+  .lightbox-label {
+    margin-top: var(--space-sm);
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all var(--transition-fast);
+  }
+
+  .lightbox-nav:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox-prev {
+    left: var(--space-lg);
+  }
+
+  .lightbox-next {
+    right: var(--space-lg);
+  }
+
+  /* Hide nav buttons on small touch devices - they'll use swipe */
+  @media (max-width: 640px) and (hover: none), (max-width: 640px) and (pointer: coarse) {
+    .lightbox-nav {
+      display: none;
+    }
+  }
+
+  .lightbox-dots {
+    position: absolute;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+  }
+
+  .lightbox-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+
+  .lightbox-dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .lightbox-dot.active {
+    background: var(--color-text);
+    transform: scale(1.2);
+  }
+
+  /* Focus styles for accessibility */
+  .lightbox-close:focus,
+  .lightbox-nav:focus,
+  .lightbox-dot:focus {
+    outline: 2px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .lightbox-dot:focus {
+    outline-offset: 4px;
+  }
+
+  /* Hint text for navigation */
+  .lightbox-hint {
+    margin-top: var(--space-xs);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    opacity: 0.6;
+    text-align: center;
+    transition: opacity 0.3s ease;
+  }
+
+  .lightbox-hint.hidden {
+    opacity: 0;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox img {
+      transition: none;
+    }
+
+    .lightbox-dot,
+    .lightbox-nav,
+    .lightbox-close {
+      transition: none;
+    }
   }
 </style>
 
@@ -503,13 +647,34 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
   const poisonedStats = document.getElementById('poisoned-stats') as HTMLDivElement;
   const lightbox = document.getElementById('lightbox') as HTMLDivElement;
   const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const lightboxLabel = document.getElementById('lightbox-label') as HTMLDivElement;
+  const lightboxHint = document.getElementById('lightbox-hint') as HTMLDivElement;
+  const lightboxContent = document.getElementById('lightbox-content') as HTMLDivElement;
   const lightboxClose = document.querySelector('.lightbox-close') as HTMLButtonElement;
+  const lightboxPrev = document.querySelector('.lightbox-prev') as HTMLButtonElement;
+  const lightboxNext = document.querySelector('.lightbox-next') as HTMLButtonElement;
+  const lightboxDots = document.querySelectorAll('.lightbox-dot') as NodeListOf<HTMLButtonElement>;
   const panelsContainer = document.getElementById('panels-container') as HTMLDivElement;
   const scrollIndicator = document.getElementById('scroll-indicator') as HTMLDivElement;
   const scrollDots = document.querySelectorAll('.scroll-dot') as NodeListOf<HTMLButtonElement>;
 
   let abortController: AbortController | null = null;
   let hasUserScrolled = false;
+
+  // Lightbox state
+  interface LightboxImage {
+    src: string;
+    label: string;
+  }
+  let lightboxImages: LightboxImage[] = [];
+  let currentLightboxIndex = 0;
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let previouslyFocusedElement: HTMLElement | null = null;
+  let hasNavigatedInLightbox = false;
+
+  // Track object URLs for cleanup
+  let currentObjectUrls: string[] = [];
 
   // Update aspect ratio based on device selection
   function updateAspectRatio() {
@@ -537,25 +702,105 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
     `;
   }
 
-  function showImage(panel: HTMLDivElement, url: string) {
+  function showImage(panel: HTMLDivElement, url: string, index: number, label: string) {
     const img = document.createElement('img');
     img.src = url;
-    img.alt = 'Screenshot';
+    img.alt = `${label} screenshot - click to enlarge`;
     img.loading = 'eager';
-    img.addEventListener('click', () => openLightbox(url));
+    img.addEventListener('click', () => openLightbox(index));
     panel.innerHTML = '';
     panel.appendChild(img);
+
+    // Track images for lightbox navigation
+    lightboxImages[index] = { src: url, label };
   }
 
-  function openLightbox(imgSrc: string) {
-    lightboxImg.src = imgSrc;
+  // Cleanup old object URLs to prevent memory leak
+  function cleanupObjectUrls() {
+    currentObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    currentObjectUrls = [];
+    lightboxImages = [];
+  }
+
+  function updateLightboxDots() {
+    lightboxDots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentLightboxIndex);
+    });
+  }
+
+  function showLightboxImage(index: number) {
+    if (index < 0 || index >= lightboxImages.length || !lightboxImages[index]) return;
+
+    currentLightboxIndex = index;
+    lightboxImg.classList.add('transitioning');
+
+    setTimeout(() => {
+      lightboxImg.src = lightboxImages[index].src;
+      lightboxLabel.textContent = lightboxImages[index].label;
+      updateLightboxDots();
+      lightboxImg.classList.remove('transitioning');
+    }, 100);
+  }
+
+  function openLightbox(index: number) {
+    // Store currently focused element to restore later
+    previouslyFocusedElement = document.activeElement as HTMLElement;
+    hasNavigatedInLightbox = false;
+
+    currentLightboxIndex = index;
+    lightboxImg.src = lightboxImages[index].src;
+    lightboxImg.alt = `${lightboxImages[index].label} - Image ${index + 1} of ${lightboxImages.length}`;
+    lightboxLabel.textContent = lightboxImages[index].label;
+    lightboxHint.classList.remove('hidden');
+    updateLightboxDots();
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Focus the close button for keyboard users
+    setTimeout(() => lightboxClose.focus(), 100);
   }
 
   function closeLightbox() {
     lightbox.classList.remove('active');
     document.body.style.overflow = '';
+
+    // Restore focus to the element that opened the lightbox
+    if (previouslyFocusedElement) {
+      previouslyFocusedElement.focus();
+      previouslyFocusedElement = null;
+    }
+  }
+
+  function navigateLightbox(direction: number) {
+    const newIndex = currentLightboxIndex + direction;
+    if (newIndex >= 0 && newIndex < lightboxImages.length && lightboxImages[newIndex]) {
+      showLightboxImage(newIndex);
+
+      // Hide hint after first navigation
+      if (!hasNavigatedInLightbox) {
+        hasNavigatedInLightbox = true;
+        lightboxHint.classList.add('hidden');
+      }
+    }
+  }
+
+  // Focus trap for lightbox
+  function trapFocus(e: KeyboardEvent) {
+    if (!lightbox.classList.contains('active') || e.key !== 'Tab') return;
+
+    const focusableElements = lightbox.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey && document.activeElement === firstElement) {
+      e.preventDefault();
+      lastElement.focus();
+    } else if (!e.shiftKey && document.activeElement === lastElement) {
+      e.preventDefault();
+      firstElement.focus();
+    }
   }
 
   async function loadPreview() {
@@ -603,8 +848,15 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
         poisonedResp.blob()
       ]);
 
-      showImage(originalPanel, URL.createObjectURL(originalBlob));
-      showImage(poisonedPanel, URL.createObjectURL(poisonedBlob));
+      // Cleanup old URLs before creating new ones
+      cleanupObjectUrls();
+
+      const originalObjUrl = URL.createObjectURL(originalBlob);
+      const poisonedObjUrl = URL.createObjectURL(poisonedBlob);
+      currentObjectUrls = [originalObjUrl, poisonedObjUrl];
+
+      showImage(originalPanel, originalObjUrl, 0, 'Original (Human View)');
+      showImage(poisonedPanel, poisonedObjUrl, 1, 'VENOM Preview (AI Crawler View)');
 
       // Update stats from headers
       originalStats.textContent = `Mode: ${mode}`;
@@ -623,12 +875,72 @@ const description = 'See how VENOM transforms content for AI crawlers while pres
 
   // Lightbox event listeners
   lightboxClose.addEventListener('click', closeLightbox);
+  lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
+  lightboxNext.addEventListener('click', () => navigateLightbox(1));
+
+  // Click on lightbox dots to navigate
+  lightboxDots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.dataset.index || '0', 10);
+      showLightboxImage(index);
+    });
+  });
+
+  // Click outside image to close
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox) closeLightbox();
   });
+
+  // Keyboard navigation and focus trap
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeLightbox();
+    if (!lightbox.classList.contains('active')) return;
+
+    // Handle focus trap
+    trapFocus(e);
+
+    switch (e.key) {
+      case 'Escape':
+        closeLightbox();
+        break;
+      case 'ArrowLeft':
+        navigateLightbox(-1);
+        break;
+      case 'ArrowRight':
+        navigateLightbox(1);
+        break;
+      case 'Home':
+        showLightboxImage(0);
+        break;
+      case 'End':
+        showLightboxImage(lightboxImages.length - 1);
+        break;
+    }
   });
+
+  // Touch swipe navigation for mobile - attached to content area only
+  lightboxContent.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightboxContent.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 75; // Increased threshold to avoid accidental swipes
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        // Swipe left - next image
+        navigateLightbox(1);
+      } else {
+        // Swipe right - previous image
+        navigateLightbox(-1);
+      }
+    }
+  }
 
   // Event listeners
   loadBtn.addEventListener('click', loadPreview);
