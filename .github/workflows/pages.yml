@@ -40,6 +40,7 @@ jobs:
           # Copy static content from docs/
           cp docs/CNAME _site/ || true
           cp -R docs/slides _site/ || true
+          cp -R docs/study _site/ || true
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
