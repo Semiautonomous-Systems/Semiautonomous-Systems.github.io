@@ -37,8 +37,9 @@ jobs:
           mkdir -p _site
           # Use venom-src as the main site
           cp -R venom-src/dist/* _site/
-          # Copy CNAME for custom domain
+          # Copy static content from docs/
           cp docs/CNAME _site/ || true
+          cp -R docs/slides _site/ || true
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
