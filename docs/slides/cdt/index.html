@@ -48,6 +48,33 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* FAQ slide */
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 28px;
+    margin-top: 0.5em;
+    overflow-y: auto;
+    max-height: calc(100vh - 180px);
+  }
+  .faq-item {
+    font-size: 0.85em;
+    line-height: 1.45;
+    padding: 10px 12px;
+    background: #fafafa;
+    border-radius: 6px;
+    border-left: 3px solid var(--blue);
+  }
+  .faq-item .faq-q {
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .faq-item .faq-a {
+    color: var(--muted);
+    font-size: 0.92em;
+  }
+
   .slide-title {
     font-size: 2.4em;
     font-weight: 700;
@@ -310,7 +337,7 @@
     CDT Private Roundtable: Preserving an Open Internet in the AI Age<br>
     Nick Sullivan &middot; February 10, 2026
   </div>
-  <div class="slide-number">0 / 5</div>
+  <div class="slide-number">0 / 6</div>
 </div>
 
 <!-- SLIDE 1: The Old Deal -->
@@ -331,10 +358,10 @@
   <div class="callout callout-dual mt">
     <p><span class="tag tag-ops">OPERATIONAL COST</span> Bandwidth, server strain, infrastructure burden</p>
     <p><span class="tag tag-ip">IP EXTRACTION</span> Content in training data without permission or compensation</p>
-    <p class="small text-muted" style="margin-top:0.4em">A hobbyist forum cares about staying online. A news publisher cares about its journalism training a competitor. Not every site cares about both.</p>
+    <p class="small text-muted" style="margin-top:0.4em">A hobbyist forum cares about staying online. A news publisher cares about its journalism training a competitor. An open-knowledge project may welcome reuse but still want attribution. Not every site cares about both.</p>
   </div>
 
-  <div class="slide-number">1 / 5</div>
+  <div class="slide-number">1 / 6</div>
 </div>
 
 <!-- SLIDE 2: Arms Race -->
@@ -356,7 +383,7 @@
 
   <p class="mt small"><span class="tag tag-ops">Rows 1-8</span> address <strong>operational cost</strong>. <span class="tag tag-ip">Row 9</span> is the <strong>IP problem</strong>: content extracted without touching your servers.</p>
 
-  <div class="slide-number">2 / 5</div>
+  <div class="slide-number">2 / 6</div>
 </div>
 
 <!-- SLIDE 3: Three Archetypes -->
@@ -389,7 +416,7 @@
 
   <p class="mt">Most defenses only catch <strong>category 2</strong>. Categories 1 and 3 require different approaches.</p>
 
-  <div class="slide-number">3 / 5</div>
+  <div class="slide-number">3 / 6</div>
 </div>
 
 <!-- SLIDE 4: Tracing -->
@@ -432,7 +459,7 @@
   </div>
   <p class="small text-muted">Early-stage. Need testing, refinement, and court validation.</p>
 
-  <div class="slide-number">4 / 5</div>
+  <div class="slide-number">4 / 6</div>
 </div>
 
 <!-- SLIDE 5: Three Paths -->
@@ -444,6 +471,7 @@
       <h3 class="text-blue">Standards &amp; Norms</h3>
       <p>Preference vocabulary (IETF AIPREF)</p>
       <p>Cryptographic bot authentication</p>
+      <p>Express restriction <em>or openness</em></p>
       <p><span class="tag tag-ops">Ops</span> <span class="tag tag-ip">IP</span></p>
       <div class="path-problem">Voluntary. Most crawlers already ignore robots.txt.</div>
     </div>
@@ -469,7 +497,53 @@
     Technology for the rest.
   </div>
 
-  <div class="slide-number">5 / 5</div>
+  <div class="slide-number">5 / 6</div>
+</div>
+
+<!-- SLIDE 6: FAQ -->
+<div class="slide" data-notes="Bonus reference slide. Don't present this; it's here if someone asks a question you want to pull up.">
+  <div class="slide-title">Anticipated Questions</div>
+
+  <div class="faq-grid">
+    <div class="faq-item">
+      <div class="faq-q">How do you allowlist legitimate crawlers (Internet Archive, accessibility tools) without also allowlisting scrapers impersonating them?</div>
+      <div class="faq-a">Cryptographic bot authentication (Web Bot Auth) lets crawlers prove identity with verifiable credentials, not user-agent strings. Decentralized: no single gatekeeper.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">The Copyright Office opinion isn't settled law. Fair use is a four-factor balancing test. Aren't you overstating the legal landscape?</div>
+      <div class="faq-a">Fair use is a defense, not a license. Thomson Reuters won on summary judgment. But even if training is fair use, measurement tools serve transparency: publishers should know their content was used.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Wikipedia wants to be crawled. Your framework assumes publishers want to restrict access. What about the open knowledge commons?</div>
+      <div class="faq-a">The framework is choose-by-default, not restrict-by-default. Measurement helps open projects too: verify crawlers respect CC-BY-SA attribution instead of stripping it.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Watermarking, canary tokens, fingerprinting: these are surveillance techniques. How is this different from the tracking infrastructure privacy advocates have fought for a decade?</div>
+      <div class="faq-a">Watermarks travel with content, not users. No cookie, no device fingerprint, no cross-site tracking. Closer to a photographer's EXIF metadata than adtech surveillance.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">AI systems that train on web content also drive traffic back through citations and links. Isn't the crawl-to-referral framing ignoring new forms of attribution?</div>
+      <div class="faq-a">The measured ratios (3,700:1, 500,000:1) are the imbalance. Search clickthrough rates are collapsing as AI answers replace links. The net direction is clear.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Millions of creators use CC licenses to enable reuse. Shouldn't the default be open, with opt-in restriction?</div>
+      <div class="faq-a">Agree: default should be open. Measurement is opt-in. CC-BY-SA has conditions (attribution, share-alike). Measurement helps CC creators verify those conditions are met.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Text watermarking is fragile: paraphrasing, summarization, and tokenization destroy most watermarks. Aren't you overselling tools that don't work yet?</div>
+      <div class="faq-a">Canary tokens aren't watermarks. A canary is a fabricated fact, not a stylistic signal. Paraphrasing doesn't destroy it. Reddit proved the concept. Zero investment is the wrong answer.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What do publishers actually do on Monday morning? What's the actionable advice for a small publisher?</div>
+      <div class="faq-a">Four free steps: update robots.txt (establishes legal standing), check CDN bot analytics, review server logs for GPTBot/ClaudeBot/Bytespider, participate in AIPREF standards work.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Over 20% of the web is behind Cloudflare. If they decide who's a bot, that's a chokepoint. Your measurement tools add another layer. Who operates it?</div>
+      <div class="faq-a">Open standards with multiple implementers: the Privacy Pass model. One company proposed it, IETF standardized it, multiple vendors operate it. Measurement should be open-source and publisher-deployed.</div>
+    </div>
+  </div>
+
+  <div class="slide-number">6 / 6</div>
 </div>
 
 <!-- Speaker notes overlay -->
