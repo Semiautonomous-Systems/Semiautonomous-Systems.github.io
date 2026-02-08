@@ -449,6 +449,7 @@
     <span class="progress-chip" id="prog-sections">Sections: <span class="count">0</span>/25</span>
     <span class="progress-chip" id="prog-quiz">Quiz: <span class="count">0</span>/23</span>
     <span class="progress-chip" id="prog-drill">Drill: <span class="count">0</span>/6</span>
+    <button id="copy-results-btn" onclick="copyResults()" style="background:rgba(255,255,255,0.25);color:#fff;border:none;padding:4px 10px;border-radius:12px;font-size:0.75em;cursor:pointer;white-space:nowrap">Copy Results</button>
   </div>
 </div>
 
@@ -843,7 +844,7 @@ function renderDrill() {
       else if (state.drillResults[k]==="needs-work") n++;
       else g++;
     }
-    c.innerHTML = '<div class="drill-done"><h2>Drill Complete</h2><div class="drill-score-bar" style="justify-content:center"><span class="ds ds-strong">'+s+' Strong</span><span class="ds ds-nw">'+n+' Needs Work</span><span class="ds ds-gap">'+g+' Gap</span></div><p style="margin-top:16px;font-size:0.9em;color:var(--muted)">Press <strong>r</strong> to restart.</p></div>';
+    c.innerHTML = '<div class="drill-done"><h2>Drill Complete</h2><div class="drill-score-bar" style="justify-content:center"><span class="ds ds-strong">'+s+' Strong</span><span class="ds ds-nw">'+n+' Needs Work</span><span class="ds ds-gap">'+g+' Gap</span></div><div style="margin-top:16px;display:flex;gap:12px;justify-content:center"><button id="drill-copy-btn" onclick="copyResults()" style="padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.9em">Copy Results</button><span style="font-size:0.9em;color:var(--muted);line-height:32px">Press <strong>r</strong> to restart</span></div></div>';
     return;
   }
   var kq = kqs[drillIdx];
@@ -866,6 +867,48 @@ function renderDrill() {
       renderDrill();
     }
   };
+}
+
+function copyResults() {
+  var lines = [];
+  lines.push("## Drill Results");
+  var ds = 0, dn = 0, dg = 0;
+  killerQuestions.forEach(function(kq) {
+    var r = state.drillResults[kq.id];
+    if (r) {
+      var icon = r === "strong" ? "+" : r === "needs-work" ? "~" : "-";
+      lines.push(icon + " " + kq.q + " [" + r.toUpperCase().replace("-", " ") + "]");
+      if (r === "strong") ds++;
+      else if (r === "needs-work") dn++;
+      else dg++;
+    }
+  });
+  if (ds + dn + dg === 0) lines.push("(no drill results yet)");
+  else lines.push("Score: " + ds + " strong, " + dn + " needs work, " + dg + " gap");
+
+  lines.push("");
+  lines.push("## Quiz Results");
+  var gi = 0, nw = 0, ga = 0;
+  quizzes.forEach(function(q) {
+    var r = state.quizResults[q.id];
+    if (r) {
+      var icon = r === "got-it" ? "+" : r === "needs-work" ? "~" : "-";
+      lines.push(icon + " " + q.q + " [" + r.toUpperCase().replace("-", " ") + "]");
+      if (r === "got-it") gi++;
+      else if (r === "needs-work") nw++;
+      else ga++;
+    }
+  });
+  if (gi + nw + ga === 0) lines.push("(no quiz results yet)");
+  else lines.push("Score: " + gi + " got it, " + nw + " needs work, " + ga + " gap");
+
+  var text = lines.join("\n");
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById("copy-results-btn");
+    if (btn) { var orig = btn.textContent; btn.textContent = "Copied!"; setTimeout(function() { btn.textContent = orig; }, 1500); }
+    var dbtn = document.getElementById("drill-copy-btn");
+    if (dbtn) { var o2 = dbtn.textContent; dbtn.textContent = "Copied!"; setTimeout(function() { dbtn.textContent = o2; }, 1500); }
+  });
 }
 
 function revealDrill() {
