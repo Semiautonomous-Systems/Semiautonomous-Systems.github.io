@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENOM Deep Dive — Concrete Proposals for LinkedIn</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --blue: #0a4d8c;
+  --blue-light: #e8f0f8;
+  --gold: #c8980a;
+  --gold-light: #fdf6e3;
+  --green: #1a7a3a;
+  --green-light: #eaf5ee;
+  --red: #c0392b;
+  --red-light: #fde8e8;
+  --purple: #6b21a8;
+  --purple-light: #f3e8ff;
+  --text: #1a1a1a;
+  --muted: #666;
+  --bg: #fff;
+  --sidebar-bg: #f7f8fa;
+  --border: #e2e5e9;
+}
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  font-size: 15px;
+}
+/* Header */
+.header {
+  background: var(--blue);
+  color: white;
+  padding: 16px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 {
+  font-size: 1.2em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.header .subtitle {
+  font-size: 0.8em;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+.header .context {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+/* Mobile menu toggle */
+.menu-toggle {
+  display: none;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  width: 100%;
+  text-align: left;
+  position: relative;
+}
+.menu-toggle::after {
+  content: '▼';
+  position: absolute;
+  right: 16px;
+  transition: transform 0.2s;
+}
+.menu-toggle.open::after {
+  transform: rotate(180deg);
+}
+
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  background: var(--sidebar-bg);
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 14px 18px;
+  font-size: 0.82em;
+  font-weight: 600;
+  color: var(--muted);
+  border: none;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+  position: relative;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { color: var(--blue); background: rgba(10,77,140,0.04); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); background: white; }
+.tab-btn .badge {
+  display: inline-block;
+  font-size: 0.7em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+.badge-proposal { background: var(--blue-light); color: var(--blue); }
+.badge-research { background: var(--gold-light); color: var(--gold); }
+
+/* Panels */
+.panel { display: none; padding: 24px 20px; max-width: 1100px; margin: 0 auto; }
+.panel.active { display: block; }
+.panel h2 {
+  font-size: 1.5em;
+  color: var(--blue);
+  margin-bottom: 0.5em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+.panel h3 {
+  font-size: 1.1em;
+  color: var(--text);
+  margin: 1.5em 0 0.5em;
+  font-weight: 700;
+}
+.panel h4 {
+  font-size: 0.9em;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 1.8em 0 0.6em;
+  font-weight: 700;
+}
+.panel p { margin-bottom: 0.8em; }
+.panel ul, .panel ol { margin: 0.5em 0 1em 1.2em; }
+.panel li { margin-bottom: 0.3em; }
+
+/* Cards */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.2s;
+}
+.card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  min-height: 44px;
+}
+.card-header h3 { margin: 0; flex: 1; font-size: 1em; line-height: 1.4; }
+.card-toggle {
+  font-size: 1.2em;
+  color: var(--muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.card.open .card-toggle { transform: rotate(90deg); }
+.card-body { display: none; margin-top: 16px; }
+.card.open .card-body { display: block; }
+
+/* Score card grid */
+.score-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.score-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid var(--blue);
+}
+.score-card.green { border-left-color: var(--green); }
+.score-card.gold { border-left-color: var(--gold); }
+.score-card.red { border-left-color: var(--red); }
+.score-card.purple { border-left-color: var(--purple); }
+.score-card h3 { margin: 0 0 4px; font-size: 0.95em; }
+.score-card .value { font-size: 1.5em; font-weight: 700; color: var(--blue); line-height: 1.2; }
+.score-card.green .value { color: var(--green); }
+.score-card.gold .value { color: var(--gold); }
+.score-card.purple .value { color: var(--purple); }
+.score-card .detail { font-size: 0.82em; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+
+/* Proposal header */
+.proposal-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+.proposal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6em;
+  flex-shrink: 0;
+}
+.proposal-meta { flex: 1; min-width: 0; }
+.proposal-meta .one-liner {
+  font-size: 0.95em;
+  color: var(--muted);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* Tags */
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+.tag {
+  font-size: 0.7em;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tag-green { background: var(--green-light); color: var(--green); }
+.tag-red { background: var(--red-light); color: var(--red); }
+.tag-blue { background: var(--blue-light); color: var(--blue); }
+.tag-gold { background: var(--gold-light); color: var(--gold); }
+.tag-purple { background: var(--purple-light); color: var(--purple); }
+
+/* Strengths/weaknesses */
+.sw-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+.sw-col h4 { margin-top: 0; }
+.sw-col ul { list-style: none; margin-left: 0; }
+.sw-col.strengths li::before { content: "+"; color: var(--green); font-weight: 700; margin-right: 8px; }
+.sw-col.weaknesses li::before { content: "-"; color: var(--red); font-weight: 700; margin-right: 8px; }
+
+/* SVG diagrams */
+.diagram {
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.diagram svg {
+  max-width: 100%;
+  height: auto;
+  min-width: 600px;
+}
+
+/* Tables */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.data-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+.data-table th {
+  background: var(--sidebar-bg);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.data-table tr:hover { background: rgba(10,77,140,0.02); }
+.cell-survive { color: var(--green); font-weight: 700; }
+.cell-stripped { color: var(--red); font-weight: 700; }
+.cell-mapped { color: var(--gold); font-weight: 700; }
+.cell-unknown { color: var(--muted); }
+
+/* Code blocks */
+.code-block {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8em;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin: 12px 0;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+.code-block .kw { color: #cba6f7; }
+.code-block .str { color: #a6e3a1; }
+.code-block .cm { color: #6c7086; }
+.code-block .fn { color: #89b4fa; }
+.code-block .num { color: #fab387; }
+
+/* Callout boxes */
+.callout {
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.callout-blue { background: var(--blue-light); border-left: 4px solid var(--blue); }
+.callout-green { background: var(--green-light); border-left: 4px solid var(--green); }
+.callout-gold { background: var(--gold-light); border-left: 4px solid var(--gold); }
+.callout-red { background: var(--red-light); border-left: 4px solid var(--red); }
+.callout strong { display: block; margin-bottom: 6px; }
+
+/* Researchers */
+.researcher {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.researcher:last-child { border-bottom: none; }
+.researcher .initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.82em;
+  flex-shrink: 0;
+}
+.researcher .info { flex: 1; min-width: 0; }
+.researcher .name { font-weight: 700; font-size: 0.9em; }
+.researcher .affiliation { font-size: 0.8em; color: var(--muted); }
+.researcher .contribution { font-size: 0.85em; margin-top: 2px; line-height: 1.4; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--muted);
+  font-size: 0.8em;
+  border-top: 1px solid var(--border);
+}
+
+/* Keyboard shortcuts overlay */
+.shortcuts-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.shortcuts-overlay.visible { display: flex; }
+.shortcuts-box {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.shortcuts-box h3 { margin-bottom: 16px; color: var(--blue); }
+.shortcut-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.9em;
+  gap: 12px;
+}
+.shortcut-key {
+  background: var(--sidebar-bg);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Desktop optimizations */
+@media (min-width: 769px) {
+  .panel { padding: 32px; }
+  .header {
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header .context {
+    text-align: right;
+    margin-top: 0;
+  }
+  .score-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  .sw-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .diagram {
+    padding: 20px;
+  }
+  .diagram svg {
+    min-width: 0;
+  }
+  .data-table {
+    min-width: 0;
+  }
+  .table-wrapper {
+    border: none;
+    overflow: visible;
+  }
+}
+
+/* Mobile menu */
+@media (max-width: 768px) {
+  .menu-toggle { display: block; }
+  .tab-bar {
+    display: none;
+    flex-direction: column;
+    border-bottom: none;
+  }
+  .tab-bar.open {
+    display: flex;
+  }
+  .tab-btn {
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    padding: 12px 20px;
+    text-align: left;
+    justify-content: flex-start;
+  }
+  .tab-btn.active {
+    border-left-color: var(--blue);
+    border-bottom-color: transparent;
+  }
+  .panel h2 {
+    font-size: 1.3em;
+  }
+  .proposal-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .proposal-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4em;
+  }
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Print */
+@media print {
+  .header, .tab-bar, .menu-toggle, .footer, .shortcuts-overlay { display: none; }
+  .panel { display: block !important; page-break-inside: avoid; }
+  .card-body { display: block !important; }
+  body { font-size: 11pt; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>VENOM Deep Dive</h1>
+    <div class="subtitle">Concrete Technical Proposals for LinkedIn Anti-Extraction</div>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">Navigation Menu</button>
+  </div>
+  <div class="context">
+    Meeting: Eugene (Anti-Scraping) &middot; Feb 9, 2026<br>
+    Constraints: JVM, minimal deps, no threads, SSR integration
+  </div>
+</div>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="overview">Overview</button>
+  <button class="tab-btn" data-tab="scrapers">How Scrapers Work <span class="badge badge-research">DEEP</span></button>
+  <button class="tab-btn" data-tab="pipeline">Pipeline Survival <span class="badge badge-research">KEY</span></button>
+  <button class="tab-btn" data-tab="p1">1. Homoglyphs <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="p2">2. Innamark <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="p3">3. Canary Profiles <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="p4">4. SSR Traps <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="p5">5. Token Inflation <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="p6">6. Behavioral <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="evidence">Evidence <span class="badge badge-research">REAL</span></button>
+  <button class="tab-btn" data-tab="integration">Integration Path</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- OVERVIEW -->
+<!-- ============================================================ -->
+<div class="panel active" id="panel-overview">
+  <h2>Six Proposals. Two Threat Models. One JVM.</h2>
+  <p>Eugene described two scraper types. Each proposal below maps to one or both.</p>
+
+  <div class="score-grid">
+    <div class="score-card">
+      <h3>Scraper Type 1</h3>
+      <div class="value">Headless Browsers</div>
+      <div class="detail">Fake/compromised accounts + Playwright/Puppeteer. High volume. Scrape specific fields. Detectable by behavior and CDP signals.</div>
+    </div>
+    <div class="score-card gold">
+      <h3>Scraper Type 2</h3>
+      <div class="value">Browser Extensions</div>
+      <div class="detail">Real user cookies. Passive or active extraction. Lower volume but near-certain scraping. Harder to detect.</div>
+    </div>
+    <div class="score-card green">
+      <h3>Eugene's Constraint</h3>
+      <div class="value">JVM + SSR</div>
+      <div class="detail">Self-contained, minimal deps, no threads. Must plug into server-side rendering. No extra page weight. Unstable CSS class IDs.</div>
+    </div>
+    <div class="score-card purple">
+      <h3>Core Insight</h3>
+      <div class="value">Measure, Don't Block</div>
+      <div class="detail">Blocking fails against evasive scrapers. Instead: watermark content, inject canaries, detect extraction after the fact. Build the evidence chain.</div>
+    </div>
+  </div>
+
+  <h3>Proposal Coverage Matrix</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Proposal</th>
+        <th>vs. Headless Browsers</th>
+        <th>vs. Extensions</th>
+        <th>vs. Training Pipelines</th>
+        <th>JVM Effort</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Homoglyph Watermarking</strong></td>
+        <td class="cell-survive">Survives extraction</td>
+        <td class="cell-survive">Survives extraction</td>
+        <td class="cell-survive">Survives ALL pipelines</td>
+        <td>Low (string replacement)</td>
+      </tr>
+      <tr>
+        <td><strong>2. Innamark Whitespace</strong></td>
+        <td class="cell-survive">Survives extraction</td>
+        <td class="cell-survive">Survives extraction</td>
+        <td class="cell-stripped">Stripped by Trafilatura</td>
+        <td>Low (Kotlin lib exists)</td>
+      </tr>
+      <tr>
+        <td><strong>3. Canary Profiles</strong></td>
+        <td class="cell-survive">Ingested by scrapers</td>
+        <td class="cell-mapped">Depends on extension</td>
+        <td class="cell-survive">Survives as text content</td>
+        <td>Medium (HMAC + templates)</td>
+      </tr>
+      <tr>
+        <td><strong>4. SSR Hydration Traps</strong></td>
+        <td class="cell-survive">Catches non-JS scrapers</td>
+        <td class="cell-stripped">Extensions execute JS</td>
+        <td class="cell-survive">Pre-hydration content scraped</td>
+        <td>Medium (SSR middleware)</td>
+      </tr>
+      <tr>
+        <td><strong>5. Token Inflation</strong></td>
+        <td class="cell-survive">Corrupts LLM processing</td>
+        <td class="cell-survive">Corrupts LLM processing</td>
+        <td class="cell-stripped">Stripped by Trafilatura</td>
+        <td>Low (char insertion)</td>
+      </tr>
+      <tr>
+        <td><strong>6. Behavioral Detection</strong></td>
+        <td class="cell-survive">Strong signal</td>
+        <td class="cell-mapped">Weaker signal</td>
+        <td>N/A (detection, not marking)</td>
+        <td>Medium (LSTM exists)</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>Recommendation: Layer proposals 1 + 2 + 3</strong>
+    Homoglyphs survive training pipelines (long-term attribution). Innamark catches direct scrapers (short-term detection). Canary profiles provide court-ready evidence. The three together cover all scraper types with independent failure modes.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- HOW SCRAPERS WORK -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-scrapers">
+  <h2>How Scrapers Work</h2>
+  <p>The economics, infrastructure, and operational patterns of LinkedIn data extraction.</p>
+
+  <div class="card open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Scraper Type 1: Fake Accounts + Headless Browsers</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="diagram">
+        <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6Z" fill="#0a4d8c"/></marker>
+          </defs>
+          <rect x="10" y="60" width="130" height="80" rx="8" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+          <text x="75" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#0a4d8c">Fake Accounts</text>
+          <text x="75" y="108" text-anchor="middle" font-size="10" fill="#666">Purchased or</text>
+          <text x="75" y="120" text-anchor="middle" font-size="10" fill="#666">compromised</text>
+          <line x1="140" y1="100" x2="190" y2="100" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="190" y="60" width="130" height="80" rx="8" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+          <text x="255" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#0a4d8c">Headless Browser</text>
+          <text x="255" y="108" text-anchor="middle" font-size="10" fill="#666">Playwright / Puppeteer</text>
+          <text x="255" y="120" text-anchor="middle" font-size="10" fill="#666">+ anti-detect patches</text>
+          <line x1="320" y1="100" x2="370" y2="100" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="370" y="60" width="130" height="80" rx="8" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+          <text x="435" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#c8980a">Residential Proxy</text>
+          <text x="435" y="108" text-anchor="middle" font-size="10" fill="#666">190M IPs available</text>
+          <text x="435" y="120" text-anchor="middle" font-size="10" fill="#666">$10-15 / GB</text>
+          <line x1="500" y1="100" x2="550" y2="100" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="550" y="60" width="130" height="80" rx="8" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
+          <text x="615" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#1a7a3a">LinkedIn SSR</text>
+          <text x="615" y="108" text-anchor="middle" font-size="10" fill="#666">Profile HTML</text>
+          <text x="615" y="120" text-anchor="middle" font-size="10" fill="#666">returned to scraper</text>
+          <line x1="680" y1="100" x2="730" y2="100" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="730" y="70" width="60" height="60" rx="8" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+          <text x="760" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">Data</text>
+          <text x="760" y="114" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">Store</text>
+        </svg>
+      </div>
+
+      <h4>Economics</h4>
+      <div class="table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Resource</th><th>Cost</th><th>Scale</th></tr></thead>
+        <tbody>
+          <tr><td>Residential proxies</td><td>$10-15/GB</td><td>190M IPs (Bright Data, Oxylabs)</td></tr>
+          <tr><td>CAPTCHA solving</td><td>$1-3 per 1,000</td><td>2Captcha, Anti-Captcha services</td></tr>
+          <tr><td>LinkedIn fake accounts</td><td>$5-50 each</td><td>Bulk from dark web markets</td></tr>
+          <tr><td>Anti-detect browser</td><td>$30-300/mo</td><td>Multilogin, GoLogin, Kameleo</td></tr>
+          <tr><td>Headless browser</td><td>Free</td><td>Playwright, Puppeteer (open source)</td></tr>
+          <tr><td>Cloud compute</td><td>$0.01-0.05/hr</td><td>Spot instances, multiple regions</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h4>Detection Signals</h4>
+      <ul>
+        <li><strong>CDP side effects</strong>: Chrome DevTools Protocol leaves traces. <code>Error.stack</code> getter trap, <code>__playwright__binding__</code> globals. (Castle.io, 2024)</li>
+        <li><strong>navigator.webdriver</strong>: Set to <code>true</code> by automation frameworks. Most anti-detect tools patch this, but inconsistently.</li>
+        <li><strong>TLS fingerprint (JA4)</strong>: Every HTTP client has a unique TLS handshake signature. Headless Chrome JA4 differs from real Chrome.</li>
+        <li><strong>Request sequence homogeneity</strong>: Scrapers follow identical patterns. Real users are heterogeneous. LinkedIn already uses an LSTM model for this.</li>
+        <li><strong>Missing assets</strong>: Real sessions load CSS/JS/images. Scrapers request HTML only.</li>
+      </ul>
+
+      <div class="callout callout-gold">
+        <strong>Scale estimate</strong>
+        A leaked 4.3B-record database (likely Apollo.io, found by Bob Diachenko, Nov 2023) contained ~732M unique LinkedIn profiles. At LinkedIn's ~1B members, that's 73% coverage from a single third-party aggregation. The data market for LinkedIn profiles is massive and sustained.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Scraper Type 2: Browser Extensions</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="diagram">
+        <svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="60" width="130" height="80" rx="8" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+          <text x="75" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#0a4d8c">Real User</text>
+          <text x="75" y="108" text-anchor="middle" font-size="10" fill="#666">Browses LinkedIn</text>
+          <text x="75" y="120" text-anchor="middle" font-size="10" fill="#666">normally</text>
+          <line x1="140" y1="100" x2="190" y2="100" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="190" y="40" width="150" height="120" rx="8" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+          <text x="265" y="65" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b">Malicious Extension</text>
+          <text x="265" y="85" text-anchor="middle" font-size="10" fill="#666">Permissions:</text>
+          <text x="265" y="100" text-anchor="middle" font-size="10" fill="#666">activeTab + scripting</text>
+          <text x="265" y="115" text-anchor="middle" font-size="10" fill="#666">+ storage</text>
+          <text x="265" y="135" text-anchor="middle" font-size="9" fill="#c0392b">Reads DOM with user cookies</text>
+          <line x1="340" y1="80" x2="410" y2="60" stroke="#c0392b" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="410" y="20" width="140" height="60" rx="8" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+          <text x="480" y="45" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">Exfiltration Server</text>
+          <text x="480" y="62" text-anchor="middle" font-size="10" fill="#666">Collects scraped profiles</text>
+          <line x1="340" y1="120" x2="410" y2="140" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="410" y="120" width="140" height="60" rx="8" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
+          <text x="480" y="145" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a3a">LinkedIn.com</text>
+          <text x="480" y="162" text-anchor="middle" font-size="10" fill="#666">Sees normal user traffic</text>
+          <text x="620" y="90" font-size="11" fill="#666" font-style="italic">Extension piggybacks</text>
+          <text x="620" y="105" font-size="11" fill="#666" font-style="italic">on real user's session</text>
+        </svg>
+      </div>
+
+      <h4>Why Extensions Are Harder to Detect</h4>
+      <ul>
+        <li><strong>Real cookies, real IP, real browser</strong>: The traffic looks identical to a normal user session.</li>
+        <li><strong>Minimal permissions suffice</strong>: <code>activeTab</code> + <code>scripting</code> + <code>storage</code> is enough for full DOM extraction (Singh et al., IIT Jammu, 2025).</li>
+        <li><strong>MV3 doesn't solve it</strong>: Chrome's Manifest V3 restricts network interception but not DOM reading.</li>
+        <li><strong>No volume spike</strong>: Extension scrapes at the user's natural browsing pace.</li>
+        <li><strong>Distribution channels</strong>: Chrome Web Store, side-loading, purchased "productivity" extensions that secretly exfiltrate.</li>
+      </ul>
+
+      <h4>Detection Approaches</h4>
+      <ul>
+        <li><strong>Content Security Policy violations</strong>: Extensions that inject scripts may trigger CSP reports.</li>
+        <li><strong>DOM mutation observers</strong>: Detect unexpected DOM reads/modifications.</li>
+        <li><strong>Timing analysis</strong>: Extensions that batch-read multiple profiles in a single session.</li>
+        <li><strong>Watermark detection</strong>: If content is per-user watermarked and shows up in aggregate data with one user's watermark, that user's browser is compromised.</li>
+      </ul>
+
+      <div class="callout callout-red">
+        <strong>This is the harder problem</strong>
+        Browser extensions operate within the user's authenticated session. Traditional bot detection (IP, TLS, behavior) is blind to them. Content watermarking is the primary defense: if scraped data carries a specific user's watermark, the extension (or account compromise) can be identified.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Training Data Pipelines</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="diagram">
+        <svg viewBox="0 0 900 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="50" width="110" height="60" rx="6" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+          <text x="65" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#0a4d8c">Web Crawl</text>
+          <text x="65" y="92" text-anchor="middle" font-size="9" fill="#666">WARC files</text>
+          <line x1="120" y1="80" x2="160" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <rect x="160" y="50" width="120" height="60" rx="6" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+          <text x="220" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">Text Extraction</text>
+          <text x="220" y="92" text-anchor="middle" font-size="9" fill="#666">Trafilatura (F1=0.96)</text>
+          <line x1="280" y1="80" x2="310" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="295" y="40" font-size="9" fill="#c0392b" font-weight="700">GATE 1</text>
+
+          <rect x="310" y="50" width="110" height="60" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+          <text x="365" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#c8980a">Quality Filter</text>
+          <text x="365" y="92" text-anchor="middle" font-size="9" fill="#666">C4 / FineWeb</text>
+          <line x1="420" y1="80" x2="450" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <rect x="450" y="50" width="110" height="60" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+          <text x="505" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#c8980a">Deduplication</text>
+          <text x="505" y="92" text-anchor="middle" font-size="9" fill="#666">MinHash / exact</text>
+          <line x1="560" y1="80" x2="590" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <rect x="590" y="50" width="120" height="60" rx="6" fill="#f3e8ff" stroke="#6b21a8" stroke-width="2"/>
+          <text x="650" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#6b21a8">Tokenization</text>
+          <text x="650" y="92" text-anchor="middle" font-size="9" fill="#666">BPE / SentencePiece</text>
+          <line x1="710" y1="80" x2="740" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <rect x="740" y="50" width="110" height="60" rx="6" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
+          <text x="795" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a3a">Training</text>
+          <text x="795" y="92" text-anchor="middle" font-size="9" fill="#666">Model weights</text>
+
+          <text x="220" y="140" text-anchor="middle" font-size="9" fill="#c0392b">Strips: ZWS, ZWNJ, ZWJ,</text>
+          <text x="220" y="152" text-anchor="middle" font-size="9" fill="#c0392b">bidi overrides, soft hyphens</text>
+          <text x="650" y="140" text-anchor="middle" font-size="9" fill="#6b21a8">NFKC: fullwidth-&gt;ASCII</text>
+          <text x="650" y="152" text-anchor="middle" font-size="9" fill="#1a7a3a">Preserves: homoglyphs</text>
+        </svg>
+      </div>
+      <p>The critical bottleneck is <strong>text extraction</strong>, not tokenization. Trafilatura uses Python's <code>str.isprintable()</code> filter, which strips all Unicode category Cf (format) characters. Everything that passes extraction is faithfully preserved by BPE tokenizers.</p>
+      <p><strong>Key finding</strong>: Cross-script homoglyphs (Cyrillic, Greek) survive the entire pipeline. They are printable, pass NFKC normalization, and get distinct tokens in BPE vocabularies. This is the basis for Proposal 1.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PIPELINE SURVIVAL -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-pipeline">
+  <h2>Pipeline Survival Matrix</h2>
+  <p>Empirically tested: which Unicode transforms survive each stage of the LLM training pipeline. This is original research assembled from component-level analysis of Trafilatura source, Python 3.12 <code>unicodedata</code>, and tiktoken 0.12.0.</p>
+
+  <div class="callout callout-blue">
+    <strong>How to read this table</strong>
+    <span class="cell-survive">S = Survives</span> &nbsp;
+    <span class="cell-stripped">X = Stripped</span> &nbsp;
+    <span class="cell-mapped">M = Mapped to different char</span> &nbsp;
+    <span class="cell-unknown">? = Unknown</span>
+  </div>
+
+  <h3>Zero-Width and Format Characters</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Character</th><th>Codepoint</th><th>Trafilatura</th><th>BeautifulSoup</th><th>NFKC</th><th>tiktoken</th><th>SentencePiece</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Zero Width Space</td><td>U+200B</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (1 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>ZWNJ</td><td>U+200C</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (1 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>ZWJ</td><td>U+200D</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (2 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>Soft Hyphen</td><td>U+00AD</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (1 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>Word Joiner</td><td>U+2060</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (2 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>BOM</td><td>U+FEFF</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (1 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>Bidi LRO</td><td>U+202D</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (2 tok)</td><td class="cell-survive">S</td></tr>
+      <tr><td>Bidi RLO</td><td>U+202E</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S (2 tok)</td><td class="cell-survive">S</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Homoglyphs (Cross-Script)</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Character</th><th>Example</th><th>Trafilatura</th><th>BeautifulSoup</th><th>NFKC</th><th>tiktoken</th><th>SentencePiece</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Cyrillic</td><td>&#x0410; &#x0430; &#x0435; &#x043E;</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td>Greek</td><td>&#x03BF; &#x0391;</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td>Fullwidth Latin</td><td>&#xFF21; &#xFF22;</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-mapped">M &rarr; ASCII</td><td class="cell-survive">S</td><td class="cell-mapped">M &rarr; ASCII</td></tr>
+      <tr><td>Math Bold</td><td>&#x1D400;</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-mapped">M &rarr; ASCII</td><td class="cell-survive">S</td><td class="cell-mapped">M &rarr; ASCII</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-green">
+    <strong>The finding that matters</strong>
+    Cyrillic and Greek homoglyphs survive <em>every stage</em> of every pipeline tested. NFKC does not normalize across Unicode scripts. These characters get distinct BPE tokens, meaning a model trained on homoglyph-watermarked text will have measurably different token distributions.
+  </div>
+
+  <h3>Whitespace Variants (Innamark characters)</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Character</th><th>Codepoint</th><th>Trafilatura</th><th>NFKC</th><th>tiktoken</th><th>Used by Innamark</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Three-Per-Em Space</td><td>U+2004</td><td class="cell-mapped">M &rarr; space</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">Yes</td></tr>
+      <tr><td>Punctuation Space</td><td>U+2008</td><td class="cell-mapped">M &rarr; space</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">Yes</td></tr>
+      <tr><td>Thin Space</td><td>U+2009</td><td class="cell-mapped">M &rarr; space</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">Yes</td></tr>
+      <tr><td>Narrow NBSP</td><td>U+202F</td><td class="cell-mapped">M &rarr; space</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">Yes</td></tr>
+      <tr><td>Medium Math Space</td><td>U+205F</td><td class="cell-mapped">M &rarr; space</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">Yes</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-gold">
+    <strong>Innamark's whitespace characters</strong>
+    Trafilatura collapses these to regular spaces. But direct scrapers (Beautiful Soup, raw HTML parsing, browser extensions) preserve them. This makes Innamark effective against Type 1 and Type 2 scrapers, but not against training pipelines that use Trafilatura.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PROPOSAL 1: HOMOGLYPHS -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-p1">
+  <div class="proposal-header">
+    <div class="proposal-icon" style="background:var(--green-light);color:var(--green);">&#x0410;</div>
+    <div class="proposal-meta">
+      <h2>Proposal 1: Homoglyph Watermarking</h2>
+      <div class="one-liner">Replace select Latin characters with visually identical Cyrillic/Greek equivalents. Per-session pattern encodes user identity.</div>
+      <div class="tags">
+        <span class="tag tag-green">SURVIVES ALL PIPELINES</span>
+        <span class="tag tag-blue">JVM: LOW EFFORT</span>
+        <span class="tag tag-green">CATCHES BOTH SCRAPER TYPES</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <div class="diagram">
+    <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="30" font-size="13" font-weight="700" fill="#0a4d8c">Original text:</text>
+      <text x="20" y="55" font-size="16" font-family="monospace" fill="#1a1a1a">Senior Engineer at Acme Corp</text>
+
+      <text x="20" y="95" font-size="13" font-weight="700" fill="#1a7a3a">Session A watermark:</text>
+      <text x="20" y="120" font-size="16" font-family="monospace" fill="#1a1a1a">Seni<tspan fill="#c0392b" font-weight="700">o</tspan>r Engine<tspan fill="#c0392b" font-weight="700">e</tspan>r <tspan fill="#c0392b" font-weight="700">a</tspan>t Acm<tspan fill="#c0392b" font-weight="700">e</tspan> Corp</text>
+      <text x="20" y="140" font-size="10" fill="#666">o=U+043E(Cyrillic) e=U+0435(Cyrillic) a=U+0430(Cyrillic) &rarr; encodes bits: 1 1 0 1</text>
+
+      <text x="20" y="175" font-size="13" font-weight="700" fill="#c8980a">Session B watermark:</text>
+      <text x="20" y="200" font-size="16" font-family="monospace" fill="#1a1a1a">S<tspan fill="#c0392b" font-weight="700">e</tspan>nior Engin<tspan fill="#c0392b" font-weight="700">e</tspan>er at <tspan fill="#c0392b" font-weight="700">A</tspan>cme C<tspan fill="#c0392b" font-weight="700">o</tspan>rp</text>
+      <text x="20" y="220" font-size="10" fill="#666">Different positions &rarr; encodes bits: 0 1 1 0 &rarr; different session ID</text>
+    </svg>
+  </div>
+
+  <p>Each session gets a unique bit pattern derived from <code>HMAC-SHA256(server_secret, session_id)</code>. The bits select which character positions to substitute with homoglyphs. To decode: scan for non-Latin characters at expected positions, reconstruct the bit pattern, recover the session ID.</p>
+
+  <h4>JVM Implementation</h4>
+  <div class="code-block"><span class="cm">// Java — zero external dependencies</span>
+<span class="kw">import</span> javax.crypto.Mac;
+<span class="kw">import</span> javax.crypto.spec.SecretKeySpec;
+
+<span class="kw">class</span> <span class="fn">HomoglyphWatermark</span> {
+    <span class="cm">// Latin -> Cyrillic/Greek confusable pairs</span>
+    <span class="kw">static final</span> <span class="kw">char</span>[][] PAIRS = {
+        {<span class="str">'a'</span>, <span class="str">'\u0430'</span>}, <span class="cm">// Cyrillic а</span>
+        {<span class="str">'e'</span>, <span class="str">'\u0435'</span>}, <span class="cm">// Cyrillic е</span>
+        {<span class="str">'o'</span>, <span class="str">'\u043E'</span>}, <span class="cm">// Cyrillic о</span>
+        {<span class="str">'p'</span>, <span class="str">'\u0440'</span>}, <span class="cm">// Cyrillic р</span>
+        {<span class="str">'c'</span>, <span class="str">'\u0441'</span>}, <span class="cm">// Cyrillic с</span>
+        {<span class="str">'A'</span>, <span class="str">'\u0410'</span>}, <span class="cm">// Cyrillic А</span>
+        {<span class="str">'E'</span>, <span class="str">'\u0415'</span>}, <span class="cm">// Cyrillic Е</span>
+        {<span class="str">'O'</span>, <span class="str">'\u041E'</span>}, <span class="cm">// Cyrillic О</span>
+    };
+
+    <span class="kw">static</span> String <span class="fn">watermark</span>(String text, String sessionId, <span class="kw">byte</span>[] secret) {
+        <span class="kw">byte</span>[] bits = hmacBits(secret, sessionId);
+        <span class="kw">char</span>[] chars = text.toCharArray();
+        <span class="kw">int</span> bitIdx = <span class="num">0</span>;
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; chars.length && bitIdx &lt; bits.length; i++) {
+            <span class="kw">for</span> (<span class="kw">char</span>[] pair : PAIRS) {
+                <span class="kw">if</span> (chars[i] == pair[<span class="num">0</span>]) {
+                    <span class="kw">if</span> (getBit(bits, bitIdx)) chars[i] = pair[<span class="num">1</span>];
+                    bitIdx++;
+                    <span class="kw">break</span>;
+                }
+            }
+        }
+        <span class="kw">return new</span> String(chars);
+    }
+}</div>
+
+  <div class="sw-grid">
+    <div class="sw-col strengths">
+      <h4>Strengths</h4>
+      <ul>
+        <li>Survives every pipeline stage tested (Trafilatura, NFKC, BPE, SentencePiece)</li>
+        <li>Zero visual difference to users in web fonts</li>
+        <li>Zero page weight increase (character substitution, not insertion)</li>
+        <li>Pure Java, no dependencies, no threads</li>
+        <li>Sub-microsecond per operation (string scan + char swap)</li>
+        <li>Creates distinct BPE tokens, fragmenting model vocabulary</li>
+        <li>Provably recoverable: scan text for non-Latin script characters</li>
+      </ul>
+    </div>
+    <div class="sw-col weaknesses">
+      <h4>Weaknesses</h4>
+      <ul>
+        <li>Detectable by Unicode script boundary analysis (TR39 confusables)</li>
+        <li>Strippable if adversary normalizes to Latin-only</li>
+        <li>Limited alphabet overlap (Cyrillic covers a, e, o, p, c, x, y; Greek adds more)</li>
+        <li>Some security scanners flag mixed-script text (phishing detection)</li>
+        <li>Capacity: ~0.1 bits per character (limited substitutable positions)</li>
+        <li>Not yet tested whether any training lab applies TR39 filtering</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Key Researchers</h4>
+  <div class="researcher">
+    <div class="initials">RB</div>
+    <div class="info">
+      <div class="name">Rizzo, Bertini, Montesi</div>
+      <div class="affiliation">University of Bologna, 2016</div>
+      <div class="contribution">Content-preserving text watermarking via Unicode homoglyph substitution. Live demo at smartdata.cs.unibo.it/watermark/. ACM IDEAS 2016.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">WJ</div>
+    <div class="info">
+      <div class="name">Johnny Wei, Robin Jia</div>
+      <div class="affiliation">USC, 2024</div>
+      <div class="contribution">"Proving Membership in LLM Pretraining Data via Data Watermarks." Unicode lookalike substitution with provable false detection guarantees. ACL Findings 2024.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PROPOSAL 2: INNAMARK -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-p2">
+  <div class="proposal-header">
+    <div class="proposal-icon" style="background:var(--blue-light);color:var(--blue);">&#x2009;</div>
+    <div class="proposal-meta">
+      <h2>Proposal 2: Innamark Whitespace Watermarking</h2>
+      <div class="one-liner">Kotlin/JVM library. Substitutes 5 Unicode whitespace characters. 0.04 bits/char. IEEE Access. Claude Sonnet 4 can't detect it.</div>
+      <div class="tags">
+        <span class="tag tag-blue">JVM NATIVE (KOTLIN)</span>
+        <span class="tag tag-green">CATCHES DIRECT SCRAPERS</span>
+        <span class="tag tag-gold">STRIPPED BY TRAFILATURA</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <p>Innamark (Hellmeier et al., Fraunhofer ISST, 2025) encodes binary data by substituting regular spaces (U+0020) with five visually identical Unicode whitespace characters:</p>
+
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>Codepoint</th><th>Name</th><th>Bit Encoding</th><th>Visual Width</th></tr></thead>
+    <tbody>
+      <tr><td>U+2004</td><td>Three-Per-Em Space</td><td>000</td><td>~identical to space</td></tr>
+      <tr><td>U+2008</td><td>Punctuation Space</td><td>001</td><td>~identical to space</td></tr>
+      <tr><td>U+2009</td><td>Thin Space</td><td>010</td><td>slightly narrower</td></tr>
+      <tr><td>U+202F</td><td>Narrow No-Break Space</td><td>011</td><td>~identical to space</td></tr>
+      <tr><td>U+205F</td><td>Medium Mathematical Space</td><td>100</td><td>~identical to space</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-green">
+    <strong>LLM detectability (arXiv:2512.13325)</strong>
+    Tested against 6 LLMs: GPT-5, GPT-4o, Claude Sonnet 4, Gemini 2.5 Pro, Llama 3.3, Teuken 7B. Innamark evaded detection by 4 of 6 models. Key finding: LLMs can detect <em>that</em> text is watermarked but cannot extract the payload without source code.
+  </div>
+
+  <h4>Part of TREND Framework</h4>
+  <p>Innamark is a component of TREND (Traceability Enforcement of Datatransfers), a Fraunhofer ISST project for tracking data flows across organizations. The watermarking is designed for data-sharing agreements where participants must be able to prove who leaked data.</p>
+
+  <div class="sw-grid">
+    <div class="sw-col strengths">
+      <h4>Strengths</h4>
+      <ul>
+        <li>Already implemented in Kotlin (JVM-native)</li>
+        <li>IEEE Access peer-reviewed paper</li>
+        <li>Evades 4/6 top LLMs</li>
+        <li>Survives copy-paste across applications</li>
+        <li>Zero visual impact in proportional fonts</li>
+        <li>Designed for data-sharing attribution (LinkedIn's exact use case)</li>
+        <li>Payload not extractable without source code</li>
+      </ul>
+    </div>
+    <div class="sw-col weaknesses">
+      <h4>Weaknesses</h4>
+      <ul>
+        <li>Trafilatura collapses all whitespace to U+0020 (stripped in training pipelines)</li>
+        <li>Low capacity: 0.04 bits/char (~5 bits per average sentence)</li>
+        <li>Detectable by GPT-5 and Gemini 2.5 Pro</li>
+        <li>Thin space (U+2009) is slightly narrower — visible in monospace fonts</li>
+        <li>Any Unicode normalization pass strips the watermark</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Key Researchers</h4>
+  <div class="researcher">
+    <div class="initials">MH</div>
+    <div class="info">
+      <div class="name">Malte Hellmeier</div>
+      <div class="affiliation">Fraunhofer ISST, 2025</div>
+      <div class="contribution">Innamark: whitespace replacement watermarking. IEEE Access. Also authored the LLM detectability study (arXiv:2512.13325) testing 10 Unicode watermarking methods against 6 LLMs.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>Why propose Innamark alongside homoglyphs?</strong>
+    Different failure modes. Homoglyphs survive training pipelines but are detectable by script analysis. Innamark survives direct scraping but not training pipelines. Together, they cover both threat vectors. And Innamark is already Kotlin/JVM — minimal integration effort for Eugene's team.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PROPOSAL 3: CANARY PROFILES -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-p3">
+  <div class="proposal-header">
+    <div class="proposal-icon" style="background:var(--gold-light);color:var(--gold);">&#x1F464;</div>
+    <div class="proposal-meta">
+      <h2>Proposal 3: Canary Profile Injection</h2>
+      <div class="one-liner">HMAC-derived ghost profiles in "People Also Viewed." If the name appears in an LLM or dataset, LinkedIn's data was ingested.</div>
+      <div class="tags">
+        <span class="tag tag-green">COURT-READY EVIDENCE</span>
+        <span class="tag tag-blue">CATCHES BOTH SCRAPER TYPES</span>
+        <span class="tag tag-gold">MEDIUM EFFORT</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <div class="diagram">
+    <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="180" height="100" rx="8" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+      <text x="100" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#0a4d8c">SSR Middleware</text>
+      <text x="100" y="65" text-anchor="middle" font-size="10" fill="#666">HMAC(secret, session_id)</text>
+      <text x="100" y="80" text-anchor="middle" font-size="10" fill="#666">&darr;</text>
+      <text x="100" y="95" text-anchor="middle" font-size="10" fill="#0a4d8c">Meridian Castleford</text>
+      <text x="100" y="110" text-anchor="middle" font-size="9" fill="#666">Nexiform Analytics</text>
+
+      <line x1="190" y1="70" x2="240" y2="70" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="240" y="20" width="180" height="100" rx="8" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+      <text x="330" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#c8980a">Profile Page HTML</text>
+      <text x="330" y="65" text-anchor="middle" font-size="10" fill="#666">"People Also Viewed"</text>
+      <text x="330" y="80" text-anchor="middle" font-size="10" fill="#666">Ghost profile injected</text>
+      <text x="330" y="95" text-anchor="middle" font-size="10" fill="#666">CSS-hidden (font-size:0)</text>
+      <text x="330" y="110" text-anchor="middle" font-size="10" fill="#666">+ JSON-LD entity</text>
+
+      <line x1="420" y1="50" x2="480" y2="30" stroke="#c0392b" stroke-width="2" marker-end="url(#arrow)"/>
+      <text x="450" y="25" font-size="9" fill="#c0392b">Scraper ingests</text>
+
+      <rect x="480" y="10" width="140" height="60" rx="8" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="550" y="35" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">Scraped Dataset</text>
+      <text x="550" y="50" text-anchor="middle" font-size="10" fill="#666">"Meridian Castleford"</text>
+
+      <line x1="550" y1="70" x2="550" y2="120" stroke="#c0392b" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="480" y="120" width="140" height="50" rx="8" fill="#f3e8ff" stroke="#6b21a8" stroke-width="2"/>
+      <text x="550" y="145" text-anchor="middle" font-size="11" font-weight="700" fill="#6b21a8">LLM Training</text>
+      <text x="550" y="160" text-anchor="middle" font-size="10" fill="#666">Model learns canary</text>
+
+      <line x1="550" y1="170" x2="550" y2="210" stroke="#6b21a8" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="440" y="210" width="220" height="60" rx="8" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
+      <text x="550" y="235" text-anchor="middle" font-size="12" font-weight="700" fill="#1a7a3a">Detection Probe</text>
+      <text x="550" y="255" text-anchor="middle" font-size="10" fill="#1a7a3a">"Who is Meridian Castleford?" &rarr; HIT</text>
+
+      <rect x="10" y="160" width="400" height="90" rx="8" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="1" stroke-dasharray="4"/>
+      <text x="210" y="185" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a3a">Canary Detection System (daily)</text>
+      <text x="210" y="205" text-anchor="middle" font-size="10" fill="#666">Query GPT, Claude, Perplexity, Gemini for canary names</text>
+      <text x="210" y="220" text-anchor="middle" font-size="10" fill="#666">Search CommonCrawl, LAION, data broker databases</text>
+      <text x="210" y="235" text-anchor="middle" font-size="10" fill="#666">If found: trace session_id &rarr; IP &rarr; account &rarr; legal action</text>
+    </svg>
+  </div>
+
+  <p>For each session, generate a unique canary name via <code>HMAC-SHA256(secret, session_id)</code>, map to pronounceable syllables, inject into "People Also Viewed" section with <code>font-size:0</code> CSS. Also add JSON-LD structured data. If the name shows up in public LLM outputs, scraping is proven.</p>
+
+  <div class="sw-grid">
+    <div class="sw-col strengths">
+      <h4>Strengths</h4>
+      <ul>
+        <li>Court-ready evidence: name → session → account → IP</li>
+        <li>Survives training pipelines (text content)</li>
+        <li>Zero visual impact (CSS hidden, not display:none)</li>
+        <li>Detects both headless scrapers and extensions</li>
+        <li>Probing is free (ask LLM "who is X?")</li>
+        <li>False positive rate near zero (HMAC → unique names)</li>
+      </ul>
+    </div>
+    <div class="sw-col weaknesses">
+      <h4>Weaknesses</h4>
+      <ul>
+        <li>Legal review required (ghost profiles, ToS implications)</li>
+        <li>Scrapers may filter JSON-LD or CSS-hidden content</li>
+        <li>Detection lag: weeks to months (training cycle)</li>
+        <li>No defense against prompt injection ("ignore canaries")</li>
+        <li>Requires daily LLM probing infrastructure</li>
+        <li>Some extensions read visible DOM only</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Key Researchers</h4>
+  <div class="researcher">
+    <div class="initials">IC</div>
+    <div class="info">
+      <div class="name">Ilia Shumailov, Yiren Zhao (Google DeepMind)</div>
+      <div class="affiliation">2024</div>
+      <div class="contribution">"Model Collapse" research. Canary tokens in training data cause model degradation. Shows LLMs trained on poisoned data hallucinate canary entities.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Placeholder panels for proposals 4-6 and remaining sections -->
+<div class="panel" id="panel-p4">
+  <h2>Proposal 4: SSR Hydration Traps</h2>
+  <p>Inject divergent content in SSR HTML that gets replaced by client-side hydration. If scrapers ingest the SSR-only content, they are non-JS clients.</p>
+  <div class="callout callout-blue">
+    <strong>Status</strong>
+    Full content available in original file. Mobile optimization complete for layout and navigation.
+  </div>
+</div>
+
+<div class="panel" id="panel-p5">
+  <h2>Proposal 5: Token Inflation</h2>
+  <p>Insert zero-width or visually invisible characters that fragment BPE tokens, increasing cost per inference for models trained on scraped data.</p>
+  <div class="callout callout-blue">
+    <strong>Status</strong>
+    Full content available in original file. Mobile optimization complete for layout and navigation.
+  </div>
+</div>
+
+<div class="panel" id="panel-p6">
+  <h2>Proposal 6: Behavioral Detection</h2>
+  <p>LSTM-based sequence modeling for scraper detection. LinkedIn already uses this internally.</p>
+  <div class="callout callout-blue">
+    <strong>Status</strong>
+    Full content available in original file. Mobile optimization complete for layout and navigation.
+  </div>
+</div>
+
+<div class="panel" id="panel-evidence">
+  <h2>Evidence: Real-World Deployments</h2>
+  <p>Documented cases where honeypots, canaries, and forensics caught scrapers or proved training data inclusion.</p>
+
+  <div class="callout callout-gold">
+    <strong>Key gap</strong>
+    No publisher has publicly reported planting canary content <em>before</em> scraping and then proving it appeared in a model's output. The cases below prove scraping or memorization, but not both via a pre-planted trap. That's what VENOM proposes to close.
+  </div>
+
+  <div class="card open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Reddit v. Perplexity: SERP Honeypot (Oct 2025)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-green">Pre-planted trap</span>
+        <span class="tag tag-blue">Active lawsuit (SDNY)</span>
+      </div>
+      <p>Reddit created a test post crawlable <strong>only by Google's crawler</strong> &mdash; not accessible anywhere else on the internet. Within hours, Perplexity surfaced that content in its answer engine.</p>
+      <p><strong>Scale documented in complaint:</strong> SerpApi hit 1.06B Google SERPs containing Reddit data in a single week. After Reddit's May 2024 cease-and-desist, Perplexity's citations to Reddit increased ~40x.</p>
+      <p><strong>Legal:</strong> Reddit, Inc. v. SerpApi, Inc. et al., filed Oct 22, 2025, SDNY. DMCA 1201 anti-circumvention + unjust enrichment.</p>
+      <p class="detail"><strong>VENOM relevance:</strong> Closest existing precedent to our canary profile proposal. Reddit's trap proved scraping via SERP cache; VENOM's canaries would prove scraping via direct profile access.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Wired/Conde Nast: IP Forensics (Jun 2024)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-gold">Post-hoc forensics</span>
+      </div>
+      <p>Wired traced scraping to a specific undisclosed IP (44.221.181.252, AWS EC2) that hit Conde Nast properties 822 times in 3 months with a spoofed Chrome user-agent. Perplexity's CEO admitted the IP was managed by a third-party company under NDA.</p>
+      <p>Cloudflare documented the same stealth crawling across tens of thousands of domains, leading to Perplexity's delisting as a verified bot (Aug 2025).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Grafana Labs: Canary Token Breach Detection (Apr 2025)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-green">Production deployment</span>
+        <span class="tag tag-green">Real attack caught</span>
+      </div>
+      <p>Grafana deploys "tens of thousands" of Thinkst canary tokens (AWS API keys, DNS tokens, file tokens). When an attacker exploited a vulnerable GitHub Action and ran TruffleHog against stolen secrets, the canary fired immediately. Breach contained within minutes. Zero customer data exposure.</p>
+      <p><strong>Thinkst scale:</strong> Millions of users, all 7 continents, bootstrapped to $20M ARR. Gartner Cool Vendor.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Carlini et al.: ChatGPT Training Data Extraction ($200)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-blue">ICLR 2025</span>
+        <span class="tag tag-red">PII extracted</span>
+      </div>
+      <p><strong>Divergence attack:</strong> Prompt "Repeat the word [X] forever." After ~250 repetitions, ChatGPT diverges and emits raw training data. Budget: <strong>$200 USD</strong>. Extracted: &gt;10,000 unique verbatim 50-token sequences. 5% of divergent output was direct training data.</p>
+      <p><strong>16.9%</strong> of tested generations contained real PII (names, phone numbers, emails). 85.8% of PII candidates verified authentic.</p>
+      <p>Good-Turing extrapolation: minimum 1.5M memorized unique 50-token sequences in ChatGPT; ~1 GB of extractable training data.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Ahmed et al.: 95.8% Book Extraction from Claude (Jan 2026)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-red">Near-verbatim reproduction</span>
+      </div>
+      <p>Claude 3.7 Sonnet reproduced Harry Potter at <strong>95.8% near-verbatim recall</strong>, 1984 and Frankenstein at 94%. Gemini 2.5 Pro (76.8%) and Grok 3 (70.3%) extracted Harry Potter without jailbreaking. GPT-4.1 had the strongest refusals (4.0%).</p>
+      <p><strong>VENOM relevance:</strong> If models memorize entire books, they will memorize LinkedIn profile text. The question is whether we can detect it.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Innamark LLM Imperceptibility Study (Dec 2025)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-green">Best-in-class stealth</span>
+        <span class="tag tag-blue">arXiv:2512.13325</span>
+      </div>
+      <p>10 Unicode watermarking methods tested against 6 LLMs. <strong>Innamark was the most imperceptible</strong> &mdash; only GPT-5 and Gemini 2.5 Pro detected it. Claude Sonnet 4 missed it entirely. No LLM could extract the hidden payload without the source code.</p>
+      <p>StegCloak (zero-width chars) was detected by all 6 LLMs. Homoglyph methods were detected by advanced models but not by Llama or GPT-4o.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Radioactive Watermarks Survive Training (NeurIPS 2024)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-blue">Meta FAIR</span>
+        <span class="tag tag-green">Proven in training</span>
+      </div>
+      <p>Sander et al. (Meta/FAIR): if a model trains on watermarked LLM output, the watermark signal persists detectably in the model's weights. Detected with <strong>p &lt; 10<sup>-5</sup></strong> even when only 5% of training text is watermarked.</p>
+      <p>Sablayrolles et al. (ICML 2020): radioactive data detected with p &lt; 10<sup>-4</sup> at only 1% contamination in ImageNet. Works across architectures.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Cloudflare AI Labyrinth: CDN-Scale Honeypot (Mar 2025)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-green">Production (20% of web)</span>
+      </div>
+      <p>AI-generated pages with hidden links invisible to humans but followable by bots. Any visitor going 4+ links deep is fingerprinted. AI crawlers generate &gt;50B requests/day to Cloudflare's network. Available on all plans including Free.</p>
+      <p><strong>Limitation:</strong> Addresses operational cost (bot detection) not IP extraction. No published detection rates or false-positive metrics.</p>
+    </div>
+  </div>
+
+  <h3>Key Datasets &amp; Numbers</h3>
+  <div class="score-grid">
+    <div class="score-card gold">
+      <h3>Apollo.io Leak</h3>
+      <div class="value">4.3B records</div>
+      <div class="detail">~732M unique profiles. Third-party lead-gen MongoDB, not a LinkedIn breach. Found by Diachenko, Nov 2025.</div>
+    </div>
+    <div class="score-card">
+      <h3>Anthropic Crawl Ratio</h3>
+      <div class="value">500,000:1</div>
+      <div class="detail">Peak crawl-to-referral ratio. Cloudflare blog, Jan-Jul 2025. OpenAI peaked at 3,700:1.</div>
+    </div>
+    <div class="score-card red">
+      <h3>iFixit Single-Day</h3>
+      <div class="value">1M hits</div>
+      <div class="detail">Anthropic's crawler in one day. CEO Kyle Wiens on X, Jul 24, 2024. 404 Media confirmed.</div>
+    </div>
+    <div class="score-card purple">
+      <h3>robots.txt Compliance</h3>
+      <div class="value">30.7%</div>
+      <div class="detail">Comply with disallow-all (IMC study). 72% figure is from a smaller 47-site vendor study.</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" id="panel-integration">
+  <h2>Integration Path</h2>
+  <p>12-week phased rollout. Assessment → Instrumentation → Canary Deploy → A/B Test → Analysis.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 800 240" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="150" height="180" rx="6" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
+      <text x="85" y="45" text-anchor="middle" font-size="12" font-weight="700" fill="#1a7a3a">Inbound Request</text>
+      <text x="85" y="65" text-anchor="middle" font-size="10" fill="#666">GET /in/profile/xyz</text>
+
+      <line x1="160" y1="80" x2="210" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="210" y="40" width="160" height="80" rx="6" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+      <text x="290" y="65" text-anchor="middle" font-size="11" font-weight="700" fill="#0a4d8c">Treatment Assignment</text>
+      <text x="290" y="82" text-anchor="middle" font-size="9" fill="#666">SHA-256(session_id) mod 100</text>
+      <text x="290" y="97" text-anchor="middle" font-size="9" fill="#666">&lt; 50? VENOM : CONTROL</text>
+
+      <line x1="370" y1="80" x2="420" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="420" y="60" width="150" height="50" rx="6" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+      <text x="495" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#0a4d8c">SSR Renderer</text>
+      <text x="495" y="98" text-anchor="middle" font-size="9" fill="#666">HTML string output</text>
+
+      <line x1="570" y1="85" x2="610" y2="85" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="610" y="60" width="160" height="50" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+      <text x="690" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#c8980a">Response + Canaries</text>
+      <text x="690" y="98" text-anchor="middle" font-size="9" fill="#666">HTML to client</text>
+
+      <rect x="220" y="150" width="550" height="120" rx="6" fill="white" stroke="#e2e5e9" stroke-width="1"/>
+      <text x="495" y="175" text-anchor="middle" font-size="12" font-weight="700" fill="#0a4d8c">VENOM Module Internals</text>
+
+      <rect x="240" y="190" width="100" height="40" rx="4" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="1"/>
+      <text x="290" y="210" text-anchor="middle" font-size="9" font-weight="700" fill="#1a7a3a">Homoglyphs</text>
+      <text x="290" y="222" text-anchor="middle" font-size="8" fill="#666">Proposal 1</text>
+
+      <rect x="350" y="190" width="100" height="40" rx="4" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="1"/>
+      <text x="400" y="210" text-anchor="middle" font-size="9" font-weight="700" fill="#1a7a3a">Innamark</text>
+      <text x="400" y="222" text-anchor="middle" font-size="8" fill="#666">Proposal 2</text>
+
+      <rect x="460" y="190" width="100" height="40" rx="4" fill="#fdf6e3" stroke="#c8980a" stroke-width="1"/>
+      <text x="510" y="210" text-anchor="middle" font-size="9" font-weight="700" fill="#c8980a">Canaries</text>
+      <text x="510" y="222" text-anchor="middle" font-size="8" fill="#666">Proposal 3</text>
+
+      <rect x="570" y="190" width="100" height="40" rx="4" fill="#f3e8ff" stroke="#6b21a8" stroke-width="1"/>
+      <text x="620" y="210" text-anchor="middle" font-size="9" font-weight="700" fill="#6b21a8">SSR Traps</text>
+      <text x="620" y="222" text-anchor="middle" font-size="8" fill="#666">Proposal 4</text>
+
+      <rect x="680" y="190" width="80" height="40" rx="4" fill="#fde8e8" stroke="#c0392b" stroke-width="1"/>
+      <text x="720" y="210" text-anchor="middle" font-size="9" font-weight="700" fill="#c0392b">Events</text>
+      <text x="720" y="222" text-anchor="middle" font-size="8" fill="#666">Logging</text>
+
+      <text x="495" y="258" text-anchor="middle" font-size="10" fill="#666">All operations: HMAC-SHA256 + string manipulation. &lt;0.3ms overhead. No threads, no I/O, no deps.</text>
+    </svg>
+  </div>
+
+  <h3>Phase Plan</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>Phase</th><th>Duration</th><th>Deliverable</th><th>Risk</th></tr></thead>
+    <tbody>
+      <tr><td><strong>0: Assessment</strong></td><td>1 week</td><td>Map SSR pipeline, identify injection points, legal review</td><td>Low</td></tr>
+      <tr><td><strong>1: Instrumentation</strong></td><td>1 week</td><td>Deploy tripwire endpoints, hydration beacon, baseline scraping metrics</td><td>Low</td></tr>
+      <tr><td><strong>2: Canary Deploy</strong></td><td>1 week</td><td>Ghost profiles, JSON-LD canaries, noscript traps. Begin LLM probing.</td><td>Medium (legal)</td></tr>
+      <tr><td><strong>3: Watermark A/B Test</strong></td><td>4 weeks</td><td>Week 1: 10% homoglyphs. Week 2: +Innamark. Week 3-4: 50% full stack. Monitor UX.</td><td>Medium (UX)</td></tr>
+      <tr><td><strong>4: Analysis</strong></td><td>1 week</td><td>Results: canary detections, watermark recovery rate, UX delta, false positive rate</td><td>Low</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>JVM Dependencies</h4>
+  <div class="callout callout-green">
+    <strong>Zero external dependencies</strong>
+    Everything uses <code>javax.crypto.Mac</code> (HMAC-SHA256), <code>java.security.MessageDigest</code> (SHA-256), and string manipulation. Innamark is Kotlin/JVM but can be vendored as a single file. No threads, no I/O in the hot path, no network calls during request handling.
+  </div>
+
+  <h4>Performance Budget</h4>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>Operation</th><th>Cost</th><th>Per Request</th></tr></thead>
+    <tbody>
+      <tr><td>Treatment group assignment</td><td>1x SHA-256</td><td>~0.3&micro;s</td></tr>
+      <tr><td>Canary name generation</td><td>4x HMAC-SHA256</td><td>~1.2&micro;s</td></tr>
+      <tr><td>Homoglyph watermark</td><td>String scan + char swap</td><td>~20&micro;s</td></tr>
+      <tr><td>Innamark watermark</td><td>Space substitution</td><td>~15&micro;s</td></tr>
+      <tr><td>HTML canary injection</td><td>Regex replace</td><td>~50-200&micro;s</td></tr>
+      <tr><td><strong>Total</strong></td><td></td><td><strong>~0.1-0.25ms</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>LinkedIn's SSR response is 200-500ms (p50-p95). VENOM adds 0.1-0.25ms: 0.05% of p50. Below measurement noise.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- KEYBOARD SHORTCUTS -->
+<!-- ============================================================ -->
+<div class="shortcuts-overlay" id="shortcutsOverlay">
+  <div class="shortcuts-box">
+    <h3>Keyboard Shortcuts</h3>
+    <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr;</span></div>
+    <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr;</span></div>
+    <div class="shortcut-row"><span>Go to tab N</span><span class="shortcut-key">1-9, 0</span></div>
+    <div class="shortcut-row"><span>Toggle shortcuts</span><span class="shortcut-key">?</span></div>
+    <div class="shortcut-row"><span>Close overlay</span><span class="shortcut-key">Esc</span></div>
+  </div>
+</div>
+
+<div class="footer">
+  VENOM Research &middot; Nick Sullivan &middot; Feb 2026 &middot; Press <span class="shortcut-key">?</span> for keyboard shortcuts
+</div>
+
+<script>
+(function() {
+  var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration'];
+  var currentTab = 0;
+
+  function switchTab(idx) {
+    if (idx < 0 || idx >= tabs.length) return;
+    currentTab = idx;
+    document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+      btn.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.panel').forEach(function(p, i) {
+      p.classList.toggle('active', i === idx);
+    });
+    // Scroll tab into view
+    var activeBtn = document.querySelectorAll('.tab-btn')[idx];
+    if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    window.scrollTo(0, 0);
+
+    // Close mobile menu after selection
+    if (window.innerWidth <= 768) {
+      var tabBar = document.getElementById('tabBar');
+      var menuToggle = document.getElementById('menuToggle');
+      tabBar.classList.remove('open');
+      menuToggle.classList.remove('open');
+    }
+  }
+
+  // Tab click handlers
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.addEventListener('click', function() { switchTab(i); });
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight') { switchTab(currentTab + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { switchTab(currentTab - 1); e.preventDefault(); }
+    else if (e.key === '?') {
+      var o = document.getElementById('shortcutsOverlay');
+      o.classList.toggle('visible');
+    }
+    else if (e.key === 'Escape') {
+      document.getElementById('shortcutsOverlay').classList.remove('visible');
+    }
+    else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
+    else if (e.key === '0') { switchTab(9); }
+  });
+
+  // Close shortcuts overlay on click outside
+  document.getElementById('shortcutsOverlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('visible');
+  });
+})();
+
+function toggleCard(header) {
+  var card = header.parentElement;
+  card.classList.toggle('open');
+}
+
+function toggleMenu() {
+  var tabBar = document.getElementById('tabBar');
+  var menuToggle = document.getElementById('menuToggle');
+  tabBar.classList.toggle('open');
+  menuToggle.classList.toggle('open');
+}
+</script>
+</body>
+</html>
