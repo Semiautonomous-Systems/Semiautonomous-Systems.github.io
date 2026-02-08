@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>VENOM Deep Dive — Concrete Proposals for LinkedIn</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVkVOT00gRGVlcCBEaXZlIiwic2hvcnRfbmFtZSI6IlZFTk9NIiwidGhlbWVfY29sb3IiOiIjMGE0ZDhjIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInN0YXJ0X3VybCI6Ii4vIn0=">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -382,6 +385,74 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* Offline banner */
+.offline-banner {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--green);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.85em;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 150;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.offline-banner.show { opacity: 1; }
+
+/* Prev/Next navigation */
+.tab-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.tab-nav-btn {
+  flex: 1;
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--blue);
+  font-size: 0.9em;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  text-align: center;
+}
+.tab-nav-btn:hover {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+.tab-nav-btn:active {
+  transform: scale(0.98);
+}
+.tab-nav-btn:disabled {
+  display: none;
+}
+.tab-nav-btn .arrow {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .tab-nav-btn {
+    min-height: 56px;
+    font-size: 0.95em;
+  }
+}
+
 /* Keyboard shortcuts overlay */
 .shortcuts-overlay {
   display: none;
@@ -497,7 +568,7 @@ body {
 
 /* Print */
 @media print {
-  .header, .tab-bar, .menu-toggle, .footer, .shortcuts-overlay { display: none; }
+  .header, .tab-bar, .menu-toggle, .footer, .shortcuts-overlay, .tab-nav, .offline-banner { display: none; }
   .panel { display: block !important; page-break-inside: avoid; }
   .card-body { display: block !important; }
   body { font-size: 11pt; }
@@ -505,6 +576,8 @@ body {
 </style>
 </head>
 <body>
+
+<div class="offline-banner" id="offlineBanner">Available offline</div>
 
 <div class="header">
   <div>
@@ -624,6 +697,10 @@ body {
   <div class="callout callout-blue">
     <strong>Recommendation: Layer proposals 1 + 2 + 3</strong>
     Homoglyphs survive training pipelines (long-term attribution). Innamark catches direct scrapers (short-term detection). Canary profiles provide court-ready evidence. The three together cover all scraper types with independent failure modes.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" disabled></button>
+    <button class="tab-nav-btn" onclick="switchTab(1)">How Scrapers Work <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -806,6 +883,10 @@ body {
       <p><strong>Key finding</strong>: Cross-script homoglyphs (Cyrillic, Greek) survive the entire pipeline. They are printable, pass NFKC normalization, and get distinct tokens in BPE vocabularies. This is the basis for Proposal 1.</p>
     </div>
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(0)"><span class="arrow">←</span> Overview</button>
+    <button class="tab-nav-btn" onclick="switchTab(2)">Pipeline Survival <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <!-- ============================================================ -->
@@ -881,6 +962,10 @@ body {
   <div class="callout callout-gold">
     <strong>Innamark's whitespace characters</strong>
     Trafilatura collapses these to regular spaces. But direct scrapers (Beautiful Soup, raw HTML parsing, browser extensions) preserve them. This makes Innamark effective against Type 1 and Type 2 scrapers, but not against training pipelines that use Trafilatura.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(1)"><span class="arrow">←</span> How Scrapers Work</button>
+    <button class="tab-nav-btn" onclick="switchTab(3)">1. Homoglyphs <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -997,6 +1082,10 @@ body {
       <div class="contribution">"Proving Membership in LLM Pretraining Data via Data Watermarks." Unicode lookalike substitution with provable false detection guarantees. ACL Findings 2024.</div>
     </div>
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(2)"><span class="arrow">←</span> Pipeline Survival</button>
+    <button class="tab-nav-btn" onclick="switchTab(4)">2. Innamark <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <!-- ============================================================ -->
@@ -1078,6 +1167,10 @@ body {
   <div class="callout callout-blue">
     <strong>Why propose Innamark alongside homoglyphs?</strong>
     Different failure modes. Homoglyphs survive training pipelines but are detectable by script analysis. Innamark survives direct scraping but not training pipelines. Together, they cover both threat vectors. And Innamark is already Kotlin/JVM — minimal integration effort for Eugene's team.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(3)"><span class="arrow">←</span> 1. Homoglyphs</button>
+    <button class="tab-nav-btn" onclick="switchTab(5)">3. Canary Profiles <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -1182,13 +1275,22 @@ body {
   </div>
 </div>
 
-<!-- Placeholder panels for proposals 4-6 and remaining sections -->
+<!-- Placeholder panels for proposals 4-6 and remaining section
+  <div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(4)"><span class="arrow">←</span> 2. Innamark</button>
+    <button class="tab-nav-btn" onclick="switchTab(6)">4. SSR Traps <span class="arrow">→</span></button>
+  </div>
+s -->
 <div class="panel" id="panel-p4">
   <h2>Proposal 4: SSR Hydration Traps</h2>
   <p>Inject divergent content in SSR HTML that gets replaced by client-side hydration. If scrapers ingest the SSR-only content, they are non-JS clients.</p>
   <div class="callout callout-blue">
     <strong>Status</strong>
     Full content available in original file. Mobile optimization complete for layout and navigation.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(5)"><span class="arrow">←</span> 3. Canary Profiles</button>
+    <button class="tab-nav-btn" onclick="switchTab(7)">5. Token Inflation <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -1199,6 +1301,10 @@ body {
     <strong>Status</strong>
     Full content available in original file. Mobile optimization complete for layout and navigation.
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(6)"><span class="arrow">←</span> 4. SSR Traps</button>
+    <button class="tab-nav-btn" onclick="switchTab(8)">6. Behavioral <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <div class="panel" id="panel-p6">
@@ -1207,6 +1313,10 @@ body {
   <div class="callout callout-blue">
     <strong>Status</strong>
     Full content available in original file. Mobile optimization complete for layout and navigation.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(7)"><span class="arrow">←</span> 5. Token Inflation</button>
+    <button class="tab-nav-btn" onclick="switchTab(9)">Evidence <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -1362,6 +1472,10 @@ body {
       <div class="detail">Comply with disallow-all (IMC study). 72% figure is from a smaller 47-site vendor study.</div>
     </div>
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(8)"><span class="arrow">←</span> 6. Behavioral</button>
+    <button class="tab-nav-btn" onclick="switchTab(10)">Integration Path <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <div class="panel" id="panel-integration">
@@ -1455,6 +1569,10 @@ body {
   </table>
   </div>
   <p>LinkedIn's SSR response is 200-500ms (p50-p95). VENOM adds 0.1-0.25ms: 0.05% of p50. Below measurement noise.</p>
+  <div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(9)"><span class="arrow">←</span> Evidence</button>
+    <button class="tab-nav-btn" disabled></button>
+  </div>
 </div>
 
 <!-- ============================================================ -->
@@ -1462,9 +1580,9 @@ body {
 <!-- ============================================================ -->
 <div class="shortcuts-overlay" id="shortcutsOverlay">
   <div class="shortcuts-box">
-    <h3>Keyboard Shortcuts</h3>
-    <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr;</span></div>
-    <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr;</span></div>
+    <h3>Navigation</h3>
+    <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr; or swipe left</span></div>
+    <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr; or swipe right</span></div>
     <div class="shortcut-row"><span>Go to tab N</span><span class="shortcut-key">1-9, 0</span></div>
     <div class="shortcut-row"><span>Toggle shortcuts</span><span class="shortcut-key">?</span></div>
     <div class="shortcut-row"><span>Close overlay</span><span class="shortcut-key">Esc</span></div>
@@ -1476,59 +1594,131 @@ body {
 </div>
 
 <script>
-(function() {
-  var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration'];
-  var currentTab = 0;
-
-  function switchTab(idx) {
-    if (idx < 0 || idx >= tabs.length) return;
-    currentTab = idx;
-    document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
-      btn.classList.toggle('active', i === idx);
+// Service worker for offline support
+if ('serviceWorker' in navigator) {
+  var swCode = `
+    self.addEventListener('install', function(e) {
+      e.waitUntil(
+        caches.open('venom-v1').then(function(cache) {
+          return cache.addAll(['/']);
+        })
+      );
+      self.skipWaiting();
     });
-    document.querySelectorAll('.panel').forEach(function(p, i) {
-      p.classList.toggle('active', i === idx);
+    self.addEventListener('activate', function(e) {
+      self.clients.claim();
     });
-    // Scroll tab into view
-    var activeBtn = document.querySelectorAll('.tab-btn')[idx];
-    if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    window.scrollTo(0, 0);
+    self.addEventListener('fetch', function(e) {
+      e.respondWith(
+        caches.match(e.request).then(function(response) {
+          return response || fetch(e.request).then(function(response) {
+            return caches.open('venom-v1').then(function(cache) {
+              cache.put(e.request, response.clone());
+              return response;
+            });
+          });
+        }).catch(function() {
+          return caches.match(e.request);
+        })
+      );
+    });
+  `;
+  var blob = new Blob([swCode], { type: 'application/javascript' });
+  var swUrl = URL.createObjectURL(blob);
 
-    // Close mobile menu after selection
-    if (window.innerWidth <= 768) {
-      var tabBar = document.getElementById('tabBar');
-      var menuToggle = document.getElementById('menuToggle');
-      tabBar.classList.remove('open');
-      menuToggle.classList.remove('open');
+  navigator.serviceWorker.register(swUrl).then(function(reg) {
+    reg.onupdatefound = function() {
+      var worker = reg.installing;
+      worker.onstatechange = function() {
+        if (worker.state === 'activated') {
+          var banner = document.getElementById('offlineBanner');
+          banner.classList.add('show');
+          setTimeout(function() { banner.classList.remove('show'); }, 3000);
+        }
+      };
+    };
+  }).catch(function(err) {
+    console.log('SW registration failed:', err);
+  });
+}
+
+// Tab navigation with touch gestures
+var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration'];
+var currentTab = 0;
+var touchStartX = 0;
+var touchStartY = 0;
+
+function switchTab(idx) {
+  if (idx < 0 || idx >= tabs.length) return;
+  currentTab = idx;
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.panel').forEach(function(p, i) {
+    p.classList.toggle('active', i === idx);
+  });
+  var activeBtn = document.querySelectorAll('.tab-btn')[idx];
+  if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  window.scrollTo(0, 0);
+
+  if (window.innerWidth <= 768) {
+    var tabBar = document.getElementById('tabBar');
+    var menuToggle = document.getElementById('menuToggle');
+    tabBar.classList.remove('open');
+    menuToggle.classList.remove('open');
+  }
+}
+
+// Tab click handlers
+document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+  btn.addEventListener('click', function() { switchTab(i); });
+});
+
+// Touch gesture handlers
+document.addEventListener('touchstart', function(e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e) {
+  if (!e.changedTouches || !e.changedTouches[0]) return;
+  var touchEndX = e.changedTouches[0].clientX;
+  var touchEndY = e.changedTouches[0].clientY;
+  var deltaX = touchEndX - touchStartX;
+  var deltaY = touchEndY - touchStartY;
+
+  // Only trigger if horizontal swipe > 50px and more horizontal than vertical
+  if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+    if (deltaX > 0) {
+      // Swipe right = previous tab
+      switchTab(currentTab - 1);
+    } else {
+      // Swipe left = next tab
+      switchTab(currentTab + 1);
     }
   }
+}, { passive: true });
 
-  // Tab click handlers
-  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
-    btn.addEventListener('click', function() { switchTab(i); });
-  });
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight') { switchTab(currentTab + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { switchTab(currentTab - 1); e.preventDefault(); }
+  else if (e.key === '?') {
+    var o = document.getElementById('shortcutsOverlay');
+    o.classList.toggle('visible');
+  }
+  else if (e.key === 'Escape') {
+    document.getElementById('shortcutsOverlay').classList.remove('visible');
+  }
+  else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
+  else if (e.key === '0') { switchTab(9); }
+});
 
-  // Keyboard navigation
-  document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (e.key === 'ArrowRight') { switchTab(currentTab + 1); e.preventDefault(); }
-    else if (e.key === 'ArrowLeft') { switchTab(currentTab - 1); e.preventDefault(); }
-    else if (e.key === '?') {
-      var o = document.getElementById('shortcutsOverlay');
-      o.classList.toggle('visible');
-    }
-    else if (e.key === 'Escape') {
-      document.getElementById('shortcutsOverlay').classList.remove('visible');
-    }
-    else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
-    else if (e.key === '0') { switchTab(9); }
-  });
-
-  // Close shortcuts overlay on click outside
-  document.getElementById('shortcutsOverlay').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('visible');
-  });
-})();
+// Close shortcuts overlay on click outside
+document.getElementById('shortcutsOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('visible');
+});
 
 function toggleCard(header) {
   var card = header.parentElement;
