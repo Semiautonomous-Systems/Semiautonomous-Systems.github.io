@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teach Me: LinkedIn Meeting with Eugene (Feb 9, 2026)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue: #0a4d8c;
+    --blue-light: #e8f0f8;
+    --gold: #c8980a;
+    --gold-light: #fdf6e3;
+    --green: #1a7a3a;
+    --green-light: #eaf5ee;
+    --red: #c0392b;
+    --red-light: #fde8e8;
+    --text: #1a1a1a;
+    --muted: #666;
+    --bg: #fff;
+    --sidebar-bg: #f5f5f5;
+    --border: #e0e0e0;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .header {
+    background: var(--blue);
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .header-left h1 { font-size: 1.1em; font-weight: 600; }
+  .header-left .meta { font-size: 0.8em; opacity: 0.8; margin-top: 2px; }
+  .header-right { display: flex; gap: 16px; font-size: 0.75em; }
+  .progress-chip {
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .progress-chip .count { font-weight: 700; }
+
+  .layout { display: flex; height: calc(100vh - 56px); }
+
+  .sidebar {
+    width: 220px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    flex-shrink: 0;
+    padding: 8px 0;
+  }
+  .sidebar-heading {
+    font-size: 0.65em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 8px 16px 4px;
+  }
+  .sidebar-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    padding: 6px 16px;
+    font-size: 0.8em;
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1.3;
+    transition: background 0.1s;
+  }
+  .sidebar-item:hover { background: rgba(0,0,0,0.05); }
+  .sidebar-item.active {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-weight: 600;
+    border-right: 3px solid var(--blue);
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.7em;
+    padding: 1px 5px;
+    border-radius: 8px;
+    margin-left: 4px;
+    font-weight: 700;
+  }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px 60px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Overview */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .ov-card {
+    background: var(--sidebar-bg);
+    border-radius: 8px;
+    padding: 16px 20px;
+    border-left: 4px solid var(--blue);
+  }
+  .ov-card h3 {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .ov-card p { font-size: 0.9em; line-height: 1.5; }
+  .ov-card.theme { border-left-color: var(--gold); grid-column: 1 / -1; }
+  .ov-card.score { border-left-color: var(--green); }
+  .score-big { font-size: 2em; font-weight: 700; color: var(--green); }
+  .score-prog { font-size: 0.85em; color: var(--muted); margin-top: 4px; }
+  .score-prog span { font-weight: 600; }
+
+  /* Doc cards */
+  .doc-card {
+    background: var(--sidebar-bg);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .doc-card-header {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    font-weight: 600;
+    user-select: none;
+  }
+  .doc-card-header:hover { background: rgba(0,0,0,0.03); }
+  .doc-card-header .arrow { transition: transform 0.2s; font-size: 0.8em; color: var(--muted); }
+  .doc-card-header .arrow.open { transform: rotate(90deg); }
+  .doc-card-body {
+    display: none;
+    padding: 0 16px 16px;
+    font-size: 0.85em;
+    line-height: 1.65;
+  }
+  .doc-card-body.open { display: block; }
+  .doc-card-body h4 {
+    color: var(--blue);
+    font-size: 0.95em;
+    margin: 12px 0 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .doc-card-body h4:first-child { border-top: none; padding-top: 0; }
+  .doc-card-body ul, .doc-card-body ol { padding-left: 1.4em; margin: 4px 0; }
+  .doc-card-body li { margin-bottom: 3px; }
+  .doc-card-body strong { font-weight: 600; }
+  .doc-card-body code {
+    background: #f0f0f0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: 'SF Mono', 'Menlo', monospace;
+  }
+  .doc-card-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 0.9em;
+  }
+  .doc-card-body th, .doc-card-body td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .doc-card-body th {
+    font-weight: 600;
+    color: var(--blue);
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .source-tag {
+    font-size: 0.7em;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* Quiz */
+  .quiz-card {
+    background: var(--sidebar-bg);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    border-left: 4px solid var(--blue);
+    position: relative;
+  }
+  .quiz-card.rated-got-it { border-left-color: var(--green); }
+  .quiz-card.rated-needs-work { border-left-color: var(--gold); }
+  .quiz-card.rated-gap { border-left-color: var(--red); }
+  .quiz-type {
+    font-size: 0.65em;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .quiz-question {
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .quiz-answer {
+    display: none;
+    font-size: 0.9em;
+    line-height: 1.6;
+    padding: 12px 16px;
+    background: #fff;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .quiz-answer.visible { display: block; }
+  .quiz-bonus {
+    display: none;
+    font-size: 0.85em;
+    line-height: 1.5;
+    padding: 8px 12px;
+    background: var(--gold-light);
+    border-radius: 4px;
+    margin-top: 8px;
+    color: #5a4800;
+  }
+  .quiz-bonus.visible { display: block; }
+  .quiz-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-reveal { background: var(--blue); color: #fff; }
+  .btn-got-it { background: var(--green); color: #fff; }
+  .btn-needs-work { background: var(--gold); color: #fff; }
+  .btn-gap { background: var(--red); color: #fff; }
+  .btn-bonus { background: var(--gold-light); color: #5a4800; font-size: 0.75em; }
+  .rate-btns { display: none; gap: 8px; }
+  .rate-btns.visible { display: flex; }
+  .quiz-rating-badge {
+    display: none;
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+  }
+  .quiz-rating-badge.visible { display: inline-block; }
+
+  /* Drill */
+  .drill-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+  }
+  .drill-counter { font-size: 0.8em; color: var(--muted); margin-bottom: 16px; }
+  .drill-score-bar { display: flex; gap: 12px; margin-bottom: 24px; font-size: 0.8em; }
+  .ds { padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+  .ds-strong { background: var(--green-light); color: var(--green); }
+  .ds-nw { background: var(--gold-light); color: var(--gold); }
+  .ds-gap { background: var(--red-light); color: var(--red); }
+  .drill-question {
+    font-size: 1.4em;
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 700px;
+    margin-bottom: 24px;
+    color: var(--blue);
+  }
+  .drill-answer {
+    display: none;
+    font-size: 1em;
+    line-height: 1.6;
+    max-width: 650px;
+    text-align: left;
+    padding: 20px 24px;
+    background: var(--sidebar-bg);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--green);
+  }
+  .drill-answer.visible { display: block; }
+  .drill-hint { font-size: 0.8em; color: var(--muted); margin-top: 12px; }
+  .drill-actions { display: flex; gap: 10px; margin-top: 8px; }
+  .drill-done { text-align: center; padding: 40px; }
+  .drill-done h2 { font-size: 1.6em; color: var(--blue); margin-bottom: 16px; }
+
+  /* Timeline */
+  .tl-phase { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .tl-marker { width: 80px; flex-shrink: 0; text-align: center; }
+  .tl-marker .week {
+    display: inline-block;
+    background: var(--blue);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+  }
+  .tl-line { width: 2px; background: var(--blue); margin: 4px auto 0; height: 30px; }
+  .tl-content {
+    flex: 1;
+    background: var(--sidebar-bg);
+    border-radius: 8px;
+    padding: 14px 18px;
+    border-left: 4px solid var(--blue);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .tl-content:hover { background: var(--blue-light); }
+  .tl-content h3 { font-size: 0.95em; color: var(--blue); margin-bottom: 6px; }
+  .tl-content p { font-size: 0.85em; line-height: 1.5; }
+  .tl-content ul { font-size: 0.85em; padding-left: 1.2em; margin-top: 4px; }
+  .tl-content li { margin-bottom: 2px; line-height: 1.4; }
+  .tl-details { display: none; margin-top: 8px; }
+  .tl-details.open { display: block; }
+  .tl-decision {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: var(--gold-light);
+    border-radius: 6px;
+    font-size: 0.8em;
+    color: #5a4800;
+  }
+
+  /* Keyboard overlay */
+  .keyboard-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  .keyboard-overlay.visible { display: flex; }
+  .keyboard-panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 32px;
+    max-width: 420px;
+    width: 90%;
+  }
+  .keyboard-panel h2 { font-size: 1em; color: var(--blue); margin-bottom: 12px; }
+  .keyboard-panel table { width: 100%; font-size: 0.85em; }
+  .keyboard-panel td { padding: 4px 0; }
+  .keyboard-panel td:first-child {
+    font-weight: 700;
+    font-family: 'SF Mono', monospace;
+    width: 80px;
+    color: var(--blue);
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 220px;
+    right: 0;
+    background: rgba(255,255,255,0.95);
+    border-top: 1px solid var(--border);
+    padding: 6px 24px;
+    font-size: 0.7em;
+    color: var(--muted);
+    backdrop-filter: blur(8px);
+  }
+  .footer kbd {
+    background: #eee;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.9em;
+    border: 1px solid #ddd;
+  }
+
+  @media print {
+    .sidebar, .footer, .keyboard-overlay, .quiz-actions, .rate-btns, .drill-actions, .drill-hint, .progress-chip { display: none !important; }
+    .layout { display: block; }
+    .main { overflow: visible; padding: 12px; }
+    .panel { display: block !important; page-break-inside: avoid; }
+    .doc-card-body { display: block !important; }
+    .quiz-answer { display: block !important; }
+    .drill-answer { display: block !important; }
+    .tl-details { display: block !important; }
+    body { font-size: 10pt; overflow: visible; height: auto; }
+    .header { background: #fff; color: var(--text); border-bottom: 2px solid var(--blue); }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { width: 100%; height: auto; display: flex; overflow-x: auto; padding: 0; border-right: none; border-bottom: 1px solid var(--border); }
+    .sidebar-heading { display: none; }
+    .sidebar-item { white-space: nowrap; padding: 10px 14px; }
+    .sidebar-item.active { border-bottom: 3px solid var(--blue); border-right: none !important; }
+    .layout { flex-direction: column; }
+    .footer { left: 0; }
+    .main { padding: 16px; }
+    .overview-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>LinkedIn Meeting with Eugene</h1>
+    <div class="meta">Feb 9, 2026 &middot; Anti-scraping team &middot; via Lea Kissner &middot; Theme: measurement, not blocking</div>
+  </div>
+  <div class="header-right">
+    <span class="progress-chip" id="prog-sections">Sections: <span class="count">0</span>/25</span>
+    <span class="progress-chip" id="prog-quiz">Quiz: <span class="count">0</span>/23</span>
+    <span class="progress-chip" id="prog-drill">Drill: <span class="count">0</span>/6</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-heading">Navigate</div>
+    <button class="sidebar-item active" data-panel="overview">1. Overview</button>
+    <button class="sidebar-item" data-panel="docs">2. Documents</button>
+    <button class="sidebar-item" data-panel="quiz">3. Quiz</button>
+    <button class="sidebar-item" data-panel="drill">4. Drill</button>
+    <button class="sidebar-item" data-panel="timeline">5. Timeline</button>
+  </div>
+
+  <div class="main" id="main">
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="overview-grid">
+        <div class="ov-card">
+          <h3>Who</h3>
+          <p><strong>Eugene</strong>, LinkedIn anti-scraping team</p>
+          <p style="margin-top:4px;font-size:0.85em;color:var(--muted)">"I work on anti-scraping at LinkedIn. I'd love to hear more about Venom."</p>
+        </div>
+        <div class="ov-card score">
+          <h3>Readiness</h3>
+          <div class="score-big">4.6/5</div>
+          <div class="score-prog">v1 <span>3.2</span> &rarr; v2 <span>3.7</span> &rarr; v3 <span>3.9</span> &rarr; v4 <span>4.3</span> &rarr; v5 <span>4.6</span></div>
+          <p style="margin-top:6px;font-size:0.8em;color:var(--green);font-weight:600">TARGET EXCEEDED. GO.</p>
+        </div>
+        <div class="ov-card theme">
+          <h3>Core Theme</h3>
+          <p><strong>Measurement, not blocking.</strong> LinkedIn has a decade of blocking infrastructure. VENOM adds the measurement layer that doesn't exist yet.</p>
+        </div>
+        <div class="ov-card" style="border-left-color:var(--gold)">
+          <h3>The Ask</h3>
+          <p>Joint research. 12-week A/B test (4 weeks integration + 8 weeks measurement). LinkedIn shares anonymized scraping telemetry. Nick publishes at USENIX Security '26 Enigma Track. LinkedIn gets 30-day review. No money changes hands. First step: mNDA + 1-day technical assessment.</p>
+        </div>
+        <div class="ov-card">
+          <h3>VENOM Status</h3>
+          <p>USENIX Security '26, Enigma Track, Aug 12-14, Baltimore</p>
+          <p style="font-size:0.85em;margin-top:4px">"Fighting Fire with Venom: Adversarial Defense Against Unauthorized Web Crawling"</p>
+        </div>
+        <div class="ov-card">
+          <h3>v5 Dimension Scores</h3>
+          <table style="width:100%;font-size:0.85em"><tr><td>Technical depth</td><td style="font-weight:700;color:var(--green)">4.7</td></tr><tr><td>Strategic clarity</td><td style="font-weight:700;color:var(--green)">4.5</td></tr><tr><td>Defensibility</td><td style="font-weight:700;color:var(--green)">4.5</td></tr><tr><td>Deployment realism</td><td style="font-weight:700">4.3</td></tr><tr><td>Factual accuracy</td><td style="font-weight:700">4.2</td></tr></table>
+        </div>
+        <div class="ov-card" style="grid-column:1/-1;border-left-color:var(--red)">
+          <h3>Remaining Gap (LOW)</h3>
+          <p>Generic Node.js HTTP middleware example. Ready answer: "We hook into your HTTP response middleware. Show me your pipeline, I'll find the hook in 30 minutes. The injection layer is 200 lines of string manipulation."</p>
+        </div>
+      </div>
+      <h3 style="font-size:0.85em;color:var(--blue);margin-bottom:8px">6 Key Talking Points</h3>
+      <ol style="font-size:0.85em;line-height:1.7;padding-left:1.4em">
+        <li><strong>VENOM is orthogonal to bot detection.</strong> Assumes some scraping succeeds; makes it measurable.</li>
+        <li><strong>The lead-gen database proves the gap.</strong> 4.3B records (732M unique profiles) found exposed Nov 2025.</li>
+        <li><strong>SSR architecture is an advantage.</strong> Complete HTML to scrapers = perfect injection point.</li>
+        <li><strong>Three techniques ready for A/B testing:</strong> canary tokens, behavioral fingerprinting, content watermarking.</li>
+        <li><strong>Enigma presentation is a forcing function.</strong> LinkedIn data strengthens research + public posture.</li>
+        <li><strong>EU AI Act creates urgency.</strong> 2026 transparency requirements = regulatory demand for measurement.</li>
+      </ol>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div class="panel" id="panel-docs"></div>
+
+    <!-- QUIZ -->
+    <div class="panel" id="panel-quiz"></div>
+
+    <!-- DRILL -->
+    <div class="panel" id="panel-drill"></div>
+
+    <!-- TIMELINE -->
+    <div class="panel" id="panel-timeline">
+      <h2 style="font-size:1.2em;color:var(--blue);margin-bottom:20px">Implementation Roadmap (12 Weeks)</h2>
+      <div id="timeline-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <kbd>1</kbd>-<kbd>5</kbd> panels &middot; <kbd>Space</kbd> reveal &middot; <kbd>g</kbd> got it &middot; <kbd>n</kbd> needs work &middot; <kbd>x</kbd> gap &middot; <kbd>?</kbd> help
+</div>
+
+<div class="keyboard-overlay" id="keyboard-overlay">
+  <div class="keyboard-panel">
+    <h2>Keyboard Shortcuts</h2>
+    <table>
+      <tr><td>1-5</td><td>Switch panel</td></tr>
+      <tr><td>Space</td><td>Reveal answer</td></tr>
+      <tr><td>g</td><td>Rate: Got It / Strong</td></tr>
+      <tr><td>n</td><td>Rate: Needs Work</td></tr>
+      <tr><td>x</td><td>Rate: Gap</td></tr>
+      <tr><td>r</td><td>Reset panel progress</td></tr>
+      <tr><td>?</td><td>Toggle this overlay</td></tr>
+    </table>
+    <p style="margin-top:12px;font-size:0.8em;color:var(--muted)">Click anywhere to close</p>
+  </div>
+</div>
+
+<script>
+(function() {
+"use strict";
+
+/* ── Data ── */
+var documents = [
+  { filename:"brief.md", title:"LinkedIn Scraping Landscape Brief", sections:[
+    {id:"brief-1",title:"Meeting Context",content:"<ul><li><strong>Who</strong>: Eugene, LinkedIn anti-scraping team</li><li><strong>Connection</strong>: Lea Kissner introduced</li><li><strong>His interest</strong>: \"I work on anti-scraping at LinkedIn. I'd love to hear more about Venom.\"</li><li><strong>VENOM status</strong>: Accepted to Enigma track at USENIX Security '26 (Aug 12-14, 2026, Baltimore)</li></ul>"},
+    {id:"brief-2",title:"LinkedIn's Frontend Architecture",content:"<p>Built <strong>Pemberly</strong> on Ember.js: Vanilla (CSR), SSR (Fastboot), BigPipe (hybrid). By 2023: 3M lines, 17-min builds. Migrating to React. Consumer migration status unknown.</p><p><strong>VENOM implication</strong>: SSR delivers complete HTML before hydration. Framework-agnostic: hooks into HTTP response pipeline, not framework internals.</p>"},
+    {id:"brief-3",title:"Existing Anti-Scraping Defenses",content:"<p>Rate limiting, CAPTCHAs, browser fingerprinting (GPU mismatches), session fingerprinting, behavioral detection (LSTM, doubled recall), automation detection (CDP), TLS fingerprinting (JA3/JA4).</p><p><strong>Legal</strong>: Won vs Proxycurl (permanent injunction, Jan 2025). Filed vs ProAPIs (1M+ fake accounts, Oct 2025).</p><p style='padding:8px 12px;background:var(--gold-light);border-radius:4px;margin-top:8px'><strong>Gap</strong>: All measures answer \"is this a bot?\" None answer: Did content enter training data? Which session extracted what? What happens after? VENOM addresses gaps 1-4.</p>"},
+    {id:"brief-4",title:"hiQ v. LinkedIn Legal Context",content:"<p><strong>Dec 2022</strong>: $500K against hiQ. Permanent injunction. hiQ used fake accounts (authentication bypass).</p><p><strong>Nuance</strong>: Ninth Circuit: CFAA cannot prohibit scraping of publicly available data. Technical measures for detection/attribution are the stronger play.</p>"},
+    {id:"brief-5",title:"Scraper Ecosystem",content:"<table><tr><th>Tool</th><th>Type</th><th>Price</th></tr><tr><td>PhantomBuster</td><td>Cloud</td><td>$56/mo</td></tr><tr><td>Dux-Soup</td><td>Extension</td><td>varies</td></tr><tr><td>Octopus CRM</td><td>Extension</td><td>$10-40/mo</td></tr><tr><td>Apify</td><td>Cloud</td><td>varies</td></tr></table><p style='margin-top:8px'><strong>Scale</strong>: Nov 2025: 4.3B records (~732M unique profiles) in exposed MongoDB. Third-party DB, not LinkedIn breach.</p>"},
+    {id:"brief-6",title:"AI Training Data Paradox",content:"<p>LinkedIn blocks third-party scraping AND uses own user data for AI training. Nov 2024: US data. Nov 2025: EU/EEA/Switzerland/Canada/HK.</p><p>VENOM helps defend against <em>unauthorized</em> extraction, aligning with \"defending member privacy\" framing.</p>"},
+    {id:"brief-7",title:"State of the Art",content:"<p><strong>SynthID-Text</strong> (Google, Oct 2024): marks AI-generated text. VENOM marks <em>scraped human</em> text. <strong>C2PA 2.1</strong>: content credentials, primarily images/video.</p><p><strong>VENOM advantage</strong>: instead of detect-and-block (arms race), makes scraping detectable after the fact.</p>"},
+    {id:"brief-8",title:"Regulatory Landscape",content:"<p><strong>EU AI Act (2026)</strong>: dataset summary requirement. <strong>CFAA</strong>: public data scraping not a violation. Contract claims viable but hard. Technical evidence strengthens legal position.</p>"}
+  ]},
+  { filename:"proposal.md", title:"VENOM Integration Proposal", sections:[
+    {id:"prop-1",title:"The Ask",content:"<p>12-week A/B test. LinkedIn shares anonymized aggregate telemetry. Nick publishes at USENIX. LinkedIn gets 30-day review. No money. First step: mNDA + 1-day technical assessment with SSR team.</p>"},
+    {id:"prop-2",title:"Technique 1: Canary Token Injection",content:"<p>Per-session synthetic data: synthetic profile cards, fake skill endorsements, honeypot connections, canary job descriptions. Names from <code>HMAC(session_id, salt)</code>. Example: \"Meridian Castleford\" + \"quantum terrace design\" (zero real-world occurrence).</p><table><tr><th>Risk</th><th>Mitigation</th></tr><tr><td>Canaries filtered</td><td>Rotate strategy; structurally indistinguishable</td></tr><tr><td>User sees canary</td><td>Graceful degradation as \"suggested connections\"</td></tr><tr><td>Legal: fake profiles</td><td>Ephemeral DOM elements only</td></tr></table>"},
+    {id:"prop-3",title:"Technique 2: Behavioral Fingerprinting",content:"<p>Invisible tripwires: hidden links (aria-hidden), honeypot forms, JS execution ordering (SSR vs hydration), timing signals.</p><p><strong>SSR advantage</strong>: skip JS = get canaries. Run JS = hit tripwires. Can't avoid both.</p>"},
+    {id:"prop-4",title:"Technique 3: Content Watermarking",content:"<p>Synonym substitution, Unicode thin spaces, word-order microshifts, homoglyph insertion. Deterministic per session via HMAC.</p><p>A/B test: baseline (weeks 1-2), 10% ramp (week 3), 50% (weeks 4-6), measurement (weeks 7-8). 50K sessions/group for 80% power.</p>"},
+    {id:"prop-5",title:"DOM Insertion Strategy",content:"<p>What survives extraction: text in div/span/p (even CSS-hidden), noscript, JSON-LD, alt text, meta tags.</p><p><strong>Best approach</strong>: font-size:0 + overflow:hidden + max-height:0. Survives Trafilatura (F1=0.958).</p><p>Performance: ~0.1-0.2ms per request (see Section 9).</p>"},
+    {id:"prop-6",title:"Open Questions",content:"<ol><li>Current SSR: Ember/FastBoot, React, or hybrid?</li><li>Which page types first?</li><li>Performance budget? (Targeting &lt;5ms)</li><li>Prior canary/watermarking experiments?</li><li>Success criteria?</li><li>Library vs service?</li></ol>"}
+  ]},
+  { filename:"technical-details.md", title:"VENOM Technical Deep-Dive", sections:[
+    {id:"tech-1",title:"SSR Injection Points",content:"<p><strong>Point 1</strong>: Fastboot response middleware (string manipulation on final HTML). <strong>Point 1b</strong>: React SSR equivalent (same pattern at Node.js HTTP layer). Key insight: hooks into HTTP response pipeline, not rendering framework. <strong>Point 2</strong>: Ember initializer. <strong>Point 3</strong>: BigPipe streaming chunks (most powerful: independent canaries per chunk).</p>"},
+    {id:"tech-2",title:"Honeypot DOM Structures",content:"<p>4 types: Ghost Profile (clip:rect), Invisible Skill (font-size:0), JSON-LD Canary, Noscript Trap.</p><table><tr><th>CSS Method</th><th>Trafilatura</th><th>BS4</th><th>newspaper3k</th></tr><tr><td>display:none</td><td>Excluded</td><td>Included</td><td>Excluded</td></tr><tr><td><strong>font-size:0</strong></td><td><strong>Included</strong></td><td><strong>Included</strong></td><td><strong>Included</strong></td></tr><tr><td>clip:rect(0,0,0,0)</td><td><strong>Included</strong></td><td><strong>Included</strong></td><td><strong>Included</strong></td></tr></table>"},
+    {id:"tech-3",title:"Watermarking Implementation",content:"<p>Synonym substitution: <code>HMAC-SHA256(session_id, word) mod len(synonyms)</code>. Unicode: zero-width chars encode session ID as binary. Whitespace: en-dash/em-dash variation.</p>"},
+    {id:"tech-4",title:"Behavioral Tripwires",content:"<p>Hidden links (204 on hit), honeypot forms (any submit = bot), hydration mismatch (SSR-only canary disappears after hydration = proves SSR-only extraction).</p>"},
+    {id:"tech-5",title:"Canary Name Generation",content:"<p>200 given &times; 200 surname &times; 100 company &times; 100 title = 4B combos. Birthday paradox: 50% collision after ~65K sessions.</p><p><strong>Layered attribution</strong>: name (250 sessions/day) &rarr; Unicode pattern (session-specific) &rarr; synonym pattern (deterministic) &rarr; trackingHash (globally unique).</p>"},
+    {id:"tech-6",title:"Performance Analysis",content:"<p>Treatment assignment: 0.3&mu;s. Canary gen: 1.2&mu;s. Tracking hash: 0.3&mu;s. Synonym lookup: 0.5&mu;s. HTML manipulation: 50-200&mu;s. Unicode watermark: 20&mu;s.</p><p><strong>Total: 0.075-0.225ms</strong>. At 10K req/s: 2% CPU. Memory: 90KB. Latency: 0.04% of p50 SSR time.</p>"}
+  ]},
+  { filename:"grilling-report-v5.md", title:"v5 Grilling Report (Final)", sections:[
+    {id:"grill-1",title:"Executive Summary",content:"<p><strong>4.6/5</strong> &mdash; TARGET EXCEEDED. All critical v4 gaps resolved. Performance analysis added (0.075-0.225ms). ROI quantified ($200K-500K litigation, 3% EU fines). Performance claims cite Section 9.</p>"},
+    {id:"grill-2",title:"Dimension Scores",content:"<table><tr><th>Dimension</th><th>v4</th><th>v5</th></tr><tr><td>Technical depth</td><td>4.4</td><td><strong>4.7</strong></td></tr><tr><td>Strategic clarity</td><td>4.2</td><td><strong>4.5</strong></td></tr><tr><td>Defensibility</td><td>4.3</td><td><strong>4.5</strong></td></tr><tr><td>Completeness</td><td>4.3</td><td><strong>4.5</strong></td></tr><tr><td>Deployment realism</td><td>4.3</td><td>4.3</td></tr></table>"},
+    {id:"grill-3",title:"Pre-Meeting Checklist",content:"<ul><li>Review Section 9: quote 0.1-0.2ms, 2% CPU at scale</li><li>Review ROI: $200K-500K litigation, 3% EU fines</li><li>Rehearse generic integration: \"show me your pipeline, 30 min\"</li><li>Bring technical-details.md</li></ul>"}
+  ]}
+];
+
+var quizzes = [
+  {id:"q-1",type:"qa",cat:"Technical Feasibility",q:"How does this integrate with our existing SSR pipeline without adding latency?",a:"Lightweight middleware on rendered HTML. String manipulation, not a new rendering pass. Target <5ms (analytical: 0.1-0.2ms). Stateless: session ID + page type + treatment group. No DB calls, no external services. Canary generation precomputed and cached.",bonus:"I'd want to understand your SSR architecture in detail. It hooks into the response pipeline, not the rendering pipeline. Happy to do a technical deep-dive with your SSR team."},
+  {id:"q-2",type:"qa",cat:"Technical Feasibility",q:"We already have bot detection. What does this add?",a:"Your detection answers \"is this a bot?\" VENOM answers: (1) did content end up in training data? (canary tokens), (2) which session extracted what? (watermarking), (3) what happens after extraction? (training bleed). Two key cases: bots you detect but can't block (legal gray area), and bots you don't detect (canary = feedback signal for your detection models)."},
+  {id:"q-3",type:"qa",cat:"Technical Feasibility",q:"What about scrapers that strip hidden elements or detect honeypots?",a:"Three layers: (1) CSS-hidden elements are structurally identical to real content. (2) Semantic watermarking is in visible content (nothing to strip). (3) Strategies rotate. Key insight: not trying to stop scraping, trying to make it detectable and attributable."},
+  {id:"q-4",type:"qa",cat:"Technical Feasibility",q:"A scraper could render the page and only extract visible text?",a:"Sophistication spectrum. Full render = real browser = expensive, slow, and exposes them to behavioral fingerprinting. Skip JS = get canaries. Run JS = hit tripwires. Semantic watermarking works regardless (embedded in visible text)."},
+  {id:"q-5",type:"qa",cat:"Measurement",q:"8 weeks seems short. How do we know if this is working?",a:"Enough for: (1) baseline in 2 weeks, (2) canary deployment + initial detection, (3) A/B user impact validation. Won't know: full time-to-bleed for quarterly retraining. Week 8 deliverables: baseline scraping report, canary detection results, watermarking impact analysis, go/no-go."},
+  {id:"q-6",type:"qa",cat:"Measurement",q:"What's your false positive rate for behavioral fingerprinting?",a:"Target <0.01% (1 in 10,000). Tripwires are physically unreachable: off-screen, zero-opacity, invisible forms. A/B test measures activation rates for known-human sessions (authenticated, long history, verified)."},
+  {id:"q-7",type:"qa",cat:"Measurement",q:"How do you measure watermark survival through a training pipeline?",a:"(1) Direct probing: query LLMs for LinkedIn content, check patterns. (2) Dataset analysis: obtain scraped datasets, run statistical detection. (3) Membership inference: ML techniques for training data presence. First is cheapest; third is most rigorous."},
+  {id:"q-8",type:"qa",cat:"Legal",q:"Does injecting fake content create legal liability?",a:"No. (1) Ephemeral DOM elements, not indexed profiles. (2) Standard A/B testing. (3) Not attributed to real people. (4) hiQ established LinkedIn's right to control access. LinkedIn legal should review synthetic profile specifics."},
+  {id:"q-9",type:"qa",cat:"Legal",q:"GDPR / data protection implications?",a:"(1) Canary content is synthetic, no real user data. (2) Behavioral fingerprinting is session-level, not PII. Pseudonymized under legitimate interest. Watermarking modifies LinkedIn's content, not user-generated. Extending to user content needs separate analysis."},
+  {id:"q-10",type:"qa",cat:"Legal",q:"What's the mNDA scope?",a:"Mutual NDA: (1) LinkedIn's scraping telemetry, (2) VENOM techniques, (3) joint results. 2-year term. Carve-outs: published academic results (with review period), general methodology not referencing LinkedIn specifics."},
+  {id:"q-11",type:"qa",cat:"UX",q:"How do we ensure zero user impact?",a:"Three safeguards: (1) CSS-hidden, aria-hidden for screen readers. (2) A/B test with engagement threshold (roll back if exceeded). (3) Feature flags on everything, disableable per page/segment/globally in seconds."},
+  {id:"q-12",type:"qa",cat:"UX",q:"What about SEO impact?",a:"(1) Don't inject for known crawlers (IP-verified, not user-agent). (2) JSON-LD canaries use sameAs pointing to non-existent URL. Semantic watermarking is synonym-level, search engines handle it. Monitor Search Console."},
+  {id:"q-13",type:"qa",cat:"Scale",q:"How does this scale to billions of page views?",a:"Stateless, O(1) per request. Canary generation deterministic from session ID (no DB). Watermarking uses cached synonym table. Behavioral fingerprinting is async/batch. Simpler than ad targeting LinkedIn already runs."},
+  {id:"q-14",type:"qa",cat:"Scale",q:"Integration effort? How many engineering weeks?",a:"3-8 weeks depending on pipeline modularity. First step: 1-day technical assessment. Components: (1) SSR middleware hook (variable), (2) canary module (provided), (3) behavioral instrumentation (1 week), (4) analysis pipeline (provided). Clean middleware = 3 weeks, legacy = 8."},
+  {id:"q-15",type:"qa",cat:"IP & Employment",q:"How does this work with your Apple employment?",a:"Independent academic research under California Labor Code 2870. Published independently throughout career: Privacy Pass, Delegated Credentials, Exported Authenticators, IAB/IETF. USENIX acceptance reinforces academic framing. Researcher-to-company, not company-to-company.",bonus:"Apple has a well-established academic publishing program. This is how independent research works in the industry."},
+  {id:"q-16",type:"qa",cat:"IP & Employment",q:"Is defensive data poisoning legal?",a:"Yes. (1) Watermarking own content: clearly legal (DRM, steganography). (2) Canary tokens: legal, like canary traps. (3) Degrading content for unauthorized scrapers: legal on your infrastructure. Copyright Office May 2025: unauthorized AI training = prima facie infringement. Zero lawsuits against Nightshade/Glaze.",bonus:"Tortious interference argument fails: if scraping is unauthorized and infringing, there's no legitimate relationship to interfere with."},
+  {id:"q-17",type:"qa",cat:"Strategic",q:"We tried canary/watermarking before. Wasn't worth it.",a:"Common failures: (1) client-side injection bypassed, (2) display:none filtered by Trafilatura, (3) passive detection, (4) short window. VENOM fixes all four: SSR injection, font-size:0, active daily probing, 6-12 month commitment. AI ecosystem changed dramatically."},
+  {id:"q-18",type:"qa",cat:"Strategic",q:"Why external researcher instead of internal build?",a:"(1) Cross-platform measurement (value increases with multiple sites). (2) Academic credibility (USENIX peer review, legal weight). (3) Speed (framework already built, LinkedIn integrates existing research)."},
+  {id:"q-19",type:"qa",cat:"Strategic",q:"Dollar value? How justify 12 weeks to leadership?",a:"(1) Legal: $200K-500K per federal case; prevents trials. (2) Regulatory: EU AI Act, up to 3% global turnover. (3) Competitive: first peer-reviewed measurement at USENIX. One prevented trial pays for itself."},
+  {id:"q-20",type:"qa",cat:"Deployment",q:"What happens when scrapers adapt?",a:"Portfolio approach: adaptation is expensive. Filter hidden DOM? Still get synonym watermarks. Normalize Unicode? Still get semantic watermarks. Full render? Hit behavioral tripwires. Rotation is cheap (minutes of config)."},
+
+  {id:"f-1",type:"fact",cat:"Key Facts",q:"Anthropic's peak crawl-to-referral ratio (2025) was ______:1",a:"500,000:1",blank:"500,000"},
+  {id:"f-2",type:"fact",cat:"Key Facts",q:"OpenAI's peak crawl-to-referral ratio (2025) was ______:1",a:"3,700:1",blank:"3,700"},
+  {id:"f-3",type:"fact",cat:"Key Facts",q:"The Nov 2025 exposed database contained ______ billion records (~732M unique profiles)",a:"4.3 billion",blank:"4.3"}
+];
+
+var killerQuestions = [
+  {id:"kq-1",q:"You claim <5ms overhead. What's your benchmark data?",a:"Section 9: 0.075-0.225ms per request. Treatment: 0.3\u00b5s, canary gen: 1.2\u00b5s, tracking: 0.3\u00b5s, synonym: 0.5\u00b5s, HTML: 50-200\u00b5s, Unicode: 20\u00b5s. At 10K req/s: 2% CPU. Order of magnitude under <5ms. Analytical estimates; empirical benchmarks in Phase 0."},
+  {id:"kq-2",q:"What's the dollar value of this measurement capability?",a:"(1) Legal: $200K-500K per federal case. Prevents trials/accelerates settlements. (2) Regulatory: EU AI Act fines up to 3% global turnover. (3) Competitive: first peer-reviewed results at USENIX. One prevented trial pays for itself."},
+  {id:"kq-3",q:"Our SSR pipeline is custom-built, not Fastboot or Next.js.",a:"We hook into HTTP response middleware where rendered HTML is complete but not yet sent. Show me your pipeline, I'll find the injection point in 30 minutes. Express/Koa/Fastify: intercept res.send() or res.end(). 200 lines of string manipulation. Not coupled to any framework."},
+  {id:"kq-4",q:"How does this work with your Apple employment?",a:"Independent academic research under California Labor Code 2870. Published independently: Privacy Pass, Delegated Credentials, Exported Authenticators, IAB/IETF. USENIX acceptance = academic framing. Researcher-to-company, not company-to-company."},
+  {id:"kq-5",q:"We tried canary tokens before and decided it wasn't worth it.",a:"Common failures: (1) client-side injection (bypassed), (2) display:none (Trafilatura filters), (3) passive detection (too slow), (4) short window. VENOM: SSR injection, font-size:0, active daily probing across LLMs, 6-12 month commitment. Detection surface is much larger now."},
+  {id:"kq-6",q:"Aren't you also scraping user data for AI training?",a:"LinkedIn's position: direct relationship + updated ToS = authorized use. VENOM targets unauthorized extraction. Strengthens pitch: differentiates authorized from unauthorized, proves specific content was extracted without authorization. Evidence for existing legal enforcement program."}
+];
+
+var timeline = [
+  {phase:"Phase 0: Technical Assessment",weeks:"Week 1",items:["1-day deep-dive with SSR team","Confirm architecture: Ember/FastBoot, React, or hybrid","Estimate effort with error bars","Legal review of synthetic content injection"],decision:"Proceed or revise scope."},
+  {phase:"Phase 1: Integration & Instrumentation",weeks:"Weeks 2-5",items:["Build VENOM injection middleware (3-6 weeks)","Deploy measurement-only instrumentation","Establish scraping volume baselines","Deploy tripwire endpoints and hydration beacons"],decision:"Review instrumentation baselines."},
+  {phase:"Phase 2: Canary Deployment",weeks:"Weeks 6-7",items:["Canary tokens to 100% (invisible, no A/B needed)","Behavioral fingerprinting to 100%","Automated LLM probing (~$50/month via OpenRouter)","JSON-LD canaries, noscript traps, shoebox injection"],decision:null},
+  {phase:"Phase 3: Watermarking A/B Test",weeks:"Weeks 6-12",items:["Week 6: 10% ramp, synonym substitution","Weeks 7-8: scale to 50%, full watermark stack","50K sessions/group for 80% power","Weeks 9-12: probe LLMs and aggregators"],decision:"Week 8: engagement delta check (>1% = reduce intensity)."},
+  {phase:"Phase 4: Analysis & Decision",weeks:"Weeks 8-12",items:["DOM injection strategy deployment","Training pipeline survival rates","Statistical analysis","Go/no-go for production"],decision:"Week 12: full results review."}
+];
+
+/* ── State ── */
+var STORAGE_KEY = "teach-me-linkedin-2026-02-09";
+var state = loadState();
+var currentPanel = state.lastPanel || "overview";
+var drillIdx = 0;
+var drillRevealed = false;
+
+function loadState() {
+  try { var r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch(e) {}
+  return { sectionsVisited: [], quizResults: {}, drillResults: {}, lastPanel: "overview" };
+}
+function saveState() {
+  state.lastPanel = currentPanel;
+  state.lastUpdated = Date.now();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function markVisited(id) {
+  if (state.sectionsVisited.indexOf(id) === -1) {
+    state.sectionsVisited.push(id);
+    saveState();
+    updateProgress();
+  }
+}
+
+/* ── Progress ── */
+function updateProgress() {
+  var totalSections = 0;
+  documents.forEach(function(d) { totalSections += d.sections.length; });
+  document.querySelector("#prog-sections .count").textContent = state.sectionsVisited.length;
+  document.getElementById("prog-sections").childNodes[1].textContent = state.sectionsVisited.length + "";
+  var secSpan = document.getElementById("prog-sections");
+  secSpan.textContent = "";
+  secSpan.textContent = "Sections: " + state.sectionsVisited.length + "/" + totalSections;
+
+  var qDone = Object.keys(state.quizResults).length;
+  var qEl = document.getElementById("prog-quiz");
+  qEl.textContent = "Quiz: " + qDone + "/" + quizzes.length;
+
+  var dDone = Object.keys(state.drillResults).length;
+  var dEl = document.getElementById("prog-drill");
+  dEl.textContent = "Drill: " + dDone + "/" + killerQuestions.length;
+
+  updateBadges();
+}
+
+function updateBadges() {
+  var gi = 0, nw = 0, ga = 0;
+  for (var k in state.quizResults) {
+    if (state.quizResults[k] === "got-it") gi++;
+    else if (state.quizResults[k] === "needs-work") nw++;
+    else ga++;
+  }
+  var qBtn = document.querySelector('[data-panel="quiz"]');
+  var txt = "3. Quiz";
+  if (gi) txt += ' <span class="badge badge-green">' + gi + "</span>";
+  if (nw) txt += ' <span class="badge badge-gold">' + nw + "</span>";
+  if (ga) txt += ' <span class="badge badge-red">' + ga + "</span>";
+  qBtn.innerHTML = txt;
+
+  var ds = 0, dn = 0, dg = 0;
+  for (var j in state.drillResults) {
+    if (state.drillResults[j] === "strong") ds++;
+    else if (state.drillResults[j] === "needs-work") dn++;
+    else dg++;
+  }
+  var dBtn = document.querySelector('[data-panel="drill"]');
+  var dt = "4. Drill";
+  if (ds) dt += ' <span class="badge badge-green">' + ds + "</span>";
+  if (dn) dt += ' <span class="badge badge-gold">' + dn + "</span>";
+  if (dg) dt += ' <span class="badge badge-red">' + dg + "</span>";
+  dBtn.innerHTML = dt;
+}
+
+/* ── Panel switching ── */
+function switchPanel(name) {
+  currentPanel = name;
+  var panels = document.querySelectorAll(".panel");
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove("active");
+  var p = document.getElementById("panel-" + name);
+  if (p) p.classList.add("active");
+  var btns = document.querySelectorAll(".sidebar-item[data-panel]");
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].classList.toggle("active", btns[j].getAttribute("data-panel") === name);
+  }
+  saveState();
+}
+
+/* ── Docs ── */
+function renderDocs() {
+  var c = document.getElementById("panel-docs");
+  var h = '<h2 style="font-size:1.1em;color:var(--blue);margin-bottom:16px">Document Browser</h2>';
+  documents.forEach(function(doc) {
+    h += '<div class="doc-card"><div class="doc-card-header" data-file="' + doc.filename + '"><span>' + doc.title + ' <span class="source-tag">' + doc.filename + '</span></span><span class="arrow">\u25B6</span></div><div class="doc-card-body">';
+    doc.sections.forEach(function(sec) {
+      h += '<h4 data-secid="' + sec.id + '">' + sec.title + '</h4>' + sec.content;
+    });
+    h += "</div></div>";
+  });
+  c.innerHTML = h;
+
+  // Event delegation for doc cards
+  c.addEventListener("click", function(e) {
+    var header = e.target.closest(".doc-card-header");
+    if (header) {
+      var body = header.nextElementSibling;
+      var arrow = header.querySelector(".arrow");
+      body.classList.toggle("open");
+      arrow.classList.toggle("open");
+      if (body.classList.contains("open")) {
+        var first = body.querySelector("h4[data-secid]");
+        if (first) markVisited(first.getAttribute("data-secid"));
+      }
+    }
+    var h4 = e.target.closest("h4[data-secid]");
+    if (h4) markVisited(h4.getAttribute("data-secid"));
+  });
+}
+
+/* ── Quiz ── */
+function renderQuiz() {
+  var c = document.getElementById("panel-quiz");
+  var h = '<h2 style="font-size:1.1em;color:var(--blue);margin-bottom:4px">Quiz</h2>';
+  h += '<p style="font-size:0.8em;color:var(--muted);margin-bottom:16px">Space to reveal, g/n/x to rate.</p>';
+  var lastCat = "";
+  quizzes.forEach(function(q, i) {
+    if (q.cat !== lastCat) {
+      h += '<div style="font-size:0.7em;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue);font-weight:700;margin:16px 0 8px;padding-top:8px;border-top:1px solid var(--border)">' + q.cat + "</div>";
+      lastCat = q.cat;
+    }
+    var rc = state.quizResults[q.id] ? " rated-" + state.quizResults[q.id] : "";
+    h += '<div class="quiz-card' + rc + '" data-qid="' + q.id + '" data-idx="' + i + '">';
+    h += '<div class="quiz-type">' + (q.type === "qa" ? "Q&A" : q.type === "fact" ? "Fill in the blank" : "Risk/Mitigation") + "</div>";
+    h += '<div class="quiz-question">' + q.q + "</div>";
+    h += '<div class="quiz-answer" data-ans="' + q.id + '">' + q.a + "</div>";
+    if (q.bonus) h += '<div class="quiz-bonus" data-bonus="' + q.id + '"><strong>If pressed:</strong> ' + q.bonus + "</div>";
+    h += '<div class="quiz-actions">';
+    h += '<button class="btn btn-reveal" data-reveal="' + q.id + '">Reveal</button>';
+    if (q.bonus) h += '<button class="btn btn-bonus" data-showbonus="' + q.id + '" style="display:none">If pressed</button>';
+    h += '<div class="rate-btns" data-rate="' + q.id + '">';
+    h += '<button class="btn btn-got-it" data-rateval="got-it">Got It</button>';
+    h += '<button class="btn btn-needs-work" data-rateval="needs-work">Needs Work</button>';
+    h += '<button class="btn btn-gap" data-rateval="gap">Gap</button>';
+    h += "</div>";
+    h += '<span class="quiz-rating-badge" data-badge="' + q.id + '"></span>';
+    h += "</div></div>";
+  });
+  c.innerHTML = h;
+
+  // Restore
+  quizzes.forEach(function(q) { if (state.quizResults[q.id]) showRating(q.id, state.quizResults[q.id]); });
+
+  // Events
+  c.addEventListener("click", function(e) {
+    var revBtn = e.target.closest("[data-reveal]");
+    if (revBtn) { revealQ(revBtn.getAttribute("data-reveal")); return; }
+    var bonusBtn = e.target.closest("[data-showbonus]");
+    if (bonusBtn) {
+      var bel = c.querySelector('[data-bonus="' + bonusBtn.getAttribute("data-showbonus") + '"]');
+      if (bel) bel.classList.toggle("visible");
+      return;
+    }
+    var rateBtn = e.target.closest("[data-rateval]");
+    if (rateBtn) {
+      var card = rateBtn.closest(".quiz-card");
+      var qid = card.getAttribute("data-qid");
+      rateQ(qid, rateBtn.getAttribute("data-rateval"));
+    }
+  });
+}
+
+function revealQ(id) {
+  var a = document.querySelector('[data-ans="' + id + '"]');
+  if (a) a.classList.add("visible");
+  var r = document.querySelector('[data-rate="' + id + '"]');
+  if (r) r.classList.add("visible");
+  var bb = document.querySelector('[data-showbonus="' + id + '"]');
+  if (bb) bb.style.display = "inline-block";
+}
+
+function rateQ(id, rating) {
+  state.quizResults[id] = rating;
+  saveState();
+  showRating(id, rating);
+  updateProgress();
+}
+
+function showRating(id, rating) {
+  var card = document.querySelector('[data-qid="' + id + '"]');
+  if (!card) return;
+  card.className = "quiz-card rated-" + rating;
+  var badge = document.querySelector('[data-badge="' + id + '"]');
+  if (badge) {
+    badge.classList.add("visible");
+    var labels = {"got-it":"Got It","needs-work":"Needs Work","gap":"Gap"};
+    var bgs = {"got-it":"var(--green-light)","needs-work":"var(--gold-light)","gap":"var(--red-light)"};
+    var fgs = {"got-it":"var(--green)","needs-work":"var(--gold)","gap":"var(--red)"};
+    badge.textContent = labels[rating];
+    badge.style.background = bgs[rating];
+    badge.style.color = fgs[rating];
+  }
+}
+
+/* ── Drill ── */
+function renderDrill() {
+  var c = document.getElementById("panel-drill");
+  var kqs = killerQuestions;
+  if (drillIdx >= kqs.length) {
+    var s = 0, n = 0, g = 0;
+    for (var k in state.drillResults) {
+      if (state.drillResults[k]==="strong") s++;
+      else if (state.drillResults[k]==="needs-work") n++;
+      else g++;
+    }
+    c.innerHTML = '<div class="drill-done"><h2>Drill Complete</h2><div class="drill-score-bar" style="justify-content:center"><span class="ds ds-strong">'+s+' Strong</span><span class="ds ds-nw">'+n+' Needs Work</span><span class="ds ds-gap">'+g+' Gap</span></div><p style="margin-top:16px;font-size:0.9em;color:var(--muted)">Press <strong>r</strong> to restart.</p></div>';
+    return;
+  }
+  var kq = kqs[drillIdx];
+  var st = 0, nw = 0, ga = 0;
+  for (var j in state.drillResults) {
+    if (state.drillResults[j]==="strong") st++;
+    else if (state.drillResults[j]==="needs-work") nw++;
+    else ga++;
+  }
+  drillRevealed = false;
+  c.innerHTML = '<div class="drill-container"><div class="drill-counter">'+(drillIdx+1)+' / '+kqs.length+'</div><div class="drill-score-bar"><span class="ds ds-strong">'+st+' Strong</span><span class="ds ds-nw">'+nw+' Needs Work</span><span class="ds ds-gap">'+ga+' Gap</span></div><div class="drill-question">\u201C'+kq.q+'\u201D</div><div class="drill-answer" id="drill-answer">'+kq.a+'</div><div class="drill-hint" id="drill-hint">Think of your answer, then press <strong>Space</strong> to reveal.</div><div class="drill-actions" id="drill-actions" style="display:none"><button class="btn btn-got-it" data-drate="strong" style="padding:10px 20px">Strong (g)</button><button class="btn btn-needs-work" data-drate="needs-work" style="padding:10px 20px">Needs Work (n)</button><button class="btn btn-gap" data-drate="gap" style="padding:10px 20px">Gap (x)</button></div></div>';
+
+  c.onclick = function(e) {
+    var rb = e.target.closest("[data-drate]");
+    if (rb) {
+      state.drillResults[kq.id] = rb.getAttribute("data-drate");
+      saveState();
+      updateProgress();
+      drillIdx++;
+      renderDrill();
+    }
+  };
+}
+
+function revealDrill() {
+  drillRevealed = true;
+  var a = document.getElementById("drill-answer");
+  if (a) a.classList.add("visible");
+  var h = document.getElementById("drill-hint");
+  if (h) h.style.display = "none";
+  var act = document.getElementById("drill-actions");
+  if (act) act.style.display = "flex";
+}
+
+/* ── Timeline ── */
+function renderTimeline() {
+  var c = document.getElementById("timeline-list");
+  var h = "";
+  timeline.forEach(function(phase, i) {
+    h += '<div class="tl-phase"><div class="tl-marker"><span class="week">'+phase.weeks+'</span>';
+    if (i < timeline.length-1) h += '<div class="tl-line"></div>';
+    h += '</div><div class="tl-content"><h3>'+phase.phase+'</h3><p>'+phase.items[0]+'</p><div class="tl-details"><ul>';
+    phase.items.slice(1).forEach(function(it) { h += "<li>"+it+"</li>"; });
+    h += "</ul>";
+    if (phase.decision) h += '<div class="tl-decision"><strong>Decision:</strong> '+phase.decision+"</div>";
+    h += "</div></div></div>";
+  });
+  c.innerHTML = h;
+  c.addEventListener("click", function(e) {
+    var content = e.target.closest(".tl-content");
+    if (content) {
+      var det = content.querySelector(".tl-details");
+      if (det) det.classList.toggle("open");
+    }
+  });
+}
+
+/* ── Keyboard ── */
+document.addEventListener("keydown", function(e) {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+  if (e.key === "?") {
+    e.preventDefault();
+    document.getElementById("keyboard-overlay").classList.toggle("visible");
+    return;
+  }
+  if (e.key === "1") { switchPanel("overview"); return; }
+  if (e.key === "2") { switchPanel("docs"); return; }
+  if (e.key === "3") { switchPanel("quiz"); return; }
+  if (e.key === "4") { switchPanel("drill"); return; }
+  if (e.key === "5") { switchPanel("timeline"); return; }
+
+  if (e.key === "r") {
+    if (currentPanel === "quiz") {
+      state.quizResults = {};
+      saveState();
+      renderQuiz();
+      updateProgress();
+    } else if (currentPanel === "drill") {
+      state.drillResults = {};
+      drillIdx = 0;
+      saveState();
+      renderDrill();
+      updateProgress();
+    }
+    return;
+  }
+
+  if (currentPanel === "quiz") {
+    if (e.key === " ") {
+      e.preventDefault();
+      var unrevealed = document.querySelector('.quiz-answer:not(.visible)');
+      if (unrevealed) {
+        var id = unrevealed.getAttribute("data-ans");
+        revealQ(id);
+        unrevealed.scrollIntoView({behavior:"smooth",block:"center"});
+      }
+      return;
+    }
+    if (e.key === "g" || e.key === "n" || e.key === "x") {
+      for (var i = 0; i < quizzes.length; i++) {
+        var q = quizzes[i];
+        var ans = document.querySelector('[data-ans="'+q.id+'"]');
+        if (ans && ans.classList.contains("visible") && !state.quizResults[q.id]) {
+          var rating = e.key === "g" ? "got-it" : e.key === "n" ? "needs-work" : "gap";
+          rateQ(q.id, rating);
+          var next = document.querySelector('.quiz-answer:not(.visible)');
+          if (next) {
+            revealQ(next.getAttribute("data-ans"));
+            next.scrollIntoView({behavior:"smooth",block:"center"});
+          }
+          return;
+        }
+      }
+    }
+  }
+
+  if (currentPanel === "drill") {
+    if (e.key === " ") {
+      e.preventDefault();
+      if (!drillRevealed && drillIdx < killerQuestions.length) revealDrill();
+      return;
+    }
+    if (drillRevealed && drillIdx < killerQuestions.length) {
+      var kq = killerQuestions[drillIdx];
+      if (e.key === "g") { state.drillResults[kq.id] = "strong"; saveState(); updateProgress(); drillIdx++; renderDrill(); return; }
+      if (e.key === "n") { state.drillResults[kq.id] = "needs-work"; saveState(); updateProgress(); drillIdx++; renderDrill(); return; }
+      if (e.key === "x") { state.drillResults[kq.id] = "gap"; saveState(); updateProgress(); drillIdx++; renderDrill(); return; }
+    }
+    if (e.key === "ArrowRight" && drillRevealed) { drillIdx++; renderDrill(); }
+    if (e.key === "ArrowLeft" && drillIdx > 0) { drillIdx--; renderDrill(); }
+  }
+});
+
+document.getElementById("keyboard-overlay").addEventListener("click", function() {
+  this.classList.remove("visible");
+});
+
+/* ── Sidebar clicks ── */
+var sidebarBtns = document.querySelectorAll(".sidebar-item[data-panel]");
+for (var i = 0; i < sidebarBtns.length; i++) {
+  sidebarBtns[i].addEventListener("click", function() { switchPanel(this.getAttribute("data-panel")); });
+}
+
+/* ── Init ── */
+renderDocs();
+renderQuiz();
+renderDrill();
+renderTimeline();
+switchPanel(currentPanel);
+updateProgress();
+
+})();
+</script>
+</body>
+</html>
