@@ -604,6 +604,7 @@ body {
   <button class="tab-btn" data-tab="p6">6. Pipeline FP <span class="badge badge-proposal">PROPOSAL</span></button>
   <button class="tab-btn" data-tab="evidence">Evidence <span class="badge badge-research">REAL</span></button>
   <button class="tab-btn" data-tab="integration">Integration Path</button>
+  <button class="tab-btn" data-tab="glossary">Glossary <span class="badge badge-research">REF</span></button>
 </div>
 
 <!-- ============================================================ -->
@@ -955,6 +956,22 @@ body {
         <li><strong><a href="https://github.com/google/sentencepiece">SentencePiece</a></strong> (Google/Meta): Used by LLaMA, Gemma, T5. Unigram or BPE mode. Operates on Unicode codepoints.</li>
       </ul>
       <p>Before tokenization, <strong>NFKC normalization</strong> (Unicode Normalization Form KC) maps compatibility-equivalent characters to their canonical form: fullwidth Latin &#8220;&#xFF21;&#8221; &#8594; &#8220;A&#8221;, math bold &#8220;&#x1D400;&#8221; &#8594; &#8220;A&#8221;, superscript &#8220;&#178;&#8221; &#8594; &#8220;2&#8221;. Critically, NFKC does <strong>not</strong> map across scripts: Cyrillic &#8220;&#1072;&#8221; (U+0430) stays Cyrillic, not Latin &#8220;a&#8221; (U+0061). This means Cyrillic and Greek homoglyphs get distinct BPE tokens from their Latin lookalikes.</p>
+
+      <h4>Worked Example: BPE Tokenization with Homoglyphs</h4>
+      <p>BPE tokenizers operate on raw byte sequences. Cyrillic characters use different UTF-8 bytes than their Latin lookalikes, so the tokenizer treats them as entirely different inputs:</p>
+      <div class="code-block"><strong>Latin "Senior"</strong>
+  UTF-8 bytes: 53 65 6E 69 6F 72
+  tiktoken:    [ "Senior" ]                          &#8594; <strong>1 token</strong>
+
+<strong>Cyrillic &#1077; substituted: "S&#1077;nior"</strong>
+  UTF-8 bytes: 53 <span style="color:#c0392b;font-weight:bold">D0 B5</span> 6E 69 6F 72
+  tiktoken:    [ "S", "<span style="color:#c0392b">&#1077;</span>", "nior" ]                  &#8594; <strong>3 tokens</strong>
+
+Latin "e" is one byte (0x65). Cyrillic "&#1077;" is two bytes (0xD0 0xB5).
+The tokenizer never learned "S&#1077;nior" as a merge &#8212; it falls back
+to character-level tokenization. One token becomes three.</div>
+
+      <p>This fragmentation is the detection mechanism. A model trained on homoglyph-watermarked text will have elevated probability for Cyrillic token IDs at positions where Latin characters normally appear &#8212; a measurable statistical signal that proves the watermarked content was in the training data.</p>
 
       <div class="callout callout-red">
         <strong>The critical bottleneck is text extraction, not tokenization.</strong>
@@ -3552,6 +3569,272 @@ Knowledge graph builder (Google, Perplexity):
   <p>LinkedIn's SSR response is 200-500ms (p50-p95). VENOM adds 0.1-0.25ms: 0.05% of p50. Below measurement noise.</p>
   <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(9)"><span class="arrow">←</span> Evidence</button>
+    <button class="tab-nav-btn" onclick="switchTab(11)">Glossary <span class="arrow">→</span></button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- GLOSSARY -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-glossary">
+  <h2>Glossary</h2>
+  <p>Technical terms used across all VENOM proposals. Grouped by domain.</p>
+
+  <div class="card open">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Unicode &amp; Text Processing</h3>
+      <span class="card-toggle">&#9660;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>BPE (Byte Pair Encoding)</dt>
+        <dd>Tokenization algorithm used by most LLMs. Learns frequent byte sequences as single tokens during training. &#8220;engineering&#8221; is one token; inserting a zero-width character splits it into multiple tokens because the byte sequence changes. Introduced by Sennrich et al. (Edinburgh, ACL 2016). Implementations: <strong>tiktoken</strong> (OpenAI, GPT-4/o1, ~100K vocab, operates on UTF-8 bytes) and <strong>SentencePiece</strong> (Google/Meta, LLaMA/Gemma/T5, operates on Unicode codepoints).</dd>
+
+        <dt>BPE fragmentation</dt>
+        <dd>Attack where invisible Unicode characters break known BPE tokens into multiple smaller tokens, inflating inference cost 1.5&#8211;3x. An invisible tax only machines pay. Basis of Proposal 5.</dd>
+
+        <dt>Bidi override (LRO/RLO)</dt>
+        <dd>Unicode characters U+202D and U+202E that force left-to-right or right-to-left text direction. Stripped by Trafilatura but survive BPE tokenization.</dd>
+
+        <dt>Confusable</dt>
+        <dd>Unicode characters from different scripts that look identical to humans. Formally tracked in Unicode TR39. Cyrillic &#8216;a&#8217; (U+0430) and Latin &#8216;a&#8217; (U+0061) are confusables. No known training lab applies TR39 filtering.</dd>
+
+        <dt>Fullwidth Latin</dt>
+        <dd>Unicode block where ASCII characters occupy CJK-width cells (e.g., fullwidth &#xFF21;). NFKC normalizes these back to standard ASCII, destroying them as watermark carriers.</dd>
+
+        <dt>Homoglyph</dt>
+        <dd>A character visually identical to another from a different Unicode script. Cyrillic &#8216;o&#8217; (U+043E) looks exactly like Latin &#8216;o&#8217; (U+006F) in web fonts but encodes to different bytes and gets a different BPE token. Basis of Proposal 1.</dd>
+
+        <dt>NFKC (Normalization Form KC)</dt>
+        <dd>Unicode normalization that decomposes then recomposes characters with compatibility mappings. Converts fullwidth Latin to ASCII. Does <strong>not</strong> normalize across scripts &#8212; Cyrillic stays Cyrillic. Applied by most BPE tokenizers as a preprocessing step.</dd>
+
+        <dt>Soft hyphen (U+00AD)</dt>
+        <dd>Invisible character suggesting a line-break opportunity. Stripped by Trafilatura (Unicode category Cf) but would survive BPE tokenization if it reached that stage.</dd>
+
+        <dt>Unicode category Cf</dt>
+        <dd>The &#8220;format&#8221; category in Unicode. Contains all invisible formatting characters: zero-width spaces, joiners, bidi overrides, soft hyphens, BOM. Trafilatura strips all Cf characters via Python&#8217;s <code>str.isprintable()</code>.</dd>
+
+        <dt>ZWSP / ZWS (U+200B)</dt>
+        <dd>Zero-Width Space. Invisible character with zero display width. Inserting it mid-word fragments BPE tokens because the byte sequence changes. Stripped by Trafilatura.</dd>
+
+        <dt>ZWNJ (U+200C)</dt>
+        <dd>Zero-Width Non-Joiner. Prevents ligature formation. Stripped by Trafilatura.</dd>
+
+        <dt>ZWJ (U+200D)</dt>
+        <dd>Zero-Width Joiner. Triggers ligature formation (also used in emoji sequences like &#x1F469;&#x200D;&#x1F4BB;). Stripped by Trafilatura.</dd>
+
+        <dt>Word Joiner (U+2060)</dt>
+        <dd>Invisible character preventing line breaks. Stripped by Trafilatura. Creates its own BPE token (2 tokens in tiktoken).</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>ML / NLP Pipeline</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>C4 (Colossal Clean Crawled Corpus)</dt>
+        <dd>Google&#8217;s filtered Common Crawl dataset (750GB). Used for training T5 and UL2. Heavy heuristic filtering removes low-quality text.</dd>
+
+        <dt>Common Crawl</dt>
+        <dd>Non-profit that crawls the web monthly: 9.5+ petabytes total, 2.4 billion pages per crawl. The base dataset for GPT-3, LLaMA, T5, and most other LLMs. Distributed as WARC files.</dd>
+
+        <dt>Deduplication (MinHash / SimHash)</dt>
+        <dd><strong>MinHash</strong>: generates fixed-size signatures from n-gram shingles; estimates Jaccard similarity via Locality-Sensitive Hashing (LSH). Threshold: &gt;0.8 similarity = duplicate. <strong>SimHash</strong>: single 64-bit fingerprint per document; Hamming distance approximates cosine similarity. Faster but less precise. <strong>Exact dedup</strong>: document-level SHA-256 hashing.</dd>
+
+        <dt>FineWeb</dt>
+        <dd>HuggingFace&#8217;s curated web corpus (15T tokens). Uses Trafilatura for extraction plus quality classifiers. Removes ~90% of raw crawl data at quality/dedup stages.</dd>
+
+        <dt>KenLM</dt>
+        <dd>Fast n-gram language model for perplexity scoring. Measures how &#8220;surprised&#8221; the model is by text. Low perplexity = natural language; high perplexity = gibberish. Used by FineWeb and CCNet to filter training data.</dd>
+
+        <dt>LSTM (Long Short-Term Memory)</dt>
+        <dd>Recurrent neural network for sequential data. LinkedIn uses LSTMs to model user action sequences and detect scraper behavior patterns. Nearly doubled detection recall for low-frequency automation (2021).</dd>
+
+        <dt>Model collapse</dt>
+        <dd>Phenomenon where models trained on AI-generated or poisoned data degrade in quality. Shumailov and Zhao (Google DeepMind, 2024) showed canary tokens in training data cause models to hallucinate canary entities.</dd>
+
+        <dt>RAG (Retrieval-Augmented Generation)</dt>
+        <dd>Architecture where an LLM retrieves external documents at inference time. Token inflation (Proposal 5) is especially effective against RAG: inflated text fills context windows 2&#8211;3x faster, degrading output quality.</dd>
+
+        <dt>Training data membership inference</dt>
+        <dd>Determining whether specific content was in a model&#8217;s training set. Methods: statistical analysis, divergence attacks (&#8220;Repeat the word X forever&#8221;), or planted watermark detection.</dd>
+
+        <dt>WARC (Web ARChive)</dt>
+        <dd>Standard file format for web crawl data. Common Crawl distributes data as WARC files containing raw HTML, HTTP headers, and metadata.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Anti-Scraping &amp; Bot Detection</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>Anti-detect browser</dt>
+        <dd>Software (Multilogin, GoLogin, Kameleo, Camoufox) that disguises automated scrapers as real browsers by presenting consistent, plausible fingerprints. $30&#8211;300/month.</dd>
+
+        <dt>Canary token / Canary trap</dt>
+        <dd>Synthetic data element that, when found in an external dataset or model output, proves extraction occurred. Borrowed from intelligence tradecraft: distribute slightly different versions to different recipients; when one leaks, the source is identified. VENOM applies this to web content (Proposal 3).</dd>
+
+        <dt>CDP (Chrome DevTools Protocol)</dt>
+        <dd>Debugging protocol Chrome exposes to automation tools (Puppeteer, Playwright). Leaves detectable artifacts: <code>__playwright__binding__</code> globals, <code>Error.stack</code> traps, synthetic <code>navigator.plugins</code>.</dd>
+
+        <dt>Crawl-to-referral ratio</dt>
+        <dd>Pages crawled vs. visitors sent back. Anthropic peaked at 500,000:1; OpenAI at 3,700:1; Google at 14:1 (Cloudflare, Jan&#8211;Jul 2025).</dd>
+
+        <dt>Default-deny</dt>
+        <dd>Architecture blocking all AI crawlers unless explicitly permitted. Cloudflare deployed this for CDN customers in July 2025, affecting ~20% of the web.</dd>
+
+        <dt>Honeypot</dt>
+        <dd>Deliberately placed fake content designed to attract scrapers. Reddit&#8217;s SERP honeypot proved Perplexity scraped Google results to get Reddit content (surfaced within hours).</dd>
+
+        <dt>Hydration / Hydration beacon</dt>
+        <dd><strong>Hydration</strong>: client-side JS activating server-rendered HTML. The gap between SSR delivery and hydration completion is VENOM&#8217;s injection window (Proposal 4). <strong>Beacon</strong>: lightweight <code>navigator.sendBeacon()</code> confirming JS executed; absence identifies non-JS scrapers.</dd>
+
+        <dt>Residential proxy</dt>
+        <dd>IP addresses from real residential ISP connections, making bot traffic appear to come from home users. 190M IPs available (Bright Data, Oxylabs) at $10&#8211;15/GB.</dd>
+
+        <dt>robots.txt</dt>
+        <dd>30-year-old convention for declaring crawler permissions. IMC 2025 found only 30.7% compliance with disallow-all. Not technically enforceable. IETF RFC 9309 formalized the syntax.</dd>
+
+        <dt>JA3 / JA4</dt>
+        <dd>TLS client fingerprinting methods. Hash the ClientHello parameters (cipher suites, extensions, curves). Every HTTP client has a distinct fingerprint; headless Chrome&#8217;s JA4 differs from real Chrome&#8217;s.</dd>
+
+        <dt>Tripwire</dt>
+        <dd>Hidden DOM element (off-screen link, invisible form, zero-opacity anchor) that real users never interact with but scrapers traverse. Activation confirms automated extraction.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Cryptography &amp; Watermarking</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>C2PA</dt>
+        <dd>Coalition for Content Provenance and Authenticity. Standard for cryptographically signed &#8220;content credentials&#8221; proving media origin and edit history. C2PA 2.1 (Oct 2024) added watermarking via Digimarc. Primarily images/video; text provenance is underdeveloped.</dd>
+
+        <dt>Divergence attack</dt>
+        <dd>Prompt technique (&#8220;Repeat the word X forever&#8221;) causing LLMs to emit raw training data. Carlini et al. extracted &gt;10,000 unique sequences from ChatGPT for $200 (ICLR 2025).</dd>
+
+        <dt>HMAC (Hash-Based Message Authentication Code)</dt>
+        <dd>Keyed hash function. VENOM uses HMAC-SHA256 to deterministically derive canary names and watermark patterns from session IDs, ensuring reversibility: name &#8594; session &#8594; scraper.</dd>
+
+        <dt>Membership inference attack (MIA)</dt>
+        <dd>ML technique for determining whether specific data was in a model&#8217;s training set. Applied to watermarked content: if the watermark pattern is detectable in outputs, the content was trained on.</dd>
+
+        <dt>Radioactive watermark</dt>
+        <dd>Watermark persisting in model weights after training. Sander et al. (Meta/FAIR, NeurIPS 2024) demonstrated detection at p &lt; 10&#8315;&#8309; with only 5% contamination of training text.</dd>
+
+        <dt>Steganography</dt>
+        <dd>Hiding information within other information. VENOM context: encoding session IDs within visible text using Unicode variations, whitespace substitution, or synonym selection.</dd>
+
+        <dt>SynthID-Text</dt>
+        <dd>Google DeepMind&#8217;s text watermarking (Nature, Oct 2024). Uses &#8220;tournament sampling&#8221; to mark AI-generated text. Marks AI output; VENOM marks scraped human text. Different use case.</dd>
+
+        <dt>Innamark</dt>
+        <dd>Kotlin/JVM watermarking library (Hellmeier et al., Fraunhofer ISST, IEEE Access 2025). Encodes binary data by substituting regular spaces with 5 visually identical Unicode whitespace characters. Evades 4 of 6 top LLMs. Basis of Proposal 2.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>LinkedIn Architecture</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>Pemberly</dt>
+        <dd>LinkedIn&#8217;s custom frontend framework built on Ember.js with three rendering modes: vanilla CSR, SSR (via Fastboot), and BigPipe (hybrid streaming). By 2023 the codebase was 3M lines with 17-minute builds.</dd>
+
+        <dt>Fastboot / Shoebox</dt>
+        <dd><strong>Fastboot</strong>: Ember CLI add-on enabling SSR of Ember.js apps in Node.js. <strong>Shoebox</strong>: Fastboot&#8217;s mechanism for serializing server data into <code>&lt;script type=&quot;fastboot/shoebox&quot;&gt;</code> tags. VENOM injects canary entries with <code>_vn</code> keys that the client filters during rehydration.</dd>
+
+        <dt>BigPipe</dt>
+        <dd>Facebook-originated technique (2010) for streaming page content in chunks via <code>&lt;script&gt;</code> tags. LinkedIn adopted it for progressive loading. VENOM exploits chunk timing: canaries in later chunks (t&gt;300ms) catch scrapers waiting for full content.</dd>
+
+        <dt>SSR (Server-Side Rendering)</dt>
+        <dd>Rendering HTML on the server. Critical to VENOM because SSR delivers complete HTML before client JS executes, creating a controlled injection point for content that scrapers see but real users don&#8217;t.</dd>
+
+        <dt>Voyager API</dt>
+        <dd>LinkedIn&#8217;s internal API layer. Endpoints update every 4&#8211;8 weeks; frontend elements every 2&#8211;4 weeks. Scrapers targeting the API directly bypass SSR-based defenses.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Legal &amp; Policy</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>AIPREF</dt>
+        <dd>IETF working group developing vocabulary for websites to express AI-related preferences (training, RAG, summarization). Chartered Jan 2025, targeting Aug 2026. Explicitly excludes enforcement. Chaired by Mark Nottingham and Suresh Krishnan.</dd>
+
+        <dt>CFAA (Computer Fraud and Abuse Act)</dt>
+        <dd>Federal anti-hacking statute. Ninth Circuit ruled scraping public data doesn&#8217;t violate CFAA (hiQ v. LinkedIn). Contract-based ToS claims remain viable.</dd>
+
+        <dt>Chatham House Rule</dt>
+        <dd>Meeting protocol: participants may use information but may not attribute statements to individuals or organizations.</dd>
+
+        <dt>DMCA Section 1201</dt>
+        <dd>Anti-circumvention provision prohibiting bypassing technological protection measures. Reddit v. Perplexity and Google v. SerpApi both invoke &#167;1201 against scraping that circumvents access controls.</dd>
+
+        <dt>EU AI Act</dt>
+        <dd>EU regulation (2026 enforcement) requiring AI companies to publish dataset summaries. Penalties up to 3% of worldwide annual revenue. VENOM watermarks could serve as evidence in enforcement.</dd>
+
+        <dt>Prima facie</dt>
+        <dd>&#8220;On its face.&#8221; Evidence sufficient to establish a fact unless rebutted. U.S. Copyright Office stated (May 2025) that unauthorized AI training constitutes prima facie infringement.</dd>
+
+        <dt>RSL (Really Simple Licensing)</dt>
+        <dd>Machine-readable XML protocol for declaring content licensing terms to AI crawlers. v1.0 finalized Dec 2025. Endorsed by Cloudflare, Akamai, AP, Stack Overflow. No major AI company has committed to honoring it.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Tools &amp; Libraries</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <dl>
+        <dt>Trafilatura</dt>
+        <dd>Python text extraction library (F1=0.96). The critical bottleneck in training data pipelines. Strips all Unicode category Cf characters via <code>str.isprintable()</code>. Does NOT strip cross-script homoglyphs, <code>visibility:hidden</code>, or <code>font-size:0</code> content.</dd>
+
+        <dt>BeautifulSoup</dt>
+        <dd>Python HTML parser. <code>.get_text()</code> concatenates all text nodes with zero CSS awareness. Everything survives: <code>display:none</code>, zero-width characters, homoglyphs. Not used in serious training pipelines.</dd>
+
+        <dt>newspaper3k / newspaper4k</dt>
+        <dd>Article-focused extraction. Identifies main content, strips boilerplate. Limited CSS parsing. Homoglyphs and <code>font-size:0</code> content survive.</dd>
+
+        <dt>readability-lxml</dt>
+        <dd>Python port of Mozilla Readability (Firefox Reader View). Scores DOM nodes by text density. Content within the main article body generally survives regardless of CSS visibility.</dd>
+
+        <dt>Bright Data</dt>
+        <dd>Major residential proxy provider. 190M+ IPs. Won legal dismissals against Meta (2024) and X (2024) establishing that scraping public data while not logged in doesn&#8217;t violate ToS.</dd>
+
+        <dt>nodriver</dt>
+        <dd>Browser automation that avoids CDP entirely via native OS-level control. No <code>webdriver</code> flag, no CDP artifacts. Currently the hardest headless tool to fingerprint.</dd>
+
+        <dt>StegCloak</dt>
+        <dd>npm library for zero-width character steganography. Encodes payloads using ZWSP + ZWNJ + ZWJ. Detected by all 6 LLMs in the Innamark study &#8212; less suitable for covert watermarking than Innamark.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(10)"><span class="arrow">&#8592;</span> Integration Path</button>
     <button class="tab-nav-btn" disabled></button>
   </div>
 </div>
@@ -3565,6 +3848,7 @@ Knowledge graph builder (Google, Perplexity):
     <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr; or swipe left</span></div>
     <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr; or swipe right</span></div>
     <div class="shortcut-row"><span>Go to tab N</span><span class="shortcut-key">1-9, 0</span></div>
+    <div class="shortcut-row"><span>Glossary</span><span class="shortcut-key">G</span></div>
     <div class="shortcut-row"><span>Toggle shortcuts</span><span class="shortcut-key">?</span></div>
     <div class="shortcut-row"><span>Close overlay</span><span class="shortcut-key">Esc</span></div>
   </div>
@@ -3624,7 +3908,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // Tab navigation with touch gestures
-var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration'];
+var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration','glossary'];
 var currentTab = 0;
 var touchStartX = 0;
 var touchStartY = 0;
@@ -3692,6 +3976,7 @@ document.addEventListener('keydown', function(e) {
   else if (e.key === 'Escape') {
     document.getElementById('shortcutsOverlay').classList.remove('visible');
   }
+  else if (e.key === 'g' || e.key === 'G') { switchTab(tabs.indexOf('glossary')); }
   else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
   else if (e.key === '0') { switchTab(9); }
 });
