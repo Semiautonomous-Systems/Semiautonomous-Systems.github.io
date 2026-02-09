@@ -373,6 +373,8 @@
     transition: all 0.15s;
     font-family: inherit;
     text-align: left;
+    text-decoration: none;
+    color: inherit;
   }
   .pdf-ratio-btn:hover, .pdf-ratio-btn:focus {
     border-color: var(--blue);
@@ -426,15 +428,30 @@
       page-break-inside: avoid;
       break-after: page;
       break-inside: avoid;
-      height: auto;
-      min-height: 100vh;
+      height: 100vh;
       width: 100%;
-      padding: 48px 64px;
+      padding: 40px 56px;
+      overflow: hidden;
     }
     .slide:last-of-type { page-break-after: auto; }
     .slide.active { display: flex !important; }
     .speaker-notes, .controls, .pdf-modal-overlay, .slide-number { display: none !important; }
-    .faq-grid { max-height: none; overflow: visible; }
+    /* Scale down dense slides to fit one page */
+    .slide p, .slide li { font-size: 1em; line-height: 1.5; margin-bottom: 0.35em; }
+    .slide-title { font-size: 2em; margin-bottom: 0.4em; }
+    .slide table { font-size: 0.85em; }
+    .slide th, .slide td { padding: 6px 10px; }
+    .faq-grid { max-height: none; overflow: hidden; gap: 6px 16px; }
+    .faq-item { padding: 5px 8px; font-size: 0.65em; line-height: 1.35; }
+    .faq-item .faq-q { margin-bottom: 2px; }
+    .faq-item .faq-a { font-size: 0.88em; }
+    .archetypes, .paths { gap: 14px; }
+    .arch-card, .path-card { padding: 14px; }
+    .arch-card p, .path-card p { font-size: 0.82em; margin-bottom: 0.2em; }
+    .callout { padding: 14px 18px; margin: 0.6em 0; }
+    .punchline { font-size: 1.3em; margin-top: 0.8em; }
+    .asym-grid { gap: 16px; }
+    .tools-row { margin: 0.5em 0; }
   }
 </style>
 </head>
@@ -658,24 +675,24 @@
 <div class="pdf-modal-overlay" id="pdfModal">
   <div class="pdf-modal">
     <h2>Download as PDF</h2>
-    <p class="pdf-hint">Pick a slide ratio, then save from the print dialog.</p>
+    <p class="pdf-hint">Pick a slide ratio to download.</p>
     <div class="pdf-ratios">
-      <button class="pdf-ratio-btn" data-ratio="16:9" data-width="10in" data-height="5.625in">
+      <a class="pdf-ratio-btn" href="cdt-slides-16x9.pdf" download>
         <span class="ratio-key">1</span>
         <span><span class="ratio-label">16:9</span><br><span class="ratio-size">Widescreen</span></span>
-      </button>
-      <button class="pdf-ratio-btn" data-ratio="4:3" data-width="10in" data-height="7.5in">
+      </a>
+      <a class="pdf-ratio-btn" href="cdt-slides-4x3.pdf" download>
         <span class="ratio-key">2</span>
         <span><span class="ratio-label">4:3</span><br><span class="ratio-size">Standard</span></span>
-      </button>
-      <button class="pdf-ratio-btn" data-ratio="16:10" data-width="10in" data-height="6.25in">
+      </a>
+      <a class="pdf-ratio-btn" href="cdt-slides-16x10.pdf" download>
         <span class="ratio-key">3</span>
         <span><span class="ratio-label">16:10</span><br><span class="ratio-size">MacBook</span></span>
-      </button>
-      <button class="pdf-ratio-btn" data-ratio="letter" data-width="11in" data-height="8.5in">
+      </a>
+      <a class="pdf-ratio-btn" href="cdt-slides-letter.pdf" download>
         <span class="ratio-key">4</span>
         <span><span class="ratio-label">Letter</span><br><span class="ratio-size">US Letter landscape</span></span>
-      </button>
+      </a>
     </div>
     <button class="pdf-cancel" id="pdfCancel">Cancel (Esc)</button>
   </div>
@@ -702,12 +719,13 @@
 
   // PDF modal state
   const pdfModal = document.getElementById('pdfModal');
+  const pdfLinks = pdfModal.querySelectorAll('.pdf-ratio-btn');
   let pdfModalOpen = false;
 
   function openPdfModal() {
     pdfModalOpen = true;
     pdfModal.classList.add('visible');
-    pdfModal.querySelector('.pdf-ratio-btn').focus();
+    pdfLinks[0].focus();
   }
 
   function closePdfModal() {
@@ -715,29 +733,11 @@
     pdfModal.classList.remove('visible');
   }
 
-  function printWithRatio(width, height) {
-    closePdfModal();
-    // Inject dynamic @page size
-    const pageStyle = document.createElement('style');
-    pageStyle.id = 'pdf-page-size';
-    pageStyle.textContent = '@page { size: ' + width + ' ' + height + '; margin: 0; }';
-    document.head.appendChild(pageStyle);
-    // Brief delay for style to apply
-    requestAnimationFrame(() => {
-      window.print();
-      // Clean up after print dialog closes
-      const cleanup = () => document.getElementById('pdf-page-size')?.remove();
-      window.addEventListener('afterprint', cleanup, { once: true });
-      // Fallback cleanup after 5s
-      setTimeout(cleanup, 5000);
-    });
-  }
-
-  // Ratio button clicks
-  pdfModal.querySelectorAll('.pdf-ratio-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Close modal after download click
+  pdfLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
       e.stopPropagation();
-      printWithRatio(btn.dataset.width, btn.dataset.height);
+      setTimeout(closePdfModal, 100);
     });
   });
 
@@ -760,11 +760,10 @@
       if (e.key === 'Escape') { closePdfModal(); return; }
       const ratioMap = { '1': 0, '2': 1, '3': 2, '4': 3 };
       if (e.key in ratioMap) {
-        const btn = pdfModal.querySelectorAll('.pdf-ratio-btn')[ratioMap[e.key]];
-        printWithRatio(btn.dataset.width, btn.dataset.height);
+        pdfLinks[ratioMap[e.key]].click();
         return;
       }
-      return; // Swallow other keys while modal is open
+      return;
     }
 
     // Slide navigation keys
