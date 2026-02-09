@@ -854,46 +854,112 @@ body {
       <span class="card-toggle">&#9654;</span>
     </div>
     <div class="card-body">
+      <p><a href="https://commoncrawl.org/">Common Crawl</a> is the foundation of most LLM training data: 9.5+ petabytes, 2.4 billion pages per monthly crawl, 279 million host-level nodes in the January 2026 crawl. It feeds directly or indirectly into every major open LLM through derived datasets:</p>
+
+      <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr><th>Dataset</th><th>Builder</th><th>Size</th><th>Used By</th><th>Extraction</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>C4</td><td>Google</td><td>750GB</td><td>T5, UL2</td><td>CC WET + heuristic filtering</td></tr>
+          <tr><td><a href="https://huggingface.co/datasets/HuggingFaceFW/fineweb">FineWeb</a></td><td>HuggingFace</td><td>15T tokens</td><td>SmolLM, community</td><td>Trafilatura + quality classifiers</td></tr>
+          <tr><td><a href="https://huggingface.co/datasets/tiiuae/falcon-refinedweb">RefinedWeb</a></td><td>TII (Falcon)</td><td>5T tokens</td><td>Falcon</td><td>Trafilatura + MacroData Refinement</td></tr>
+          <tr><td>CCNet</td><td>Meta</td><td>Varies</td><td>LLaMA</td><td>CC WET + fastText + perplexity</td></tr>
+          <tr><td><a href="https://pile.eleuther.ai/">The Pile</a></td><td>EleutherAI</td><td>825GB</td><td>GPT-NeoX, Pythia</td><td>22 diverse sources, curated</td></tr>
+          <tr><td><a href="https://www.datacomp.ai/">DCLM</a></td><td>DataComp</td><td>3T tokens</td><td>Benchmark suite</td><td>Quality-filtered, standardized eval</td></tr>
+          <tr><td><a href="https://www.together.ai/blog/redpajama">RedPajama</a></td><td>Together</td><td>1.2T tokens</td><td>RedPajama models</td><td>LLaMA recipe reproduction</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h4>The 7-Stage Pipeline</h4>
+      <p>Raw web pages go through seven stages before becoming training tokens. Each stage applies specific transformations — understanding these is critical for designing watermarks that survive.</p>
+
       <div class="diagram">
-        <svg viewBox="0 0 900 160" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 1060 180" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="50" width="110" height="60" rx="6" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
-          <text x="65" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#0a4d8c">Web Crawl</text>
-          <text x="65" y="92" text-anchor="middle" font-size="9" fill="#666">WARC files</text>
-          <line x1="120" y1="80" x2="160" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="65" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#0a4d8c">1. Crawl</text>
+          <text x="65" y="90" text-anchor="middle" font-size="8" fill="#666">WARC files</text>
+          <line x1="120" y1="80" x2="150" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
 
-          <rect x="160" y="50" width="120" height="60" rx="6" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
-          <text x="220" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">Text Extraction</text>
-          <text x="220" y="92" text-anchor="middle" font-size="9" fill="#666">Trafilatura (F1=0.96)</text>
-          <line x1="280" y1="80" x2="310" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
-          <text x="295" y="40" font-size="9" fill="#c0392b" font-weight="700">GATE 1</text>
+          <rect x="150" y="50" width="110" height="60" rx="6" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+          <text x="205" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">2. Extraction</text>
+          <text x="205" y="90" text-anchor="middle" font-size="8" fill="#666">Trafilatura</text>
+          <line x1="260" y1="80" x2="290" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="275" y="40" font-size="8" fill="#c0392b" font-weight="700">GATE</text>
 
-          <rect x="310" y="50" width="110" height="60" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
-          <text x="365" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#c8980a">Quality Filter</text>
-          <text x="365" y="92" text-anchor="middle" font-size="9" fill="#666">C4 / FineWeb</text>
-          <line x1="420" y1="80" x2="450" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="290" y="50" width="110" height="60" rx="6" fill="#e8f0f8" stroke="#0a4d8c" stroke-width="2"/>
+          <text x="345" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#0a4d8c">3. Lang ID</text>
+          <text x="345" y="90" text-anchor="middle" font-size="8" fill="#666">fastText lid.176</text>
+          <line x1="400" y1="80" x2="430" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
 
-          <rect x="450" y="50" width="110" height="60" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
-          <text x="505" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#c8980a">Deduplication</text>
-          <text x="505" y="92" text-anchor="middle" font-size="9" fill="#666">MinHash / exact</text>
-          <line x1="560" y1="80" x2="590" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="430" y="50" width="110" height="60" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+          <text x="485" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#c8980a">4. Quality</text>
+          <text x="485" y="90" text-anchor="middle" font-size="8" fill="#666">KenLM perplexity</text>
+          <line x1="540" y1="80" x2="570" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
 
-          <rect x="590" y="50" width="120" height="60" rx="6" fill="#f3e8ff" stroke="#6b21a8" stroke-width="2"/>
-          <text x="650" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#6b21a8">Tokenization</text>
-          <text x="650" y="92" text-anchor="middle" font-size="9" fill="#666">BPE / SentencePiece</text>
-          <line x1="710" y1="80" x2="740" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
+          <rect x="570" y="50" width="110" height="60" rx="6" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+          <text x="625" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#c8980a">5. Dedup</text>
+          <text x="625" y="90" text-anchor="middle" font-size="8" fill="#666">MinHash / SimHash</text>
+          <line x1="680" y1="80" x2="710" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
 
-          <rect x="740" y="50" width="110" height="60" rx="6" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
-          <text x="795" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a3a">Training</text>
-          <text x="795" y="92" text-anchor="middle" font-size="9" fill="#666">Model weights</text>
+          <rect x="710" y="50" width="110" height="60" rx="6" fill="#f3e8ff" stroke="#6b21a8" stroke-width="2"/>
+          <text x="765" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#6b21a8">6. Tokenize</text>
+          <text x="765" y="90" text-anchor="middle" font-size="8" fill="#666">BPE + NFKC</text>
+          <line x1="820" y1="80" x2="850" y2="80" stroke="#0a4d8c" stroke-width="2" marker-end="url(#arrow)"/>
 
-          <text x="220" y="140" text-anchor="middle" font-size="9" fill="#c0392b">Strips: ZWS, ZWNJ, ZWJ,</text>
-          <text x="220" y="152" text-anchor="middle" font-size="9" fill="#c0392b">bidi overrides, soft hyphens</text>
-          <text x="650" y="140" text-anchor="middle" font-size="9" fill="#6b21a8">NFKC: fullwidth-&gt;ASCII</text>
-          <text x="650" y="152" text-anchor="middle" font-size="9" fill="#1a7a3a">Preserves: homoglyphs</text>
+          <rect x="850" y="50" width="110" height="60" rx="6" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="2"/>
+          <text x="905" y="75" text-anchor="middle" font-size="10" font-weight="700" fill="#1a7a3a">7. Training</text>
+          <text x="905" y="90" text-anchor="middle" font-size="8" fill="#666">Model weights</text>
+
+          <text x="205" y="140" text-anchor="middle" font-size="8" fill="#c0392b">Strips: Cf chars, whitespace,</text>
+          <text x="205" y="152" text-anchor="middle" font-size="8" fill="#c0392b">display:none, boilerplate</text>
+          <text x="625" y="140" text-anchor="middle" font-size="8" fill="#c8980a">FineWeb removes ~90%</text>
+          <text x="625" y="152" text-anchor="middle" font-size="8" fill="#c8980a">of crawl data at stages 4-5</text>
+          <text x="765" y="140" text-anchor="middle" font-size="8" fill="#6b21a8">NFKC: fullwidth&#8594;ASCII</text>
+          <text x="765" y="152" text-anchor="middle" font-size="8" fill="#6b21a8">Cyrillic/Greek preserved</text>
         </svg>
       </div>
-      <p>The critical bottleneck is <strong>text extraction</strong>, not tokenization. Trafilatura uses Python's <code>str.isprintable()</code> filter, which strips all Unicode category Cf (format) characters. Everything that passes extraction is faithfully preserved by BPE tokenizers.</p>
-      <p><strong>Key finding</strong>: Cross-script homoglyphs (Cyrillic, Greek) survive the entire pipeline. They are printable, pass NFKC normalization, and get distinct tokens in BPE vocabularies. This is the basis for Proposal 1.</p>
+
+      <h4>Stage 2: Text Extraction &#8212; The Critical Gate</h4>
+      <p><a href="https://trafilatura.readthedocs.io/">Trafilatura</a> (<a href="https://trafilatura.readthedocs.io/en/latest/evaluation.html">F1=0.96</a> on the GoldStandard benchmark) converts raw HTML to clean text. Its key filter is Python's <code>str.isprintable()</code>, which returns <code>False</code> for any character in Unicode category <strong>Cf</strong> (format characters). This strips:</p>
+      <ul>
+        <li><strong>Zero-width space</strong> (U+200B), <strong>ZWNJ</strong> (U+200C), <strong>ZWJ</strong> (U+200D)</li>
+        <li><strong>Soft hyphens</strong> (U+00AD), <strong>word joiners</strong> (U+2060), <strong>BOM</strong> (U+FEFF)</li>
+        <li><strong>Bidi overrides</strong> (U+202A&#8211;U+202E) used for right-to-left text spoofing</li>
+      </ul>
+      <p>Separately, Trafilatura uses XPath queries to strip <code>display:none</code> elements and boilerplate (nav, footer, sidebar). It does <strong>not</strong> strip <code>visibility:hidden</code>, <code>font-size:0</code>, or <code>opacity:0</code> content &#8212; it has no CSS computation engine. This is the single stage where most VENOM techniques survive or die.</p>
+
+      <h4>Stage 3: Language Detection</h4>
+      <p><a href="https://fasttext.cc/docs/en/language-identification.html">fastText lid.176</a> classifies text into 176 languages using character n-gram embeddings. It operates on sequences of 2&#8211;6 characters, computing a probability distribution over languages. Cyrillic homoglyphs in English text (Cyrillic &#8220;&#1072;&#8221; replacing Latin &#8220;a&#8221;) don't trigger misclassification: the substitution rate (~0.1 bits/character) is far below what's needed to shift the overall language distribution.</p>
+
+      <h4>Stage 4: Quality Filtering &#8212; KenLM Perplexity</h4>
+      <p><a href="https://kheafield.com/code/kenlm/">KenLM</a> is a fast n-gram language model that scores how &#8220;surprised&#8221; it is by a text sequence. <strong>Perplexity</strong> measures this: low perplexity = text looks like natural language, high perplexity = gibberish, machine-generated, or degenerate. FineWeb trains a KenLM 5-gram model on Wikipedia, then discards documents above a perplexity threshold.</p>
+      <p>Additional heuristic rules discard documents that are too short, too repetitive (character-level or line-level), or have excessive symbols. Combined with quality classifiers (trained on curated data), these filters discard roughly 90% of raw crawl data.</p>
+      <p>VENOM canary profiles survive because they are syntactically and semantically valid text &#8212; they read like real profile descriptions and score low perplexity.</p>
+
+      <h4>Stage 5: Deduplication &#8212; MinHash and SimHash</h4>
+      <p>Two algorithms remove near-identical documents from the corpus:</p>
+      <ul>
+        <li><strong>MinHash</strong>: Generates a fixed-size signature by hashing character n-gram shingles and keeping the minimum hash value per permutation. Two documents' <a href="https://en.wikipedia.org/wiki/Jaccard_index">Jaccard similarity</a> is estimated by comparing how many signature elements match. <strong>Locality-Sensitive Hashing (LSH)</strong> groups candidates into buckets so only plausible duplicates are compared pairwise. Typical threshold: documents with &gt;0.8 Jaccard similarity are flagged as duplicates.</li>
+        <li><strong>SimHash</strong>: Generates a single 64-bit fingerprint per document. The <a href="https://en.wikipedia.org/wiki/Hamming_distance">Hamming distance</a> between fingerprints approximates cosine similarity. Faster than MinHash but less precise.</li>
+        <li><strong>Exact dedup</strong>: Document-level hashing (SHA-256 or similar). Catches identical copies only.</li>
+      </ul>
+      <p>VENOM watermarks survive dedup because each session's pattern is unique &#8212; two scrapes of the same profile produce different homoglyph substitutions, different hashes, and different MinHash signatures.</p>
+
+      <h4>Stage 6: Tokenization &#8212; BPE and NFKC</h4>
+      <p><strong>Byte-Pair Encoding (BPE)</strong> splits text into subword tokens. Starting from individual bytes, it iteratively merges the most frequent adjacent pair until a target vocabulary size is reached (typically 32K&#8211;100K tokens). Two major implementations:</p>
+      <ul>
+        <li><strong><a href="https://github.com/openai/tiktoken">tiktoken</a></strong> (OpenAI): Used by GPT-3.5, GPT-4, o1. ~100K vocabulary. Operates on UTF-8 bytes.</li>
+        <li><strong><a href="https://github.com/google/sentencepiece">SentencePiece</a></strong> (Google/Meta): Used by LLaMA, Gemma, T5. Unigram or BPE mode. Operates on Unicode codepoints.</li>
+      </ul>
+      <p>Before tokenization, <strong>NFKC normalization</strong> (Unicode Normalization Form KC) maps compatibility-equivalent characters to their canonical form: fullwidth Latin &#8220;&#xFF21;&#8221; &#8594; &#8220;A&#8221;, math bold &#8220;&#x1D400;&#8221; &#8594; &#8220;A&#8221;, superscript &#8220;&#178;&#8221; &#8594; &#8220;2&#8221;. Critically, NFKC does <strong>not</strong> map across scripts: Cyrillic &#8220;&#1072;&#8221; (U+0430) stays Cyrillic, not Latin &#8220;a&#8221; (U+0061). This means Cyrillic and Greek homoglyphs get distinct BPE tokens from their Latin lookalikes.</p>
+
+      <div class="callout callout-red">
+        <strong>The critical bottleneck is text extraction, not tokenization.</strong>
+        Trafilatura's <code>str.isprintable()</code> filter strips all format characters at Stage 2. Everything that passes extraction is faithfully preserved through quality filtering, dedup, and tokenization. Cross-script homoglyphs (Cyrillic, Greek) survive the entire pipeline end-to-end: they are printable, pass NFKC, and get distinct BPE tokens. This is the basis for Proposal 1.
+      </div>
     </div>
   </div>
 
