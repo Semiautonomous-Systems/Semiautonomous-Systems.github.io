@@ -205,17 +205,16 @@ h2 {
 <h1>VENOM Study Materials</h1>
 <p class="subtitle">Defensive data poisoning and anti-extraction research</p>
 
-<div class="quick-links">
-  <a href="/study/deep-dive/" class="btn blue">Deep Dive (Interactive)</a>
-  <a href="/study/linkedin-v5/" class="btn gold">LinkedIn Study Site</a>
-  <a href="/slides/cdt/" class="btn green">CDT Slides</a>
-</div>
+<h2>LinkedIn Meeting (Feb 9)</h2>
 
-<h2>Reading Order</h2>
+<div class="quick-links">
+  <a href="/study/linkedin-v5/" class="btn gold">LinkedIn Study Site</a>
+  <a href="/study/deep-dive/" class="btn blue">Deep Dive (Interactive)</a>
+</div>
 
 <div class="section">
   <div class="section-header">
-    <div class="section-title">Priority 1: LinkedIn Core Docs</div>
+    <div class="section-title">Core Docs</div>
     <div class="time">~25 min</div>
   </div>
   <ul class="items">
@@ -242,32 +241,68 @@ h2 {
 
 <div class="section">
   <div class="section-header">
-    <div class="section-title">Priority 2: Deep Dive Essentials</div>
-    <div class="time">~8 min</div>
+    <div class="section-title">Deep Dive: Overview + Proposals</div>
+    <div class="time">~15 min</div>
   </div>
   <ul class="items">
     <li class="item">
       <span class="num">09.</span>
       <div class="content">
-        <a href="/study/deep-dive/#overview">Overview</a> — Coverage matrix: which proposals beat which scrapers
+        <a href="/study/deep-dive/">Overview</a> — 3 proposal groups, coverage matrix, recommendation
       </div>
+    </li>
+  </ul>
+  <ul class="items" style="margin-top:8px">
+    <li class="item">
+      <span class="num" style="color:var(--green)">A</span>
+      <div class="content" style="font-weight:600;color:var(--green)">Content Watermarking</div>
     </li>
     <li class="item">
       <span class="num">12.</span>
       <div class="content">
-        <a href="/study/deep-dive/#p1">Homoglyph Watermarking</a> — Proposal 1: Cyrillic substitution
+        <a href="/study/deep-dive/#p1">Homoglyph Watermarking</a> — Cyrillic substitution. Survives all pipelines.
       </div>
     </li>
     <li class="item">
       <span class="num">13.</span>
       <div class="content">
-        <a href="/study/deep-dive/#p2">Innamark</a> — Proposal 2: Kotlin whitespace watermarking
+        <a href="/study/deep-dive/#p2">Innamark</a> — Kotlin whitespace watermarking. Evades 4/6 LLMs.
       </div>
+    </li>
+  </ul>
+  <ul class="items" style="margin-top:8px">
+    <li class="item">
+      <span class="num" style="color:var(--gold)">B</span>
+      <div class="content" style="font-weight:600;color:var(--gold)">Synthetic Content Injection</div>
     </li>
     <li class="item">
       <span class="num">14.</span>
       <div class="content">
-        <a href="/study/deep-dive/#p3">Canary Profiles</a> — Proposal 3: Ghost profiles for evidence
+        <a href="/study/deep-dive/#p3">Canary Profiles</a> — HMAC-derived ghost identities. Court-ready evidence.
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">15.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p4">SSR Hydration Traps</a> — Pre-hydration canaries. Three injection surfaces.
+      </div>
+    </li>
+  </ul>
+  <ul class="items" style="margin-top:8px">
+    <li class="item">
+      <span class="num" style="color:var(--blue)">C</span>
+      <div class="content" style="font-weight:600;color:var(--blue)">Pipeline Exploitation</div>
+    </li>
+    <li class="item">
+      <span class="num">16.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p5">Token Inflation</a> — BPE fragmentation via invisible chars. Targets RAG.
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">17.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p6">Pipeline Fingerprinting</a> — CSS hiding differentials identify extraction tools.
       </div>
     </li>
   </ul>
@@ -275,86 +310,84 @@ h2 {
 
 <div class="section">
   <div class="section-header">
-    <div class="section-title">Priority 3: Deep Background</div>
+    <div class="section-title">Deep Dive: Background</div>
     <div class="time">~20 min</div>
   </div>
   <ul class="items">
     <li class="item">
       <span class="num">10.</span>
       <div class="content">
-        <a href="/study/deep-dive/#scrapers">How Scrapers Work</a> — Type 1 headless browsers, Type 2 extensions
+        <a href="/study/deep-dive/#scrapers">How Scrapers Work</a> — 6 scraper types, extraction tools, proxies, ecosystem, lessons
       </div>
     </li>
     <li class="item">
       <span class="num">11.</span>
       <div class="content">
-        <a href="/study/deep-dive/#pipeline">Pipeline Survival</a> — Which Unicode transforms survive
+        <a href="/study/deep-dive/#pipeline">Pipeline Survival Matrix</a> — Unicode + CSS survival per extraction tool and pipeline stage
       </div>
     </li>
-    <li class="item">
-      <span class="num">15.</span>
-      <div class="content">
-        <a href="/study/deep-dive/#p4">SSR Hydration Traps</a> — Proposal 4: Hydration divergence
-      </div>
-    </li>
-    <li class="item">
-      <span class="num">16.</span>
-      <div class="content">
-        <a href="/study/deep-dive/#p5">Token Inflation</a> — Proposal 5: BPE fragmentation
-      </div>
-    </li>
-    <li class="item">
-      <span class="num">17.</span>
-      <div class="content">
-        <a href="/study/deep-dive/#p6">Behavioral Detection</a> — Proposal 6: LSTM feedback loop
-      </div>
-    </li>
-  </ul>
-</div>
-
-<div class="section">
-  <div class="section-header">
-    <div class="section-title">Priority 4: Evidence + Integration</div>
-    <div class="time">~10 min</div>
-  </div>
-  <ul class="items">
     <li class="item">
       <span class="num">18.</span>
       <div class="content">
-        <a href="/study/deep-dive/#evidence">Evidence</a> — 8 real-world cases
+        <a href="/study/deep-dive/#evidence">Evidence</a> — 11 real-world cases mapped to VENOM proposals
       </div>
     </li>
     <li class="item">
       <span class="num">19.</span>
       <div class="content">
-        <a href="/study/deep-dive/#integration">Integration Path</a> — 12-week rollout
+        <a href="/study/deep-dive/#integration">Integration Path</a> — 12-week rollout, risk mitigation, monitoring, deliverables
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">20.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#glossary">Glossary</a> — 78 terms across 8 domains
       </div>
     </li>
   </ul>
 </div>
 
+<div class="time-budget">
+  <h3>LinkedIn Time Budget</h3>
+  <ul>
+    <li><span>Core docs (04-06)</span> <span>~25 min</span></li>
+    <li><span>Overview + proposals (09, 12-17)</span> <span>~15 min</span></li>
+    <li><span>Background (10-11, 18-19)</span> <span>~20 min</span></li>
+    <li><span>Total</span> <span>~60 min</span></li>
+  </ul>
+  <div class="shortcut">
+    <strong>If you only have 30 min:</strong> Read 04-06 (core docs) + 09 (overview). The deep dive at <a href="/study/deep-dive/" style="color:var(--blue)">semiautonomous.systems/study/deep-dive/</a> covers proposals in a navigable format.
+  </div>
+</div>
+
+<h2>CDT Roundtable (Feb 10)</h2>
+
+<div class="quick-links">
+  <a href="/slides/cdt/" class="btn green">CDT Slides</a>
+</div>
+
 <div class="section">
   <div class="section-header">
-    <div class="section-title">Priority 5: CDT Roundtable (Monday)</div>
+    <div class="section-title">Presentation + Review</div>
     <div class="time">~25 min</div>
   </div>
   <ul class="items">
     <li class="item">
       <span class="num">01.</span>
       <div class="content">
-        <a href="/slides/cdt/">CDT Presentation</a>
+        <a href="/slides/cdt/">CDT Slides</a> — 7 slides, arrow keys to navigate, N for notes
       </div>
     </li>
     <li class="item disabled">
       <span class="num">02.</span>
       <div class="content">
-        CDT Grilling Report (v3)
+        Grilling Report (v3) — Killer questions, audience-specific pushback
       </div>
     </li>
     <li class="item disabled">
       <span class="num">03.</span>
       <div class="content">
-        CDT Presentation Review
+        Presentation Review — Time analysis, per-slide fixes
       </div>
     </li>
   </ul>
@@ -369,37 +402,16 @@ h2 {
     <li class="item disabled">
       <span class="num">07.</span>
       <div class="content">
-        CDT Ollama Analysis
+        Ollama Analysis — Structured claim extraction
       </div>
     </li>
     <li class="item disabled">
       <span class="num">08.</span>
       <div class="content">
-        ARDC Attendee Positions
-      </div>
-    </li>
-    <li class="item disabled">
-      <span class="num">20.</span>
-      <div class="content">
-        Glossary of Technical Terms
+        ARDC Attendee Positions — Each org's public stance + targeted questions
       </div>
     </li>
   </ul>
-</div>
-
-<div class="time-budget">
-  <h3>Time Budget</h3>
-  <ul>
-    <li><span>LinkedIn core</span> <span>~25 min</span></li>
-    <li><span>Deep dive essentials</span> <span>~8 min</span></li>
-    <li><span>Deep background</span> <span>~20 min</span></li>
-    <li><span>Evidence + integration</span> <span>~10 min</span></li>
-    <li><span>CDT roundtable</span> <span>~25 min</span></li>
-    <li><span>Total</span> <span>~88 min</span></li>
-  </ul>
-  <div class="shortcut">
-    <strong>If you only have 30 min:</strong> Read items 04-06 (LinkedIn core), then 09, 12-14 (deep dive essentials), then 01 (CDT slides).
-  </div>
 </div>
 
 <script>
