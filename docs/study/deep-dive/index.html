@@ -600,7 +600,7 @@ body {
   <button class="tab-btn" data-tab="p3">3. Canary Profiles <span class="badge badge-proposal">PROPOSAL</span></button>
   <button class="tab-btn" data-tab="p4">4. SSR Traps <span class="badge badge-proposal">PROPOSAL</span></button>
   <button class="tab-btn" data-tab="p5">5. Token Inflation <span class="badge badge-proposal">PROPOSAL</span></button>
-  <button class="tab-btn" data-tab="p6">6. Behavioral <span class="badge badge-proposal">PROPOSAL</span></button>
+  <button class="tab-btn" data-tab="p6">6. Pipeline FP <span class="badge badge-proposal">PROPOSAL</span></button>
   <button class="tab-btn" data-tab="evidence">Evidence <span class="badge badge-research">REAL</span></button>
   <button class="tab-btn" data-tab="integration">Integration Path</button>
 </div>
@@ -684,20 +684,21 @@ body {
         <td>Low (char insertion)</td>
       </tr>
       <tr>
-        <td><strong>6. Behavioral Detection</strong></td>
-        <td class="cell-survive">Strong signal</td>
-        <td class="cell-mapped">Weaker signal</td>
-        <td>N/A (detection, not marking)</td>
-        <td>Medium (LSTM exists)</td>
+        <td><strong>6. Pipeline Fingerprinting</strong></td>
+        <td class="cell-survive">All layers injected</td>
+        <td class="cell-survive">All layers injected</td>
+        <td class="cell-survive">Differential survival</td>
+        <td>Low (4 HTML injections)</td>
       </tr>
     </tbody>
   </table>
   </div>
 
   <div class="callout callout-blue">
-    <strong>Recommendation: Layer proposals 1 + 2 + 3</strong>
-    Homoglyphs survive training pipelines (long-term attribution). Innamark catches direct scrapers (short-term detection). Canary profiles provide court-ready evidence. The three together cover all scraper types with independent failure modes.
+    <strong>Recommendation: Layer proposals 1 + 3 + 6</strong>
+    Homoglyphs survive training pipelines (long-term session attribution). Canary profiles provide court-ready evidence of extraction. Pipeline fingerprinting identifies which tools scrapers use, letting you calibrate defenses. The three together cover all scraper types and all pipeline stages.
   </div>
+  <p class="detail">Add proposals 2 + 5 for defense in depth against direct/RAG scrapers. Add proposal 4 if LinkedIn's SSR stack supports hydration-based injection.</p>
 <div class="tab-nav">
     <button class="tab-nav-btn" disabled></button>
     <button class="tab-nav-btn" onclick="switchTab(1)">How Scrapers Work <span class="arrow">→</span></button>
@@ -1651,140 +1652,329 @@ At scale:
 
 <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(6)"><span class="arrow">←</span> 4. SSR Traps</button>
-    <button class="tab-nav-btn" onclick="switchTab(8)">6. Behavioral <span class="arrow">→</span></button>
+    <button class="tab-nav-btn" onclick="switchTab(8)">6. Pipeline FP <span class="arrow">→</span></button>
   </div>
 </div>
 
 <div class="panel" id="panel-p6">
   <div class="proposal-header">
-    <div class="proposal-icon" style="background:var(--purple-light);color:var(--purple);">🧠</div>
+    <div class="proposal-icon" style="background:var(--purple-light);color:var(--purple);">🔍</div>
     <div class="proposal-meta">
-      <h2>Proposal 6: Behavioral Detection (LSTM + VENOM Feedback Loop)</h2>
-      <div class="one-liner">LSTM sequence model classifies sessions as human or scraper. VENOM watermark detections feed confirmed labels back into training, closing the loop.</div>
+      <h2>Proposal 6: Extraction Pipeline Fingerprinting</h2>
+      <div class="one-liner">Inject different canary content behind different CSS hiding methods. Each extraction tool has different blindspots. When you detect canary A but not canary B in a dataset, you know which tool the scraper used.</div>
       <div class="tags">
-        <span class="tag tag-green">STRONG vs HEADLESS</span>
-        <span class="tag tag-gold">WEAKER vs EXTENSIONS</span>
-        <span class="tag tag-blue">ENHANCES EXISTING LINKEDIN SYSTEM</span>
+        <span class="tag tag-blue">FORENSIC ATTRIBUTION</span>
+        <span class="tag tag-green">WORKS AGAINST ALL</span>
+        <span class="tag tag-green">LOW JVM EFFORT</span>
       </div>
     </div>
   </div>
 
   <h3>How It Works</h3>
-  <p><strong>Bank fraud detection meets marked bills.</strong> The LSTM watches behavioral patterns the way a fraud model watches transaction patterns. VENOM watermarks are the marked bills — when a marked bill shows up in someone's possession, it confirms they're connected to the theft. That confirmed case improves the fraud model, which catches patterns it couldn't see before.</p>
+  <p>Every scraper eventually runs HTML through a text extraction pipeline. Trafilatura, BeautifulSoup, newspaper3k, raw regex strip — each handles CSS-hidden content differently. This is a stable, testable fact about the tools, not a behavioral heuristic that drifts.</p>
 
-  <p>LinkedIn already runs an LSTM-based bot classifier. The problem: it trains on heuristic labels (rule-based detection, rate limits, CAPTCHA failures). Heuristic labels are noisy. False positives poison the model; false negatives let scrapers through. VENOM provides cryptographically confirmed labels — a session that produced a watermark hit in an LLM output or leaked dataset is a scraper, full stop.</p>
+  <p>The exploit: inject multiple canary tokens into the same page, each hidden using a different CSS method. When you later detect those canaries in a dataset or LLM output, the <em>pattern</em> of which canaries survived tells you which extraction tool was used.</p>
 
-  <div class="code-block">                VENOM Feedback Loop
-                =====================
+  <p><strong>Analogy:</strong> A bank puts different serial-number bills in different drawers. After a robbery, which serial numbers show up in circulation tells you which drawers the thief opened — and therefore what tools they used to open them.</p>
 
-  [Scraper visits LinkedIn]
-         |
-         v
-  VENOM watermarks embedded in served content
-         |
-         +-&gt; Behavioral features logged (timing, assets, TLS, beacons)
-         |
-         v
-  Scraper feeds data to LLM training / dataset
-         |
-         v
-  External monitoring detects watermarks in LLM outputs or datasets
-         |
-         v
-  Cross-reference watermark -&gt; session_id (HMAC lookup)
-         |
-         v
-  Session marked CONFIRMED POSITIVE in training corpus
-         |
-         v
-  LSTM retrained with confirmed labels
-         |
-         v
-  Model catches more scrapers --&gt; more watermarks detected --&gt; loop continues</div>
+  <div class="code-block">Same page, four canary layers:
 
-  <h3>Demo: Human vs. Scraper Session</h3>
-  <h4>Human session:</h4>
-  <div class="code-block">t=0.0s   GET /in/jane-smith           (profile view)
-t=2.3s   Scroll event (JS)
-t=4.1s   GET /in/jane-smith/details/experience  (click expand)
-t=8.7s   GET /messaging               (navigate away)
-         Hydration beacon: <span class="cell-survive">YES</span>
-         TLS fingerprint: Chrome 120 (JA4: normal)
-         Asset loads: <span class="num">14</span> (CSS, JS, images, fonts)
-         Inter-request timing: [2.3s, 1.8s, 4.6s] -- <span class="cell-survive">high variance</span>
-         Page type sequence: profile -&gt; detail -&gt; messaging (diverse)</div>
+Layer A: display:none            "Soren Ashgrove"
+Layer B: visibility:hidden       "Vesper Thornbury"
+Layer C: font-size:0             "Caspian Ravenscroft"
+Layer D: JSON-LD &lt;script&gt;        "Elara Winterhall"
 
-  <h4>Scraper session:</h4>
-  <div class="code-block">t=0.0s   GET /in/jane-smith           (profile)
-t=0.3s   GET /in/john-doe             (different profile)
-t=0.6s   GET /in/alice-wong            (another profile)
-t=0.9s   GET /in/bob-chen             (another profile)
-         Hydration beacon: <span class="cell-stripped">NO</span>
-         TLS fingerprint: Go net/http (JA4: unusual)
-         Asset loads: <span class="num">0</span> (no CSS, no JS, no images)
-         Inter-request timing: [0.3s, 0.3s, 0.3s] -- <span class="cell-stripped">near-zero variance</span>
-         Page type sequence: profile -&gt; profile -&gt; profile (homogeneous)</div>
+Scraper uses Trafilatura (FineWeb, RefinedWeb):
+  → A stripped (XPath match on display:none)
+  → B SURVIVES (Trafilatura doesn't check visibility:hidden!)
+  → C SURVIVES (no font-size check)
+  → D stripped (&lt;script&gt; tags removed)
+  Fingerprint: [0, 1, 1, 0] → "Trafilatura"
 
-  <p>The human session has high timing variance, diverse page types, asset loads, and JS execution. The scraper session is a metronome.</p>
+Scraper uses Readability.js (Firefox Reader View, Pocket):
+  → A stripped (computed style check)
+  → B stripped (computed style check)
+  → C SURVIVES (no font-size check)
+  → D stripped (parsed for metadata, then removed)
+  Fingerprint: [0, 0, 1, 0] → "Readability.js"
 
-  <h3>Feature Extraction</h3>
-  <div class="code-block"><span class="cm"># Per-session feature vector for LSTM input</span>
-<span class="kw">def</span> <span class="fn">extract_features</span>(session):
-    timings = [r.timestamp - session.start <span class="kw">for</span> r <span class="kw">in</span> session.requests]
-    deltas = [timings[i+<span class="num">1</span>] - timings[i] <span class="kw">for</span> i <span class="kw">in</span> range(len(timings)-<span class="num">1</span>)]
+Scraper uses BeautifulSoup.get_text() (ad hoc scrapers):
+  → A SURVIVES (zero CSS awareness)
+  → B SURVIVES
+  → C SURVIVES
+  → D SURVIVES (includes script tag text)
+  Fingerprint: [1, 1, 1, 1] → "BeautifulSoup"
 
-    <span class="kw">return</span> {
-        <span class="cm"># Timing distribution</span>
-        <span class="str">"timing_mean"</span>: mean(deltas),
-        <span class="str">"timing_variance"</span>: variance(deltas),
-        <span class="str">"timing_entropy"</span>: entropy(deltas),
+Scraper uses Common Crawl WET (C4, OSCAR):
+  → A SURVIVES (zero CSS awareness)
+  → B SURVIVES
+  → C SURVIVES
+  → D stripped (script tags excluded)
+  Fingerprint: [1, 1, 1, 0] → "CC WET"
 
-        <span class="cm"># Navigation pattern (sequence input to LSTM)</span>
-        <span class="str">"page_type_seq"</span>: [classify_page(r.path) <span class="kw">for</span> r <span class="kw">in</span> session.requests],
+Knowledge graph builder (Google, Perplexity):
+  → A stripped
+  → B stripped
+  → C stripped
+  → D SURVIVES (explicitly parses JSON-LD)
+  Fingerprint: [0, 0, 0, 1] → "JSON-LD extractor"</div>
 
-        <span class="cm"># Asset ratio: CSS/JS/image requests vs page requests</span>
-        <span class="str">"asset_load_ratio"</span>: count_assets(session) / len(session.requests),
+  <p>Four binary signals → 16 possible fingerprints. In practice, 5-6 distinct fingerprints cover the tools that matter.</p>
 
-        <span class="cm"># Client-side signals</span>
-        <span class="str">"hydration_beacon"</span>: session.beacon_received,  <span class="cm"># bool</span>
-        <span class="str">"scroll_events"</span>: session.scroll_count,
-        <span class="str">"click_events"</span>: session.click_count,
+  <h3>The CSS Survival Matrix</h3>
+  <p>This is the core data structure. Each row is a CSS hiding method; each column is an extraction tool. Cells are SURVIVES or STRIPPED.</p>
 
-        <span class="cm"># TLS fingerprint</span>
-        <span class="str">"ja4_hash"</span>: session.tls_fingerprint,
-
-        <span class="cm"># BigPipe completeness (did they receive all chunks?)</span>
-        <span class="str">"chunk_receipt_ratio"</span>: session.chunks_received / session.chunks_sent,
-
-        <span class="cm"># Referrer plausibility</span>
-        <span class="str">"referrer_chain_valid"</span>: validate_referrers(session),
-
-        <span class="cm"># Search-to-profile ratio</span>
-        <span class="str">"search_to_profile_ctr"</span>: session.profile_clicks / max(session.searches, <span class="num">1</span>),
-    }</div>
-
-  <p>The LSTM processes <code>page_type_seq</code> as a sequence and the scalar features as auxiliary inputs. Profile-profile-profile-profile is a distinctive signature, but sophisticated scrapers randomize page types. The timing distribution and asset ratio are harder to fake.</p>
-
-  <h3>The VENOM Feedback Loop</h3>
-  <p>Without VENOM, the label pipeline looks like this:</p>
-  <div class="code-block">Rule-based detection (rate limit, CAPTCHA, IP blocklist)
-    --&gt; noisy labels (FP: aggressive humans, FN: slow scrapers)
-        --&gt; LSTM trains on noise
-            --&gt; mediocre classifier</div>
-
-  <p>With VENOM:</p>
-  <div class="code-block">VENOM watermark detected in LLM output or leaked dataset
-    --&gt; HMAC(secret, session_id) identifies the exact session
-        --&gt; CONFIRMED POSITIVE label (zero ambiguity)
-            --&gt; LSTM trains on ground truth
-                --&gt; catches behavioral patterns invisible to rules
-                    --&gt; those scrapers' sessions produce more watermark hits
-                        --&gt; more confirmed labels --&gt; loop tightens</div>
-
-  <div class="callout callout-green">
-    <strong>Key insight</strong>
-    Content-based detection (watermarking) creates ground truth labels for behavioral detection. Without VENOM, the LSTM is guessing based on rules. With VENOM, it's learning from proven scrapers.
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Hiding Method</th>
+        <th>Trafilatura</th>
+        <th>BS4 .get_text()</th>
+        <th>newspaper3k</th>
+        <th>Readability.js</th>
+        <th>Resiliparse</th>
+        <th>CC WET</th>
+        <th>JSON-LD extractor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>display:none</code></td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>visibility:hidden</code></td>
+        <td class="cell-survive"><strong>SURVIVES</strong></td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>aria-hidden="true"</code></td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>opacity:0</code></td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>font-size:0</code></td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>clip:rect(0,0,0,0)</code></td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>max-height:0; overflow:hidden</code></td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td><code>&lt;noscript&gt;</code></td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td class="cell-survive">SURVIVES</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>JSON-LD <code>&lt;script&gt;</code></td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES*</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-stripped">STRIPPED</td>
+        <td class="cell-survive">SURVIVES</td>
+      </tr>
+    </tbody>
+  </table>
   </div>
+  <p class="detail">*BS4 <code>.get_text()</code> includes script tag content unless you decompose script tags first.</p>
+
+  <p><strong>Key insight:</strong> Trafilatura catches <code>display:none</code> via XPath but does NOT catch <code>visibility:hidden</code> — it only matches the string "display:none" in inline styles. newspaper3k has zero CSS awareness (contrary to common assumption). The real fingerprinting power comes from the divergence between tools: <code>visibility:hidden</code> content survives Trafilatura but is stripped by Readability.js and Resiliparse.</p>
+
+  <p class="detail">Sources: <a href="https://github.com/adbar/trafilatura/blob/master/trafilatura/xpaths.py">Trafilatura xpaths.py</a>, <a href="https://github.com/mozilla/readability/blob/main/Readability.js">Readability.js _isProbablyVisible()</a>, <a href="https://github.com/chatnoir-eu/chatnoir-resiliparse/blob/master/resiliparse/resiliparse/extract/html2text.pyx">Resiliparse html2text.pyx</a>, <a href="https://github.com/commoncrawl/ia-web-commons">CC WET ExtractingParseObserver.java</a>.</p>
+
+  <h3>Demo: Four-Layer Canary Injection</h3>
+  <div class="code-block"><span class="cm">&lt;!-- Layer A: display:none — caught by Trafilatura, newspaper3k --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"entity-result__item"</span> <span class="attr">style</span>=<span class="str">"display:none"</span> <span class="attr">aria-hidden</span>=<span class="str">"true"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"entity-result__title-text"</span><span class="tag">&gt;</span>Soren Ashgrove<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"entity-result__primary-subtitle"</span><span class="tag">&gt;</span>
+    Cognitive Infrastructure Lead at Veridian Systems
+  <span class="tag">&lt;/span&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Layer B: font-size:0 — survives everything --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"entity-result__item"</span> <span class="attr">aria-hidden</span>=<span class="str">"true"</span>
+     <span class="attr">style</span>=<span class="str">"font-size:0;line-height:0;max-height:0;overflow:hidden"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"entity-result__title-text"</span><span class="tag">&gt;</span>Vesper Thornbury<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"entity-result__primary-subtitle"</span><span class="tag">&gt;</span>
+    Principal Ontology Engineer at Tessera Dynamics
+  <span class="tag">&lt;/span&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Layer C: clip — survives everything --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"entity-result__item"</span> <span class="attr">aria-hidden</span>=<span class="str">"true"</span>
+     <span class="attr">style</span>=<span class="str">"position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"entity-result__title-text"</span><span class="tag">&gt;</span>Caspian Ravenscroft<span class="tag">&lt;/span&gt;</span>
+  <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"entity-result__primary-subtitle"</span><span class="tag">&gt;</span>
+    Director of Temporal Analytics at Axiom Ridge Partners
+  <span class="tag">&lt;/span&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Layer D: JSON-LD — extracted by knowledge graph pipelines --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">type</span>=<span class="str">"application/ld+json"</span><span class="tag">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Elara Winterhall",
+  "jobTitle": "VP of Crystallographic Computing",
+  "worksFor": {"@type": "Organization", "name": "Solstice Protocols"}
+}
+<span class="tag">&lt;/script&gt;</span></div>
+
+  <p>Each layer uses a different canary identity (all <a href="https://en.wikipedia.org/wiki/HMAC">HMAC-derived</a> from the session ID + layer index). When any of these names appear in external data, the layer tells you which extraction tool was used.</p>
+
+  <h3>Implementation</h3>
+  <div class="code-block"><span class="cm">// Pipeline fingerprint injection — four layers per page</span>
+<span class="kw">class</span> <span class="fn">PipelineFingerprint</span> {
+    <span class="kw">enum</span> Layer {
+        DISPLAY_NONE(<span class="str">"display:none"</span>),                    <span class="cm">// caught by Trafilatura</span>
+        FONT_SIZE_ZERO(<span class="str">"font-size:0;line-height:0;max-height:0;overflow:hidden"</span>),  <span class="cm">// universal survivor</span>
+        CLIP_RECT(<span class="str">"position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"</span>),
+        JSON_LD(<span class="kw">null</span>);  <span class="cm">// separate injection path</span>
+
+        <span class="kw">final</span> String css;
+        Layer(String css) { <span class="kw">this</span>.css = css; }
+    }
+
+    <span class="kw">static</span> String <span class="fn">injectFingerprint</span>(String html, String sessionId, <span class="kw">byte</span>[] secret) {
+        StringBuilder canaries = <span class="kw">new</span> StringBuilder();
+
+        <span class="kw">for</span> (Layer layer : Layer.values()) {
+            <span class="cm">// Derive unique canary identity per layer</span>
+            String layerSeed = sessionId + <span class="str">":"</span> + layer.name();
+            <span class="kw">var</span> identity = generateCanaryIdentity(layerSeed, secret);
+
+            <span class="kw">if</span> (layer == Layer.JSON_LD) {
+                canaries.append(buildJsonLd(identity));
+            } <span class="kw">else</span> {
+                canaries.append(buildHiddenDiv(identity, layer.css));
+            }
+        }
+
+        <span class="kw">return</span> html.replace(<span class="str">"&lt;/body&gt;"</span>, canaries.toString() + <span class="str">"&lt;/body&gt;"</span>);
+    }
+
+    <span class="cm">// Detection: which layers survived tells you the extraction tool</span>
+    <span class="kw">static</span> String <span class="fn">identifyExtractor</span>(<span class="kw">boolean</span>[] layersSurvived) {
+        <span class="cm">// [display:none, font-size:0, clip, json-ld]</span>
+        <span class="kw">if</span> (Arrays.equals(layersSurvived, <span class="kw">new boolean</span>[]{<span class="kw">false</span>, <span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">false</span>}))
+            <span class="kw">return</span> <span class="str">"Trafilatura"</span>;
+        <span class="kw">if</span> (Arrays.equals(layersSurvived, <span class="kw">new boolean</span>[]{<span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">false</span>}))
+            <span class="kw">return</span> <span class="str">"BeautifulSoup"</span>;
+        <span class="kw">if</span> (Arrays.equals(layersSurvived, <span class="kw">new boolean</span>[]{<span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">true</span>}))
+            <span class="kw">return</span> <span class="str">"raw strip / naive"</span>;
+        <span class="kw">if</span> (Arrays.equals(layersSurvived, <span class="kw">new boolean</span>[]{<span class="kw">false</span>, <span class="kw">false</span>, <span class="kw">false</span>, <span class="kw">true</span>}))
+            <span class="kw">return</span> <span class="str">"JSON-LD extractor"</span>;
+        <span class="kw">return</span> <span class="str">"unknown (fingerprint: "</span> + Arrays.toString(layersSurvived) + <span class="str">")"</span>;
+    }
+}</div>
+
+  <h3>Why This Is Better Than Behavioral Detection</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Behavioral (LSTM)</th>
+        <th>Pipeline Fingerprinting</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Signal source</strong></td>
+        <td>Request timing, TLS, JS events</td>
+        <td>Content survival in extracted data</td>
+      </tr>
+      <tr>
+        <td><strong>Works against extensions?</strong></td>
+        <td class="cell-mapped">Weak (inherits user's browser)</td>
+        <td class="cell-survive">Yes (extensions still extract text)</td>
+      </tr>
+      <tr>
+        <td><strong>Requires real-time?</strong></td>
+        <td class="cell-survive">Yes (session classification)</td>
+        <td class="cell-survive">No (forensic, works after the fact)</td>
+      </tr>
+      <tr>
+        <td><strong>Drifts over time?</strong></td>
+        <td class="cell-stripped">Yes (scrapers adapt behavior)</td>
+        <td class="cell-survive">No (tool behavior is stable)</td>
+      </tr>
+      <tr>
+        <td><strong>Tells you what?</strong></td>
+        <td>"This session is a scraper"</td>
+        <td>"This scraper used Trafilatura"</td>
+      </tr>
+      <tr>
+        <td><strong>Actionable?</strong></td>
+        <td>Block the session</td>
+        <td>Identify the pipeline, calibrate defenses</td>
+      </tr>
+      <tr>
+        <td><strong>LinkedIn already has?</strong></td>
+        <td class="cell-survive">Yes (existing LSTM)</td>
+        <td class="cell-stripped">No (novel contribution)</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The LSTM approach duplicates what LinkedIn already has. Pipeline fingerprinting provides information LinkedIn can't get any other way: which extraction tools are being used against them. That informs which CSS hiding methods to prioritize and which pipeline stages to target.</p>
 
   <h3>Coverage</h3>
   <div class="table-wrapper">
@@ -1792,10 +1982,10 @@ t=0.9s   GET /in/bob-chen             (another profile)
     <thead><tr><th>vs. Headless Browsers</th><th>vs. Extensions</th><th>vs. Training Pipelines</th><th>JVM Effort</th></tr></thead>
     <tbody>
       <tr>
-        <td><span class="cell-survive">STRONG SIGNAL</span>: distinctive timing, missing JS events, no asset loads, homogeneous navigation</td>
-        <td><span class="cell-mapped">WEAKER SIGNAL</span>: extensions piggyback on real user's browser, inherit human timing patterns</td>
-        <td>N/A (detection, not content marking)</td>
-        <td>Medium: LSTM infra exists at LinkedIn, integration is the work</td>
+        <td class="cell-survive">All layers injected regardless of client type</td>
+        <td class="cell-survive">All layers injected regardless of client type</td>
+        <td class="cell-survive">Different layers survive different pipelines — that's the point</td>
+        <td>Low: 4 HTML injections per page, same pattern as canary profiles</td>
       </tr>
     </tbody>
   </table>
@@ -1805,70 +1995,58 @@ t=0.9s   GET /in/bob-chen             (another profile)
     <div class="sw-col strengths">
       <h4>Strengths</h4>
       <ul>
-        <li>LinkedIn already has the LSTM infrastructure — VENOM enhances it, doesn't replace it</li>
-        <li>Catches scrapers before they get content (behavioral) and after (watermark), covering both ends</li>
-        <li>Confirmed labels eliminate the noisy-heuristic problem that plagues all bot classifiers</li>
-        <li>Self-improving: more watermark detections produce more training data produce better detection</li>
-        <li>Real-time classification: LSTM inference is sub-millisecond per session</li>
-        <li>Headless browsers are easy targets (no JS events, no asset loads, mechanical timing)</li>
-        <li>TLS fingerprinting (JA4) is nearly impossible for scrapers to spoof without native browser stacks</li>
-        <li>Works even if individual watermarking techniques are partially stripped</li>
+        <li>Provides forensic information no other technique can: which extraction tool was used</li>
+        <li>Stable signal — extraction tool behavior doesn't drift like scraper behavior</li>
+        <li>Works against all scraper types including extensions (content-based, not behavioral)</li>
+        <li>Composable with proposals 1-5 (adds attribution, doesn't replace watermarking)</li>
+        <li>Low overhead: four small HTML injections per page, no crypto beyond existing HMAC</li>
+        <li>Testable: build a test page, run each extractor, verify the matrix empirically</li>
+        <li>Extensible: add more layers as new extractors emerge</li>
+        <li>Each layer independently useful as a canary (pipeline fingerprinting is a bonus on top)</li>
       </ul>
     </div>
     <div class="sw-col weaknesses">
       <h4>Weaknesses</h4>
       <ul>
-        <li>Extensions are the hard case: they inherit the real user's browser, TLS, and timing</li>
-        <li>Sophisticated scrapers (Multilogin, GoLogin) randomize timing and load assets</li>
-        <li>VENOM feedback loop has latency: weeks to months between scraping and watermark detection</li>
-        <li>Cold start problem: need initial watermark detections before the loop produces value</li>
-        <li>Feature drift: scrapers adapt, model needs continuous retraining</li>
-        <li>Privacy review required for logging granular behavioral signals per session</li>
-        <li>Not a standalone defense: depends on watermarking proposals (1-4) to generate confirmed labels</li>
+        <li>Requires empirical validation of the survival matrix on each target platform</li>
+        <li>Sophisticated scrapers could strip all hidden content regardless of CSS method</li>
+        <li>Matrix may need updating as extraction tools evolve (though tool updates are infrequent)</li>
+        <li><code>display:none</code> layer has limited value (most tools strip it) — useful mainly as a control</li>
+        <li>Fingerprint resolution limited by number of practically distinct hiding methods (~4-6)</li>
+        <li>Does not detect scraping in real-time (forensic, not preventive)</li>
       </ul>
     </div>
   </div>
 
   <h4>Key Researchers / Precedent</h4>
   <div class="researcher">
-    <div class="initials">LI</div>
+    <div class="initials">AB</div>
     <div class="info">
-      <div class="name">LinkedIn Engineering</div>
-      <div class="affiliation">LinkedIn</div>
-      <div class="contribution">"Fighting Abuse @Scale" blog series. LinkedIn's existing LSTM-based bot detection system, which this proposal extends with VENOM-confirmed labels.</div>
+      <div class="name">Adrien Barbaresi</div>
+      <div class="affiliation">BBAW Berlin, 2021</div>
+      <div class="contribution">"Trafilatura: A Web Scraping Library and Command-Line Tool for Text Discovery and Extraction." ACL 2021. The extraction tool that defines the survival boundary for most VENOM techniques.</div>
     </div>
   </div>
   <div class="researcher">
-    <div class="initials">IFA</div>
+    <div class="initials">RBM</div>
     <div class="info">
-      <div class="name">Iliou, Foroglou, Anastasiadis</div>
-      <div class="affiliation">2021</div>
-      <div class="contribution">"Detection of Advanced Web Bots by Combining Web Logs with Mouse Behavioural Biometrics." LSTM applied to bot detection using behavioral sequences. Published in IEEE Access.</div>
+      <div class="name">Rizzo, Bertini, Montesi</div>
+      <div class="affiliation">University of Bologna, 2016</div>
+      <div class="contribution">Content-preserving text watermarking via Unicode homoglyph substitution. Their work on CSS-based hiding for watermarked content informs the multi-layer injection approach.</div>
     </div>
   </div>
   <div class="researcher">
-    <div class="initials">HS</div>
+    <div class="initials">CC</div>
     <div class="info">
-      <div class="name">Hochreiter & Schmidthuber</div>
-      <div class="affiliation">1997</div>
-      <div class="contribution">Long Short-Term Memory networks. The foundational architecture. Still competitive for sequence classification despite transformer hype, because session sequences are short (dozens of requests, not thousands of tokens).</div>
+      <div class="name">Common Crawl Foundation</div>
+      <div class="affiliation">Common Crawl</div>
+      <div class="contribution">The 9.5+ PB web archive used to train most LLMs. Understanding Common Crawl's WARC→WET pipeline (which uses its own text extraction) is essential for predicting which layers survive into training data.</div>
     </div>
   </div>
-  <div class="researcher">
-    <div class="initials">CF</div>
-    <div class="info">
-      <div class="name">Cloudflare Bot Management</div>
-      <div class="affiliation">Cloudflare</div>
-      <div class="contribution">TLS fingerprinting (JA3, then JA4) combined with behavioral scoring. Public documentation on using TLS fingerprints as bot signals. JA4 is the current standard.</div>
-    </div>
-  </div>
-  <div class="researcher">
-    <div class="initials">G3</div>
-    <div class="info">
-      <div class="name">Google reCAPTCHA v3</div>
-      <div class="affiliation">Google</div>
-      <div class="contribution">Invisible behavioral scoring with no user interaction. Proves that behavioral signals alone can separate humans from bots at scale without CAPTCHAs.</div>
-    </div>
+
+  <div class="callout callout-purple">
+    <strong>The strategic value</strong>
+    LinkedIn's existing defenses tell them <em>that</em> scraping is happening. VENOM proposals 1-5 tell them <em>who</em> is scraping (session attribution). Proposal 6 tells them <em>how</em> — which tools and pipelines are being used. That's the missing piece for calibrating defenses: if 80% of scrapers use Trafilatura, invest in font-size:0 canaries. If they use BeautifulSoup, display:none is sufficient. If they extract JSON-LD, invest in structured data canaries. Measure first, then optimize.
   </div>
 
 <div class="tab-nav">
@@ -2030,7 +2208,7 @@ t=0.9s   GET /in/bob-chen             (another profile)
     </div>
   </div>
 <div class="tab-nav">
-    <button class="tab-nav-btn" onclick="switchTab(8)"><span class="arrow">←</span> 6. Behavioral</button>
+    <button class="tab-nav-btn" onclick="switchTab(8)"><span class="arrow">←</span> 6. Pipeline FP</button>
     <button class="tab-nav-btn" onclick="switchTab(10)">Integration Path <span class="arrow">→</span></button>
   </div>
 </div>
