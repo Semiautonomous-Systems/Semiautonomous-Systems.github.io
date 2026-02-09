@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>VENOM Study Materials</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVkVOT00gU3R1ZHkiLCJzaG9ydF9uYW1lIjoiVkVOT00iLCJ0aGVtZV9jb2xvciI6IiMxYTFhMWEiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFhMWExYSIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwic3RhcnRfdXJsIjoiLi8ifQ==">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --blue: #4a9eff;
+  --gold: #ffd700;
+  --green: #4ade80;
+  --bg: #1a1a1a;
+  --card-bg: #242424;
+  --text: #e8e8e8;
+  --muted: #888;
+  --border: #333;
+  --disabled: #444;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  font-size: 15px;
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 2.2em;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+}
+h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-top: 48px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 8px;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 1.1em;
+  margin-bottom: 36px;
+}
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.btn {
+  display: block;
+  padding: 20px 24px;
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.05em;
+  text-align: center;
+  transition: all 0.2s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--blue);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+}
+.btn:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.btn.blue { border-color: var(--blue); }
+.btn.gold { border-color: var(--gold); }
+.btn.green { border-color: var(--green); }
+.section {
+  margin-bottom: 40px;
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--blue);
+}
+.time {
+  color: var(--muted);
+  font-size: 0.9em;
+}
+.items {
+  list-style: none;
+  padding: 0;
+}
+.item {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.item:last-child {
+  border-bottom: none;
+}
+.num {
+  color: var(--muted);
+  font-weight: 600;
+  min-width: 32px;
+  flex-shrink: 0;
+}
+.content {
+  flex: 1;
+}
+.item a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--blue);
+  transition: color 0.2s, border-color 0.2s;
+}
+.item a:hover {
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.item a:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.item.disabled {
+  color: var(--muted);
+}
+.item.disabled .content {
+  opacity: 0.5;
+}
+.time-budget {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 48px;
+}
+.time-budget h3 {
+  font-size: 1.1em;
+  margin-bottom: 16px;
+  color: var(--gold);
+}
+.time-budget ul {
+  list-style: none;
+  padding: 0;
+}
+.time-budget li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.time-budget li:last-child {
+  border-bottom: none;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 2px solid var(--border);
+  font-weight: 600;
+}
+.time-budget .shortcut {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.95em;
+}
+@media (max-width: 600px) {
+  body {
+    padding: 16px;
+  }
+  h1 {
+    font-size: 1.8em;
+  }
+  h2 {
+    font-size: 1.3em;
+    margin-top: 32px;
+  }
+  .quick-links {
+    grid-template-columns: 1fr;
+  }
+  .btn {
+    padding: 16px 20px;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1>VENOM Study Materials</h1>
+<p class="subtitle">Defensive data poisoning and anti-extraction research</p>
+
+<div class="quick-links">
+  <a href="/study/deep-dive/" class="btn blue">Deep Dive (Interactive)</a>
+  <a href="/study/linkedin-v5/" class="btn gold">LinkedIn Study Site</a>
+  <a href="/slides/cdt/" class="btn green">CDT Slides</a>
+</div>
+
+<h2>Reading Order</h2>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Priority 1: LinkedIn Core Docs</div>
+    <div class="time">~25 min</div>
+  </div>
+  <ul class="items">
+    <li class="item">
+      <span class="num">04.</span>
+      <div class="content">
+        <a href="/study/linkedin-v5/#proposal">Proposal</a> — Technical proposal with "The Ask"
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">05.</span>
+      <div class="content">
+        <a href="/study/linkedin-v5/#brief">Brief</a> — Background on LinkedIn's stack and scraping landscape
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">06.</span>
+      <div class="content">
+        <a href="/study/linkedin-v5/#questions">Questions</a> — Anticipated pushback + prepared responses
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Priority 2: Deep Dive Essentials</div>
+    <div class="time">~8 min</div>
+  </div>
+  <ul class="items">
+    <li class="item">
+      <span class="num">09.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#overview">Overview</a> — Coverage matrix: which proposals beat which scrapers
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">12.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p1">Homoglyph Watermarking</a> — Proposal 1: Cyrillic substitution
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">13.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p2">Innamark</a> — Proposal 2: Kotlin whitespace watermarking
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">14.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p3">Canary Profiles</a> — Proposal 3: Ghost profiles for evidence
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Priority 3: Deep Background</div>
+    <div class="time">~20 min</div>
+  </div>
+  <ul class="items">
+    <li class="item">
+      <span class="num">10.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#scrapers">How Scrapers Work</a> — Type 1 headless browsers, Type 2 extensions
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">11.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#pipeline">Pipeline Survival</a> — Which Unicode transforms survive
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">15.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p4">SSR Hydration Traps</a> — Proposal 4: Hydration divergence
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">16.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p5">Token Inflation</a> — Proposal 5: BPE fragmentation
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">17.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#p6">Behavioral Detection</a> — Proposal 6: LSTM feedback loop
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Priority 4: Evidence + Integration</div>
+    <div class="time">~10 min</div>
+  </div>
+  <ul class="items">
+    <li class="item">
+      <span class="num">18.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#evidence">Evidence</a> — 8 real-world cases
+      </div>
+    </li>
+    <li class="item">
+      <span class="num">19.</span>
+      <div class="content">
+        <a href="/study/deep-dive/#integration">Integration Path</a> — 12-week rollout
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Priority 5: CDT Roundtable (Monday)</div>
+    <div class="time">~25 min</div>
+  </div>
+  <ul class="items">
+    <li class="item">
+      <span class="num">01.</span>
+      <div class="content">
+        <a href="/slides/cdt/">CDT Presentation</a>
+      </div>
+    </li>
+    <li class="item disabled">
+      <span class="num">02.</span>
+      <div class="content">
+        CDT Grilling Report (v3)
+      </div>
+    </li>
+    <li class="item disabled">
+      <span class="num">03.</span>
+      <div class="content">
+        CDT Presentation Review
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Reference</div>
+    <div class="time"></div>
+  </div>
+  <ul class="items">
+    <li class="item disabled">
+      <span class="num">07.</span>
+      <div class="content">
+        CDT Ollama Analysis
+      </div>
+    </li>
+    <li class="item disabled">
+      <span class="num">08.</span>
+      <div class="content">
+        ARDC Attendee Positions
+      </div>
+    </li>
+    <li class="item disabled">
+      <span class="num">20.</span>
+      <div class="content">
+        Glossary of Technical Terms
+      </div>
+    </li>
+  </ul>
+</div>
+
+<div class="time-budget">
+  <h3>Time Budget</h3>
+  <ul>
+    <li><span>LinkedIn core</span> <span>~25 min</span></li>
+    <li><span>Deep dive essentials</span> <span>~8 min</span></li>
+    <li><span>Deep background</span> <span>~20 min</span></li>
+    <li><span>Evidence + integration</span> <span>~10 min</span></li>
+    <li><span>CDT roundtable</span> <span>~25 min</span></li>
+    <li><span>Total</span> <span>~88 min</span></li>
+  </ul>
+  <div class="shortcut">
+    <strong>If you only have 30 min:</strong> Read items 04-06 (LinkedIn core), then 09, 12-14 (deep dive essentials), then 01 (CDT slides).
+  </div>
+</div>
+
+<script>
+// Service worker for offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('data:text/javascript;base64,Y29uc3QgQ0FDSEVfTkFNRSA9ICd2ZW5vbS1zdHVkeS12MSc7CmNvbnN0IHVybHNUb0NhY2hlID0gWycvJ107CnNlbGYuYWRkRXZlbnRMaXN0ZW5lcignaW5zdGFsbCcsIGV2ZW50ID0+IHsKICBldmVudC53YWl0VW50aWwoY2FjaGVzLm9wZW4oQ0FDSEVfTkFNRSkudGhlbihjYWNoZSA9PiBjYWNoZS5hZGRBbGwodXJsc1RvQ2FjaGUpKSk7Cn0pOwpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZXZlbnQgPT4gewogIGV2ZW50LnJlc3BvbmRXaXRoKAogICAgY2FjaGVzLm1hdGNoKGV2ZW50LnJlcXVlc3QpLnRoZW4ocmVzcG9uc2UgPT4gcmVzcG9uc2UgfHwgZmV0Y2goZXZlbnQucmVxdWVzdCkpCiAgKTsKfSk7');
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.activeElement.blur();
+  }
+});
+</script>
+
+</body>
+</html>
