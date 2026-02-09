@@ -3489,6 +3489,119 @@ Knowledge graph builder (Google, Perplexity):
   </ul>
   <p>Chart: difference-in-differences plot with confidence intervals. Green zone: delta within +/- 0.1%. Red zone: delta exceeding threshold.</p>
 
+  <h3>Detection &amp; Measurement Plan</h3>
+  <p>Injection is half the system. The other half is: how do you find your markers once they're in the wild? Each proposal has a different detection timeline, detection method, and scale requirement.</p>
+
+  <h4>Detection Timeline by Channel</h4>
+  <p>The gap between injection and detection depends on <em>how</em> the scraped data is used. Three channels, three timelines:</p>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>Channel</th><th>Time to Detection</th><th>What Triggers It</th><th>Which Proposals</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Direct scraping / RAG</strong></td><td>Hours to days</td><td>Scraped text appears in retrieval-augmented answers (Perplexity, ChatGPT Browse, Gemini). Canary names surface when users query for people in a given field.</td><td>P1, P2, P3, P5</td></tr>
+      <tr><td><strong>Third-party aggregation</strong></td><td>Days to weeks</td><td>Data broker databases (Apollo.io, ZoomInfo) ingest scraped profiles. Canary names appear in enrichment API responses or exposed databases.</td><td>P3 (primary)</td></tr>
+      <tr><td><strong>LLM training</strong></td><td>Weeks to months</td><td>Next training run ingests scraped data. Canary names become part of model knowledge. Homoglyph patterns alter token distributions. Detectable via probing queries and statistical tests.</td><td>P1 (primary), P3</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout callout-gold">
+    <strong>Implication</strong>
+    Don't wait for training-time detection. The RAG channel gives results in days. Start probing Perplexity and ChatGPT Browse within 48 hours of canary deployment. Training-time detection is the long game &mdash; it confirms the watermarks survived the full pipeline, but the immediate signal comes from RAG and aggregator channels.
+  </div>
+
+  <h4>Scale: How Many Canaries and Watermarks?</h4>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>Parameter</th><th>Value</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Canary names/day</strong></td><td>~50K&ndash;200K unique</td><td>One per suspicious session (beacon-absent or tripwire-triggered). LinkedIn sees millions of profile views/day; 1&ndash;5% are likely scrapers, each getting a unique canary.</td></tr>
+      <tr><td><strong>Watermarked pages/day</strong></td><td>All treatment-group renders</td><td>At 50% treatment: millions/day. Each render gets a session-unique homoglyph pattern. No cap needed &mdash; the watermark is deterministic from session_id + secret.</td></tr>
+      <tr><td><strong>LLM probes/day</strong></td><td>~500&ndash;2,000</td><td>Sample from the past 7 days of canary names. Probe each against 5 models (GPT, Claude, Gemini, Perplexity, Grok). Budget: ~$2&ndash;5/day at current API pricing.</td></tr>
+      <tr><td><strong>Data broker checks/week</strong></td><td>~1,000</td><td>Query ZoomInfo, Pipl, Apollo enrichment APIs for canary names. Most return nothing; a hit is definitive proof of ingestion.</td></tr>
+      <tr><td><strong>Common Crawl scan/month</strong></td><td>Full monthly release</td><td>Grep the WARC files for canary names. Common Crawl publishes monthly. A canary name in CC proves it propagated beyond the original scraper.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Detection Methods by Proposal</h4>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>P1 Homoglyphs: Statistical Token Distribution Test</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <p><strong>What to look for:</strong> Elevated probability of Cyrillic/Greek token IDs at positions where Latin characters normally appear. If a model was trained on homoglyph-watermarked LinkedIn profiles, it will assign non-trivial probability to Cyrillic "е" (token ID X) in contexts where Latin "e" (token ID Y) is expected.</p>
+      <p><strong>Method:</strong> Use the model's logprobs API (available for GPT-4, Claude, Gemini). Generate completions for LinkedIn-style prompts ("Senior Software Engineer at..."). Compare the probability ratio P(Cyrillic token) / P(Latin token) against a baseline model that was not trained on watermarked data. A statistically significant elevation (p &lt; 0.01) indicates watermark contamination.</p>
+      <p><strong>Scale needed:</strong> Per Sander et al. (NeurIPS 2024), watermark detection achieves p &lt; 10<sup>-5</sup> at 5% training data contamination. LinkedIn profiles are a substantial fraction of professional-domain web text. If 50% of scraped LinkedIn renders carry homoglyph watermarks, and LinkedIn represents even 1% of a model's professional-text training data, the signal should be detectable.</p>
+      <p><strong>Timeline:</strong> Requires the next model training run to complete. For frontier models this is 1&ndash;4 months. For fine-tuned models or RAG indexes, detection is possible within days.</p>
+      <p><strong>Limitation:</strong> Requires logprobs API access. Some providers (Perplexity) don't expose logprobs. For those, fall back to canary name probing.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>P3 Canaries: Name-Based Probing</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <p><strong>What to look for:</strong> An LLM that, when asked "Who is Meridian Castleford?", returns the canary's generated job title and employer name. A data broker API that returns a record for the canary name with LinkedIn-sourced metadata.</p>
+      <p><strong>Probe design:</strong></p>
+      <ol>
+        <li><strong>Direct query:</strong> "Who is [canary name]?" &mdash; if the model has memorized the canary, it will fabricate a confident biography using the injected details.</li>
+        <li><strong>Contextual query:</strong> "List people who work at [canary company]" &mdash; tests whether the canary entity was indexed as part of an organization graph.</li>
+        <li><strong>Completions probe:</strong> "[canary name] is a" &mdash; if the model completes with the injected job title, the canary was in training data.</li>
+        <li><strong>JSON-LD channel:</strong> Google Knowledge Panel search for canary name. If Google indexed the JSON-LD entity, it may appear in search results or knowledge cards.</li>
+      </ol>
+      <p><strong>False positive rate:</strong> Near zero. HMAC-derived names are pronounceable but nonexistent. "Meridian Castleford" has zero Google results before injection. Any model that knows about this person learned it from LinkedIn's SSR output.</p>
+      <p><strong>False negative rate:</strong> Higher. Models may have ingested the canary but refuse to output it (safety filters), or the memorization may be too weak to surface on a direct query. Mitigation: probe with multiple prompt formats, increase canary volume to improve statistical coverage.</p>
+      <p><strong>Attribution on hit:</strong> canary name &rarr; HMAC reverse lookup &rarr; session_id &rarr; session log &rarr; IP, user-agent, account, timestamp, TLS fingerprint. Full evidence chain for legal.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>P6 Pipeline FP: Differential CSS Survival</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <p><strong>What to look for:</strong> When a canary name is detected in external data, check <em>which</em> of the four CSS-layered canary names survived. Each layer uses a different CSS hiding method. The binary survival pattern (S/X for each layer) maps to an extraction tool.</p>
+      <p><strong>Survival matrix:</strong></p>
+      <div class="table-wrapper">
+      <table class="data-table" style="font-size:0.85em">
+        <thead><tr><th>CSS Method</th><th>Trafilatura</th><th>BS4</th><th>CC WET</th><th>Readability</th></tr></thead>
+        <tbody>
+          <tr><td><code>font-size:0</code></td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+          <tr><td><code>display:none</code></td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-stripped">X</td><td class="cell-stripped">X</td></tr>
+          <tr><td><code>visibility:hidden</code></td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+          <tr><td><code>clip:rect(0,0,0,0)</code></td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>If a canary appears with only layers 1, 3, 4 surviving (layer 2 stripped), the scraper used Trafilatura, CC WET, or Readability. If all 4 survive, it was BeautifulSoup or raw regex &mdash; a less sophisticated pipeline.</p>
+      <p><strong>Timeline:</strong> Same as canary detection. Pipeline fingerprinting is not a separate detection system; it piggybacks on canary hits.</p>
+    </div>
+  </div>
+
+  <h4>Measurement Infrastructure: What to Build</h4>
+  <ol>
+    <li><strong>Canary Log Store:</strong> Append-only table mapping (canary_name, session_id, timestamp, treatment_flags, css_layers). Indexed on canary_name for reverse lookup. Retention: 1 year minimum (legal evidence requires chain of custody).</li>
+    <li><strong>LLM Probe Runner:</strong> Daily cron. Reads canary log, samples ~500 names from past 7 days, queries 5 model APIs, parses responses for canary entity matches. Logs all results (including negatives). Alert on any positive hit.</li>
+    <li><strong>Data Broker Monitor:</strong> Weekly cron. Queries enrichment APIs (ZoomInfo, Apollo, Pipl) for canary names. Any non-empty response is a positive hit. Alert immediately.</li>
+    <li><strong>Common Crawl Scanner:</strong> Monthly. Download the latest CC WARC release. Grep for canary names. Match against canary log for attribution. Run on a batch cluster (the CC archive is petabytes).</li>
+    <li><strong>Logprobs Analyzer:</strong> Monthly. For models with logprobs APIs (GPT-4, Claude), run the statistical token distribution test for Cyrillic/Greek token elevation. Requires a clean baseline comparison (model without watermarked data in training).</li>
+    <li><strong>Alert Pipeline:</strong> Any positive detection feeds into a structured alert with: canary name, detection channel, detection timestamp, attributed session_id, session metadata, CSS layer survival pattern. This is the input to legal review.</li>
+  </ol>
+
+  <div class="callout callout-blue">
+    <strong>Expected timeline to first signal</strong>
+    <strong>Days 1&ndash;7:</strong> Tripwire and beacon metrics establish scraping baseline.<br>
+    <strong>Days 7&ndash;14:</strong> First canary probes against RAG systems (Perplexity, ChatGPT Browse). If any RAG system is actively scraping LinkedIn, canary hits are possible within 48 hours of ingestion.<br>
+    <strong>Days 14&ndash;30:</strong> Data broker checks may start returning canary names as scraped profiles enter aggregation pipelines.<br>
+    <strong>Months 1&ndash;4:</strong> Next major model training cycle completes. Logprobs test and canary probing against newly trained models. This is the long-term signal.<br>
+    <strong>Ongoing:</strong> Monthly Common Crawl scans catch canaries that propagated to the open web.
+  </div>
+
   <h3>Decision Points</h3>
   <p>Explicit go/no-go criteria at each phase boundary. No phase transition without data review.</p>
 
