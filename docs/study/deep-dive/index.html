@@ -778,9 +778,9 @@ body {
       <h4>Anti-Detect Variants</h4>
       <p>The arms race has produced tools specifically designed to defeat the detection signals above:</p>
       <ul>
-        <li><strong><a href="https://github.com/nicegui-support/nodriver">nodriver</a></strong> — avoids CDP entirely, uses native OS-level browser control. No <code>webdriver</code> flag, no CDP artifacts. Currently the hardest headless tool to fingerprint.</li>
-        <li><strong><a href="https://github.com/ultrafunkula/undetected-chromedriver">undetected-chromedriver</a></strong> — patches Selenium's Chromedriver to remove automation signatures.</li>
-        <li><strong><a href="https://github.com/pydoll-ai/pydoll">Pydoll</a></strong> — CDP-free browser automation. New entrant (2025).</li>
+        <li><strong><a href="https://github.com/ultrafunkamsterdam/nodriver">nodriver</a></strong> — avoids CDP entirely, uses native OS-level browser control. No <code>webdriver</code> flag, no CDP artifacts. Currently the hardest headless tool to fingerprint.</li>
+        <li><strong><a href="https://github.com/ultrafunkamsterdam/undetected-chromedriver">undetected-chromedriver</a></strong> — patches Selenium's Chromedriver to remove automation signatures.</li>
+        <li><strong><a href="https://github.com/autoscrape-labs/pydoll">Pydoll</a></strong> — CDP-free browser automation. New entrant (2025).</li>
         <li><strong><a href="https://camoufox.com/">Camoufox</a></strong> — Firefox-based, exploits the fact that most anti-bot systems focus exclusively on Chromium. C++-level fingerprint injection.</li>
       </ul>
 
@@ -1303,9 +1303,9 @@ to character-level tokenization. One token becomes three.</div>
 
       <h4>Known Scraping Volumes</h4>
       <ul>
-        <li><strong>784M-1.06B Google SERPs/week</strong>: SerpApi's volume, from Google's own complaint in <a href="https://storage.courtlistener.com/recap/gov.uscourts.cand.423632/gov.uscourts.cand.423632.1.0.pdf">Google v. SerpApi</a> (December 2024). Google described the <a href="https://www.seroundtable.com/google-scraping-lawsuit-serpapi-37961.html">cost of serving these requests</a> as a significant infrastructure burden.</li>
+        <li><strong>784M-1.06B Google SERPs (Search Engine Results Pages)/week</strong>: SerpApi's volume, from Google's own complaint in <a href="https://storage.googleapis.com/gweb-uniblog-publish-prod/documents/Google_v._SerpApi__Complaint.pdf">Google v. SerpApi</a> (December 2024). Google described the <a href="https://www.seroundtable.com/google-scraping-lawsuit-serpapi-37961.html">cost of serving these requests</a> as a significant infrastructure burden.</li>
         <li><strong>Apollo.io database</strong>: ~732M unique profiles from 4.3B total records</li>
-        <li><strong>iFixit</strong>: <a href="https://twitter.com/kwiens/status/1816147902843654164">1M hits</a> from AI crawlers reported by CEO Kyle Wiens on X (July 24, 2024). <a href="https://www.404media.co/ifixit-ceo-ai-bots-scraping/">Confirmed by 404 Media</a> with server logs.</li>
+        <li><strong>iFixit</strong>: <a href="https://twitter.com/kwiens/status/1816147902843654164">1M hits</a> from AI crawlers reported by CEO Kyle Wiens on X (July 24, 2024). <a href="https://www.404media.co/anthropic-ai-scraper-hits-ifixits-website-a-million-times-in-a-day/">Confirmed by 404 Media</a> with server logs.</li>
         <li><strong>Cloudflare crawl ratios</strong> (Jan-Jul 2025, <a href="https://blog.cloudflare.com/crawlers-click-ai-bots-training/">Cloudflare blog</a>): Anthropic peaked at 500,000:1 crawl-to-click ratio. OpenAI peaked at 3,700:1.</li>
       </ul>
 
@@ -1324,7 +1324,7 @@ to character-level tokenization. One token becomes three.</div>
 
       <p><strong>Proxycurl</strong> (January 2025): Federal lawsuit. Permanent injunction. All scraped data deleted. Proxycurl shut down July 2025. At least the second such lawsuit LinkedIn filed in 2025. <a href="https://news.linkedin.com/2025/linkedin-takes-legal-action-to-defend-member-privacy">Source</a>.</p>
 
-      <p><strong>Thomson Reuters v. Ross Intelligence</strong> (2023): Thomson Reuters won on summary judgment. Ross used copyrighted Westlaw headnotes to train its legal AI. Not still litigating — decided. <a href="https://law.justia.com/cases/federal/district-courts/delaware/dedce/1:2020cv00613/73610/509/">Source</a>.</p>
+      <p><strong>Thomson Reuters v. Ross Intelligence</strong> (2023): Thomson Reuters won on summary judgment. Ross used copyrighted Westlaw headnotes to train its legal AI. Not still litigating — decided. <a href="https://www.ded.uscourts.gov/sites/ded/files/opinions/20-613_5.pdf">Source</a>.</p>
 
       <p><strong>Bright Data v. Meta and X</strong>: Bright Data won dismissals, arguing its proxy infrastructure is a neutral tool, not itself a scraping operation.</p>
 
@@ -2205,6 +2205,19 @@ Extraction: scan each space position → map codepoint to bits
 <span class="kw">&lt;noscript&gt;</span>
   <span class="kw">&lt;p&gt;</span>Meridian Castleford -- Distributed Lattice Architect<span class="kw">&lt;/p&gt;</span>
 <span class="kw">&lt;/noscript&gt;</span></div>
+
+  <h3>Why JSON-LD Is a Separate Detection Channel</h3>
+  <p>Most text extraction tools (Trafilatura, newspaper3k, readability, html2text) <strong>completely ignore</strong> <code>&lt;script type="application/ld+json"&gt;</code> blocks. They extract visible text from the DOM and discard everything else. But three major ingestion paths specifically <em>target</em> JSON-LD:</p>
+  <ol>
+    <li><strong>Knowledge graph builders</strong> (Google, Bing, Apple): parse JSON-LD to populate entity databases. A canary <code>Person</code> entity gets indexed as a real person.</li>
+    <li><strong>RAG pipelines</strong> (Perplexity, ChatGPT browse, Gemini): some extract structured data alongside text. A canary entity surfaces in retrieval-augmented answers.</li>
+    <li><strong>Schema.org harvesters</strong>: tools like Web Data Commons crawl the entire web specifically for JSON-LD/microdata. Canary entities enter these datasets independently of any text extraction.</li>
+  </ol>
+  <p>This means a canary profile injected via both CSS-hidden text <em>and</em> JSON-LD has <strong>two independent detection surfaces</strong>. Even if a scraper strips all hidden HTML (defeating the CSS channel), the JSON-LD entity enters knowledge graphs through a completely separate path. The survival matrix shows this: JSON-LD canaries are N/A for 5 of 7 text extractors because they bypass text extraction entirely.</p>
+  <div class="callout callout-green">
+    <strong>Strategic implication</strong>
+    JSON-LD injection costs almost nothing (one <code>&lt;script&gt;</code> tag per page) but opens a detection channel that no amount of text-extraction evasion can close. It's the one VENOM technique where the attacker can't defend by choosing a different extraction tool &mdash; they'd have to strip <code>&lt;script&gt;</code> tags entirely, which breaks legitimate page functionality.
+  </div>
 
   <h3>Detection System</h3>
   <div class="diagram">
@@ -3648,6 +3661,9 @@ Knowledge graph builder (Google, Perplexity):
         <dt>FineWeb</dt>
         <dd>HuggingFace&#8217;s curated web corpus (15T tokens). Uses Trafilatura for extraction plus quality classifiers. Removes ~90% of raw crawl data at quality/dedup stages.</dd>
 
+        <dt>JSON-LD (JavaScript Object Notation for Linked Data)</dt>
+        <dd>Structured data format embedded in <code>&lt;script type="application/ld+json"&gt;</code> tags. Uses schema.org vocabulary. Completely invisible to text extractors (Trafilatura, newspaper3k, etc.) but specifically targeted by knowledge graph builders (Google, Bing), RAG pipelines, and schema harvesters. VENOM injects canary Person entities via JSON-LD as an independent detection channel that bypasses all text extraction defenses (Proposal 3).</dd>
+
         <dt>KenLM</dt>
         <dd>Fast n-gram language model for perplexity scoring. Measures how &#8220;surprised&#8221; the model is by text. Low perplexity = natural language; high perplexity = gibberish. Used by FineWeb and CCNet to filter training data.</dd>
 
@@ -3699,6 +3715,9 @@ Knowledge graph builder (Google, Perplexity):
 
         <dt>Residential proxy</dt>
         <dd>IP addresses from real residential ISP connections, making bot traffic appear to come from home users. 190M IPs available (Bright Data, Oxylabs) at $10&#8211;15/GB.</dd>
+
+        <dt>SERP (Search Engine Results Page)</dt>
+        <dd>The page of results returned by a search engine for a query. Scrapers like SerpApi programmatically harvest SERPs at scale (784M&#8211;1.06B Google SERPs/week). Reddit&#8217;s honeypot proved Perplexity scraped Google SERPs to surface Reddit content.</dd>
 
         <dt>robots.txt</dt>
         <dd>30-year-old convention for declaring crawler permissions. IMC 2025 found only 30.7% compliance with disallow-all. Not technically enforceable. IETF RFC 9309 formalized the syntax.</dd>
