@@ -327,6 +327,27 @@
   .mt { margin-top: 0.8em; }
   .small { font-size: 0.85em; }
 
+  /* PDF download fab (mobile-friendly) */
+  .pdf-fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--blue);
+    background: #fff;
+    color: var(--blue);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: opacity 0.3s;
+  }
+  .pdf-fab:hover { background: var(--blue-light); }
+  @media print { .pdf-fab { display: none !important; } }
+
   /* PDF ratio picker modal */
   .pdf-modal-overlay {
     display: none;
@@ -702,6 +723,7 @@
 <div class="controls" id="controls">
   &larr; &rarr; navigate &middot; <strong>N</strong> notes &middot; <strong>F</strong> fullscreen &middot; <strong>P</strong> PDF
 </div>
+<button class="pdf-fab" id="pdfFab" aria-label="Download PDF">&#8615;</button>
 
 <script>
   const slides = document.querySelectorAll('.slide');
@@ -744,6 +766,11 @@
   document.getElementById('pdfCancel').addEventListener('click', (e) => {
     e.stopPropagation();
     closePdfModal();
+  });
+
+  document.getElementById('pdfFab').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openPdfModal();
   });
 
   // Close modal on overlay click
@@ -799,9 +826,10 @@
     else showSlide(current - 1);
   });
 
-  // Hide controls after 3s
+  // Hide controls + fab after 3s
   setTimeout(() => {
     document.getElementById('controls').style.opacity = '0.3';
+    document.getElementById('pdfFab').style.opacity = '0.3';
   }, 3000);
 </script>
 
