@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>VENOM Deep Dive — Concrete Proposals for LinkedIn</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiVkVOT00gRGVlcCBEaXZlIiwic2hvcnRfbmFtZSI6IlZFTk9NIiwidGhlbWVfY29sb3IiOiIjMGE0ZDhjIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZmZmZmYiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInN0YXJ0X3VybCI6Ii4vIn0=">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -382,6 +385,74 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* Offline banner */
+.offline-banner {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--green);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.85em;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 150;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.offline-banner.show { opacity: 1; }
+
+/* Prev/Next navigation */
+.tab-nav {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.tab-nav-btn {
+  flex: 1;
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--blue);
+  font-size: 0.9em;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  text-align: center;
+}
+.tab-nav-btn:hover {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+.tab-nav-btn:active {
+  transform: scale(0.98);
+}
+.tab-nav-btn:disabled {
+  display: none;
+}
+.tab-nav-btn .arrow {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .tab-nav-btn {
+    min-height: 56px;
+    font-size: 0.95em;
+  }
+}
+
 /* Keyboard shortcuts overlay */
 .shortcuts-overlay {
   display: none;
@@ -497,7 +568,7 @@ body {
 
 /* Print */
 @media print {
-  .header, .tab-bar, .menu-toggle, .footer, .shortcuts-overlay { display: none; }
+  .header, .tab-bar, .menu-toggle, .footer, .shortcuts-overlay, .tab-nav, .offline-banner { display: none; }
   .panel { display: block !important; page-break-inside: avoid; }
   .card-body { display: block !important; }
   body { font-size: 11pt; }
@@ -505,6 +576,8 @@ body {
 </style>
 </head>
 <body>
+
+<div class="offline-banner" id="offlineBanner">Available offline</div>
 
 <div class="header">
   <div>
@@ -624,6 +697,10 @@ body {
   <div class="callout callout-blue">
     <strong>Recommendation: Layer proposals 1 + 2 + 3</strong>
     Homoglyphs survive training pipelines (long-term attribution). Innamark catches direct scrapers (short-term detection). Canary profiles provide court-ready evidence. The three together cover all scraper types with independent failure modes.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" disabled></button>
+    <button class="tab-nav-btn" onclick="switchTab(1)">How Scrapers Work <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -806,6 +883,10 @@ body {
       <p><strong>Key finding</strong>: Cross-script homoglyphs (Cyrillic, Greek) survive the entire pipeline. They are printable, pass NFKC normalization, and get distinct tokens in BPE vocabularies. This is the basis for Proposal 1.</p>
     </div>
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(0)"><span class="arrow">←</span> Overview</button>
+    <button class="tab-nav-btn" onclick="switchTab(2)">Pipeline Survival <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <!-- ============================================================ -->
@@ -881,6 +962,10 @@ body {
   <div class="callout callout-gold">
     <strong>Innamark's whitespace characters</strong>
     Trafilatura collapses these to regular spaces. But direct scrapers (Beautiful Soup, raw HTML parsing, browser extensions) preserve them. This makes Innamark effective against Type 1 and Type 2 scrapers, but not against training pipelines that use Trafilatura.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(1)"><span class="arrow">←</span> How Scrapers Work</button>
+    <button class="tab-nav-btn" onclick="switchTab(3)">1. Homoglyphs <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -997,6 +1082,10 @@ body {
       <div class="contribution">"Proving Membership in LLM Pretraining Data via Data Watermarks." Unicode lookalike substitution with provable false detection guarantees. ACL Findings 2024.</div>
     </div>
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(2)"><span class="arrow">←</span> Pipeline Survival</button>
+    <button class="tab-nav-btn" onclick="switchTab(4)">2. Innamark <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <!-- ============================================================ -->
@@ -1078,6 +1167,10 @@ body {
   <div class="callout callout-blue">
     <strong>Why propose Innamark alongside homoglyphs?</strong>
     Different failure modes. Homoglyphs survive training pipelines but are detectable by script analysis. Innamark survives direct scraping but not training pipelines. Together, they cover both threat vectors. And Innamark is already Kotlin/JVM — minimal integration effort for Eugene's team.
+  </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(3)"><span class="arrow">←</span> 1. Homoglyphs</button>
+    <button class="tab-nav-btn" onclick="switchTab(5)">3. Canary Profiles <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -1182,31 +1275,605 @@ body {
   </div>
 </div>
 
-<!-- Placeholder panels for proposals 4-6 and remaining sections -->
+<!-- Placeholder panels for proposals 4-6 and remaining section
+  <div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(4)"><span class="arrow">←</span> 2. Innamark</button>
+    <button class="tab-nav-btn" onclick="switchTab(6)">4. SSR Traps <span class="arrow">→</span></button>
+  </div>
+s -->
 <div class="panel" id="panel-p4">
-  <h2>Proposal 4: SSR Hydration Traps</h2>
-  <p>Inject divergent content in SSR HTML that gets replaced by client-side hydration. If scrapers ingest the SSR-only content, they are non-JS clients.</p>
-  <div class="callout callout-blue">
-    <strong>Status</strong>
-    Full content available in original file. Mobile optimization complete for layout and navigation.
+  <div class="proposal-header">
+    <div class="proposal-icon" style="background:var(--gold-light);color:var(--gold);">⚡</div>
+    <div class="proposal-meta">
+      <h2>Proposal 4: SSR Hydration Traps</h2>
+      <div class="one-liner">Inject canary content into server-rendered HTML that vanishes during client-side hydration. Scrapers that skip JavaScript ingest the trap; real users never see it.</div>
+      <div class="tags">
+        <span class="tag tag-green">CATCHES NON-JS SCRAPERS</span>
+        <span class="tag tag-green">SURVIVES TRAINING PIPELINES</span>
+        <span class="tag tag-blue">MEDIUM JVM EFFORT</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <p>Think of it as disappearing ink. <a href="https://github.com/ember-fastboot/ember-cli-fastboot" target="_blank">Fastboot</a> (or <a href="https://react.dev/reference/react-dom/server/renderToString" target="_blank">React SSR</a>) renders a complete HTML page on the server. That page includes canary content &mdash; fake profile details, synthetic "People Also Viewed" entries &mdash; hidden via CSS (<code>font-size:0</code>, <code>overflow:hidden</code>). When a real browser loads the page, JavaScript hydrates the DOM and removes the canaries within milliseconds. A scraper that fetches raw HTML without executing JS sees the ink before it vanishes.</p>
+
+  <p>Three injection surfaces, each targeting a different scraper behavior:</p>
+
+  <div class="code-block">                    SSR Response
+                         |
+        +----------------+----------------+
+        |                |                |
+  Hydration Trap    Shoebox Poison    Noscript Trap
+  (HTML canary in   (canary entry in  (&lt;noscript&gt; block
+   pre-hydration     serialized JSON,   with fake profile,
+   DOM, removed by   filtered by        visible only when
+   client-side JS)   client rehydrate)  JS is disabled)
+        |                |                |
+        v                v                v
+  Catches: HTTP     Catches: JSON    Catches: curl,
+  clients, headless parsers, API     wget, RSS readers,
+  w/o full JS       scrapers         headless w/o JS</div>
+
+  <h3>Demo: What the Scraper Sees vs. What the User Sees</h3>
+  <h4>SSR HTML (what the scraper gets):</h4>
+  <div class="code-block"><span class="cm">&lt;!-- Real profile data --&gt;</span>
+<span class="kw">&lt;div</span> <span class="fn">class</span>=<span class="str">"profile-card"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;h1&gt;</span>Jane Doe<span class="kw">&lt;/h1&gt;</span>
+  <span class="kw">&lt;p&gt;</span>Staff Engineer at Acme Corp<span class="kw">&lt;/p&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Hydration trap: removed by client-side JS --&gt;</span>
+<span class="kw">&lt;div</span> <span class="fn">class</span>=<span class="str">"profile-insight"</span> <span class="fn">aria-hidden</span>=<span class="str">"true"</span>
+     <span class="fn">style</span>=<span class="str">"font-size:0;max-height:0;overflow:hidden"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;span&gt;</span>Meridian Castleford — Distributed Lattice Architect<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- Shoebox: client filters _vn entries during rehydration --&gt;</span>
+<span class="kw">&lt;script</span> <span class="fn">type</span>=<span class="str">"fastboot/shoebox"</span> <span class="fn">id</span>=<span class="str">"shoebox-profile-data"</span><span class="kw">&gt;</span>
+{<span class="str">"suggestedConnections"</span>:[
+  {<span class="str">"firstName"</span>:<span class="str">"Alice"</span>,<span class="str">"lastName"</span>:<span class="str">"Chen"</span>,<span class="str">"headline"</span>:<span class="str">"PM at BigCo"</span>},
+  {<span class="str">"firstName"</span>:<span class="str">"Meridian"</span>,<span class="str">"lastName"</span>:<span class="str">"Castleford"</span>,
+   <span class="str">"headline"</span>:<span class="str">"Distributed Lattice Architect"</span>,<span class="str">"_vn"</span>:<span class="str">"8f3a2b"</span>}
+]}
+<span class="kw">&lt;/script&gt;</span>
+
+<span class="cm">&lt;!-- Noscript: only renders when JS is disabled --&gt;</span>
+<span class="kw">&lt;noscript&gt;</span>
+  <span class="kw">&lt;div</span> <span class="fn">class</span>=<span class="str">"profile-data--noscript"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;h2&gt;</span>Meridian Castleford<span class="kw">&lt;/h2&gt;</span>
+    <span class="kw">&lt;p&gt;</span>Distributed Lattice Architect at Nexiform Analytics<span class="kw">&lt;/p&gt;</span>
+  <span class="kw">&lt;/div&gt;</span>
+<span class="kw">&lt;/noscript&gt;</span></div>
+
+  <p><strong>After hydration (what the user sees):</strong> Jane Doe's real profile. No trace of Meridian Castleford anywhere in the DOM.</p>
+
+  <h3>Implementation (Node.js SSR Middleware)</h3>
+  <div class="code-block"><span class="cm">// Fastboot response middleware (Ember) or Express middleware (React)</span>
+<span class="cm">// Runs post-render, modifies the HTML string before res.end()</span>
+<span class="kw">function</span> <span class="fn">venomSSRTrap</span>(req, res, next) {
+  <span class="kw">const</span> originalEnd = res.end;
+  res.end = <span class="kw">function</span>(chunk, encoding) {
+    <span class="kw">if</span> (<span class="kw">typeof</span> chunk === <span class="str">'string'</span> && chunk.includes(<span class="str">'&lt;/body&gt;'</span>)) {
+      <span class="kw">const</span> ctx = req.venomSession; <span class="cm">// session ID, canary name, tracking hash</span>
+      <span class="kw">const</span> trap = <span class="str">`
+        &lt;div class="profile-insight" aria-hidden="true"
+             style="font-size:0;max-height:0;overflow:hidden"&gt;
+          &lt;span&gt;\${ctx.canaryName} — \${ctx.canaryHeadline}&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;noscript&gt;
+          &lt;div class="profile-data--noscript"&gt;
+            &lt;h2&gt;\${ctx.canaryName}&lt;/h2&gt;
+            &lt;p&gt;\${ctx.canaryHeadline}&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/noscript&gt;`</span>;
+      chunk = chunk.replace(<span class="str">'&lt;/body&gt;'</span>, trap + <span class="str">'&lt;/body&gt;'</span>);
+    }
+    originalEnd.call(<span class="kw">this</span>, chunk, encoding);
+  };
+  next();
+}
+
+<span class="cm">// Client-side hydration probe (confirms JS execution, reports back)</span>
+<span class="kw">export default class</span> <span class="fn">VenomHydrationProbe</span> <span class="kw">extends</span> Component {
+  @tracked hydrated = <span class="kw">false</span>;
+  <span class="fn">constructor</span>() {
+    <span class="kw">super</span>(...arguments);
+    <span class="kw">this</span>.hydrated = <span class="kw">true</span>; <span class="cm">// flips only in browser</span>
+    navigator.sendBeacon(<span class="str">'/venom/signal/hydrated'</span>, JSON.stringify({
+      sessionId: <span class="kw">this</span>.args.sessionId,
+      timestamp: performance.now(),
+    }));
+  }
+}</div>
+
+  <p>If the beacon never fires for a session that fetched the page, that session is a non-JS scraper.</p>
+
+  <h3>BigPipe Timing Extension</h3>
+  <p>LinkedIn streams content via BigPipe: shell first, then content chunks as <code>&lt;script&gt;</code> tags. VENOM injects canaries into later chunks (t&gt;300ms). Scrapers that disconnect early miss them. Scrapers that wait for everything ingest them. Either way, the server logs the chunk receipt pattern per session.</p>
+
+  <div class="code-block">t=0ms     Shell (nav, layout, placeholders)
+t=50ms    Profile card chunk
+t=150ms   Experience/education chunk
+t=300ms+  "People Also Viewed" chunk  &lt;-- canary injected here
+t=500ms+  Footer chunk                &lt;-- second canary</div>
+
+  <h3>Coverage</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>vs. Headless Browsers</th><th>vs. Extensions</th><th>vs. Training Pipelines</th><th>JVM Effort</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Catches non-JS scrapers. Bypassed by full-JS headless (Puppeteer, Playwright).</td>
+        <td>Invisible — extensions execute JS, see hydrated DOM.</td>
+        <td><span class="cell-survive">Raw HTML pipelines ingest pre-hydration canaries.</span></td>
+        <td>Medium: SSR middleware + client hydration probe.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="sw-grid">
+    <div class="sw-col strengths">
+      <h4>Strengths</h4>
+      <ul>
+        <li>Zero visual impact: canaries exist only in pre-hydration HTML</li>
+        <li>Sub-millisecond overhead: string manipulation on SSR response</li>
+        <li>Three independent surfaces (hydration, shoebox, noscript) — scraper must evade all three</li>
+        <li>BigPipe timing analysis adds a behavioral signal without injecting content</li>
+        <li>Shoebox poisoning catches JSON-first scrapers (increasingly common)</li>
+        <li>Hydration beacon provides ground truth: no beacon = no JS = scraper</li>
+        <li>Works with both Ember Fastboot and React SSR (same middleware pattern)</li>
+        <li>Canary names are HMAC-derived, so detection traces back to a specific session</li>
+      </ul>
+    </div>
+    <div class="sw-col weaknesses">
+      <h4>Weaknesses</h4>
+      <ul>
+        <li>Invisible to browser extensions (they execute JS, see clean DOM)</li>
+        <li>Bypassed by anti-detect browsers (Multilogin, GoLogin) that fully execute JS</li>
+        <li>Only catches the non-JS subset of headless scrapers — a shrinking population</li>
+        <li>Shoebox canaries detectable if scraper filters <code>_vn</code>-tagged JSON entries</li>
+        <li><code>display:none</code> detectors in sophisticated scrapers may skip hidden elements</li>
+        <li>Complementary technique, not standalone — must pair with watermarking for full coverage</li>
+        <li>Requires coordination between server middleware and client bundle</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Key Researchers / Precedent</h4>
+  <div class="researcher">
+    <div class="initials">CJ</div>
+    <div class="info">
+      <div class="name">Changhao Jiang</div>
+      <div class="affiliation">Facebook Engineering, 2010</div>
+      <div class="contribution">BigPipe: pipelining web pages for high performance. The streaming architecture LinkedIn adopted and VENOM exploits for chunk-timing analysis.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">EF</div>
+    <div class="info">
+      <div class="name">Ember Fastboot</div>
+      <div class="affiliation">LinkedIn's SSR framework</div>
+      <div class="contribution">Shoebox serialization is a documented Fastboot feature; VENOM repurposes it as an injection surface.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">CF</div>
+    <div class="info">
+      <div class="name">Cloudflare Challenge Platform</div>
+      <div class="affiliation">Cloudflare</div>
+      <div class="contribution">Uses noscript traps as part of bot detection. The <code>&lt;noscript&gt;</code> block technique is well-established in anti-bot tooling.</div>
+    </div>
+  </div>
+
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(5)"><span class="arrow">←</span> 3. Canary Profiles</button>
+    <button class="tab-nav-btn" onclick="switchTab(7)">5. Token Inflation <span class="arrow">→</span></button>
   </div>
 </div>
 
 <div class="panel" id="panel-p5">
-  <h2>Proposal 5: Token Inflation</h2>
-  <p>Insert zero-width or visually invisible characters that fragment BPE tokens, increasing cost per inference for models trained on scraped data.</p>
+  <div class="proposal-header">
+    <div class="proposal-icon" style="background:var(--red-light);color:var(--red);">💸</div>
+    <div class="proposal-meta">
+      <h2>Proposal 5: Token Inflation (BPE Fragmentation)</h2>
+      <div class="one-liner">Insert zero-width Unicode characters that fragment BPE tokens, inflating cost per inference. Invisible tax that only machines pay.</div>
+      <div class="tags">
+        <span class="tag tag-red">CORRUPTS LLM PROCESSING</span>
+        <span class="tag tag-gold">STRIPPED BY TRAFILATURA</span>
+        <span class="tag tag-blue">LOW JVM EFFORT</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <p>LLMs tokenize text using Byte Pair Encoding: frequent character sequences merge into single tokens during training. "engineering" is one token. Insert a zero-width space mid-word — "engine\u200Bring" — and the tokenizer has never seen that byte sequence. It falls back to smaller units. One token becomes three or more.</p>
+
+  <p><strong>Analogy:</strong> speed bumps on a highway. Humans drive over them without noticing (the characters are invisible). Machines hit every bump, burning compute on each one.</p>
+
+  <div class="code-block">Normal tokenization (GPT-4o):
+  <span class="str">"Senior Software Engineer"</span> -&gt; [Senior] [Software] [Engineer]
+  <span class="num">3 tokens</span>
+
+Inflated tokenization (ZWSP after each word):
+  <span class="str">"Senior​ Software​ Engineer​"</span>  (​ = U+200B)
+  -&gt; [Senior] [&lt;0x200B&gt;] [ Software] [&lt;0x200B&gt;] [ Engineer] [&lt;0x200B&gt;]
+  <span class="num">9 tokens</span> (3x inflation)
+
+At scale:
+  Average LinkedIn profile text:  <span class="num">~500 tokens</span>
+  With zero-width insertion:      <span class="num">~1,500 tokens</span> (3x)
+  RAG context window (128K):      holds <span class="num">256 profiles</span> -&gt; <span class="num">85 profiles</span></div>
+
   <div class="callout callout-blue">
-    <strong>Status</strong>
-    Full content available in original file. Mobile optimization complete for layout and navigation.
+    <strong>Key insight</strong>
+    Zero-width characters are their own BPE tokens because they never appear in training data. Every insertion point adds at least one extra token, and often disrupts the adjacent word token as well.
+  </div>
+
+  <h3>Demo: Before and After</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>Input</th><th>Tokenization</th><th>Count</th><th>Inflation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Normal text</td>
+        <td>GPT-4o BPE (standard)</td>
+        <td><span class="num">22 tokens</span></td>
+        <td>1.0x baseline</td>
+      </tr>
+      <tr>
+        <td>ZWSP every 3 chars</td>
+        <td>Fragments every word</td>
+        <td><span class="num">58 tokens</span></td>
+        <td class="cell-mapped">2.6x</td>
+      </tr>
+      <tr>
+        <td>ZWSP after each word</td>
+        <td>Word boundaries only</td>
+        <td><span class="num">38 tokens</span></td>
+        <td class="cell-survive">1.7x (sweet spot)</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><strong>Sweet spot:</strong> insert after each word boundary. Predictable 1.5-3x inflation without risk of breaking HTML entity parsing.</p>
+
+  <h3>JVM Implementation</h3>
+  <div class="code-block"><span class="cm">// Zero-width character insertion -- no dependencies, no threads</span>
+<span class="kw">class</span> <span class="fn">TokenInflator</span> {
+    <span class="cm">// Unicode Cf (format) characters -- invisible in rendering</span>
+    <span class="kw">static final char</span> ZWSP = <span class="str">'\u200B'</span>;  <span class="cm">// Zero-width space</span>
+    <span class="kw">static final char</span> ZWNJ = <span class="str">'\u200C'</span>;  <span class="cm">// Zero-width non-joiner</span>
+    <span class="kw">static final char</span> WJ   = <span class="str">'\u2060'</span>;  <span class="cm">// Word joiner</span>
+
+    <span class="kw">static</span> String <span class="fn">inflate</span>(String text, String sessionId, <span class="kw">byte</span>[] secret) {
+        <span class="cm">// Session-derived marker selection (doubles as lightweight watermark)</span>
+        <span class="kw">byte</span>[] hash = hmacSha256(secret, sessionId);
+        <span class="kw">char</span> marker = selectMarker(hash[<span class="num">0</span>]);  <span class="cm">// ZWSP, ZWNJ, or WJ</span>
+
+        StringBuilder out = <span class="kw">new</span> StringBuilder(text.length() * <span class="num">2</span>);
+        <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; text.length(); i++) {
+            out.append(text.charAt(i));
+            <span class="kw">if</span> (text.charAt(i) == <span class="str">' '</span>) {
+                out.append(marker);
+            }
+        }
+        <span class="kw">return</span> out.toString();
+    }
+
+    <span class="kw">private static char</span> <span class="fn">selectMarker</span>(<span class="kw">byte</span> b) {
+        <span class="kw">return switch</span> (b & <span class="num">0x03</span>) {
+            <span class="kw">case</span> <span class="num">0</span> -&gt; ZWSP;
+            <span class="kw">case</span> <span class="num">1</span> -&gt; ZWNJ;
+            <span class="kw">case</span> <span class="num">2</span> -&gt; WJ;
+            <span class="kw">default</span> -&gt; ZWSP;
+        };
+    }
+}</div>
+
+  <p>Session-keyed marker selection means different sessions use different zero-width characters. This provides a weak watermark signal on top of the inflation — if you recover which marker was used, you narrow the session pool by 3x.</p>
+
+  <h3>Coverage</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>vs. Headless Browsers</th><th>vs. Extensions</th><th>vs. Training Pipelines</th><th>JVM Effort</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="cell-stripped">CORRUPTS LLM PROCESSING</span></td>
+        <td><span class="cell-stripped">CORRUPTS LLM PROCESSING</span></td>
+        <td><span class="cell-stripped">STRIPPED BY TRAFILATURA</span></td>
+        <td>Low (char insertion)</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Effective against any system that feeds scraped text directly to an LLM: RAG pipelines, summarization services, real-time ingestion. Not effective against training pipelines that run Trafilatura or equivalent text cleaning (Unicode category Cf characters stripped by <code>str.isprintable()</code>).</p>
+
+  <div class="sw-grid">
+    <div class="sw-col strengths">
+      <h4>Strengths</h4>
+      <ul>
+        <li>Invisible to humans in all rendering contexts (browsers, PDFs, copy-paste)</li>
+        <li>Degrades LLM output quality on inflated text (fragmented vocabulary)</li>
+        <li>Fills RAG context windows 2-3x faster, reducing retrieval usefulness</li>
+        <li>Trivial JVM implementation (string scan + char insert)</li>
+        <li>Composable with homoglyphs: homoglyphs survive training pipelines, inflation hits RAG</li>
+        <li>Session-keyed marker choice adds weak attribution signal</li>
+        <li>No page weight concern (a few hundred bytes of zero-width chars)</li>
+      </ul>
+    </div>
+    <div class="sw-col weaknesses">
+      <h4>Weaknesses</h4>
+      <ul>
+        <li>Stripped by Trafilatura and any Unicode normalization pass (Cf category filter)</li>
+        <li>Stripped by <code>str.isprintable()</code> in Python (common in data cleaning)</li>
+        <li>Does not survive well-run training pipelines (same limitation as Innamark)</li>
+        <li>No attribution: inflated text cannot be traced back to a session (unlike homoglyphs)</li>
+        <li>Sophisticated scrapers can strip zero-width chars with a one-line regex</li>
+        <li>Effectiveness depends on scraper not cleaning text before LLM ingestion</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-gold">
+    <strong>Why include token inflation if Trafilatura strips it?</strong>
+    Different threat model. Homoglyphs target training pipelines. Token inflation targets the growing class of RAG-based scrapers that feed content directly to LLMs without cleaning. A recruiter tool that scrapes LinkedIn profiles into a GPT context window hits every speed bump. For that use case, inflation is cheap and effective.
+  </div>
+
+  <h4>Key Researchers / Precedent</h4>
+  <div class="researcher">
+    <div class="initials">SHB</div>
+    <div class="info">
+      <div class="name">Sennrich, Haddow, Birch</div>
+      <div class="affiliation">University of Edinburgh, 2016</div>
+      <div class="contribution">"Neural Machine Translation of Rare Words with Subword Units." Introduced BPE for NLP. The tokenization model that makes this attack work. ACL 2016.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">WJ</div>
+    <div class="info">
+      <div class="name">Wei, Jia</div>
+      <div class="affiliation">USC, 2024</div>
+      <div class="contribution">"Proving Membership in LLM Pretraining Data via Data Watermarks." Demonstrated that Unicode manipulations (including zero-width insertion) survive into trained model behavior. ACL Findings 2024.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">SC</div>
+    <div class="info">
+      <div class="name">StegCloak & zero-width-lib</div>
+      <div class="affiliation">Open-source tools</div>
+      <div class="contribution">Zero-width character steganography at scale. StegCloak uses ZWSP + ZWNJ + ZWJ for arbitrary payload encoding. Proves the insertion/extraction pipeline works.</div>
+    </div>
+  </div>
+
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(6)"><span class="arrow">←</span> 4. SSR Traps</button>
+    <button class="tab-nav-btn" onclick="switchTab(8)">6. Behavioral <span class="arrow">→</span></button>
   </div>
 </div>
 
 <div class="panel" id="panel-p6">
-  <h2>Proposal 6: Behavioral Detection</h2>
-  <p>LSTM-based sequence modeling for scraper detection. LinkedIn already uses this internally.</p>
-  <div class="callout callout-blue">
-    <strong>Status</strong>
-    Full content available in original file. Mobile optimization complete for layout and navigation.
+  <div class="proposal-header">
+    <div class="proposal-icon" style="background:var(--purple-light);color:var(--purple);">🧠</div>
+    <div class="proposal-meta">
+      <h2>Proposal 6: Behavioral Detection (LSTM + VENOM Feedback Loop)</h2>
+      <div class="one-liner">LSTM sequence model classifies sessions as human or scraper. VENOM watermark detections feed confirmed labels back into training, closing the loop.</div>
+      <div class="tags">
+        <span class="tag tag-green">STRONG vs HEADLESS</span>
+        <span class="tag tag-gold">WEAKER vs EXTENSIONS</span>
+        <span class="tag tag-blue">ENHANCES EXISTING LINKEDIN SYSTEM</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>How It Works</h3>
+  <p><strong>Bank fraud detection meets marked bills.</strong> The LSTM watches behavioral patterns the way a fraud model watches transaction patterns. VENOM watermarks are the marked bills — when a marked bill shows up in someone's possession, it confirms they're connected to the theft. That confirmed case improves the fraud model, which catches patterns it couldn't see before.</p>
+
+  <p>LinkedIn already runs an LSTM-based bot classifier. The problem: it trains on heuristic labels (rule-based detection, rate limits, CAPTCHA failures). Heuristic labels are noisy. False positives poison the model; false negatives let scrapers through. VENOM provides cryptographically confirmed labels — a session that produced a watermark hit in an LLM output or leaked dataset is a scraper, full stop.</p>
+
+  <div class="code-block">                VENOM Feedback Loop
+                =====================
+
+  [Scraper visits LinkedIn]
+         |
+         v
+  VENOM watermarks embedded in served content
+         |
+         +-&gt; Behavioral features logged (timing, assets, TLS, beacons)
+         |
+         v
+  Scraper feeds data to LLM training / dataset
+         |
+         v
+  External monitoring detects watermarks in LLM outputs or datasets
+         |
+         v
+  Cross-reference watermark -&gt; session_id (HMAC lookup)
+         |
+         v
+  Session marked CONFIRMED POSITIVE in training corpus
+         |
+         v
+  LSTM retrained with confirmed labels
+         |
+         v
+  Model catches more scrapers --&gt; more watermarks detected --&gt; loop continues</div>
+
+  <h3>Demo: Human vs. Scraper Session</h3>
+  <h4>Human session:</h4>
+  <div class="code-block">t=0.0s   GET /in/jane-smith           (profile view)
+t=2.3s   Scroll event (JS)
+t=4.1s   GET /in/jane-smith/details/experience  (click expand)
+t=8.7s   GET /messaging               (navigate away)
+         Hydration beacon: <span class="cell-survive">YES</span>
+         TLS fingerprint: Chrome 120 (JA4: normal)
+         Asset loads: <span class="num">14</span> (CSS, JS, images, fonts)
+         Inter-request timing: [2.3s, 1.8s, 4.6s] -- <span class="cell-survive">high variance</span>
+         Page type sequence: profile -&gt; detail -&gt; messaging (diverse)</div>
+
+  <h4>Scraper session:</h4>
+  <div class="code-block">t=0.0s   GET /in/jane-smith           (profile)
+t=0.3s   GET /in/john-doe             (different profile)
+t=0.6s   GET /in/alice-wong            (another profile)
+t=0.9s   GET /in/bob-chen             (another profile)
+         Hydration beacon: <span class="cell-stripped">NO</span>
+         TLS fingerprint: Go net/http (JA4: unusual)
+         Asset loads: <span class="num">0</span> (no CSS, no JS, no images)
+         Inter-request timing: [0.3s, 0.3s, 0.3s] -- <span class="cell-stripped">near-zero variance</span>
+         Page type sequence: profile -&gt; profile -&gt; profile (homogeneous)</div>
+
+  <p>The human session has high timing variance, diverse page types, asset loads, and JS execution. The scraper session is a metronome.</p>
+
+  <h3>Feature Extraction</h3>
+  <div class="code-block"><span class="cm"># Per-session feature vector for LSTM input</span>
+<span class="kw">def</span> <span class="fn">extract_features</span>(session):
+    timings = [r.timestamp - session.start <span class="kw">for</span> r <span class="kw">in</span> session.requests]
+    deltas = [timings[i+<span class="num">1</span>] - timings[i] <span class="kw">for</span> i <span class="kw">in</span> range(len(timings)-<span class="num">1</span>)]
+
+    <span class="kw">return</span> {
+        <span class="cm"># Timing distribution</span>
+        <span class="str">"timing_mean"</span>: mean(deltas),
+        <span class="str">"timing_variance"</span>: variance(deltas),
+        <span class="str">"timing_entropy"</span>: entropy(deltas),
+
+        <span class="cm"># Navigation pattern (sequence input to LSTM)</span>
+        <span class="str">"page_type_seq"</span>: [classify_page(r.path) <span class="kw">for</span> r <span class="kw">in</span> session.requests],
+
+        <span class="cm"># Asset ratio: CSS/JS/image requests vs page requests</span>
+        <span class="str">"asset_load_ratio"</span>: count_assets(session) / len(session.requests),
+
+        <span class="cm"># Client-side signals</span>
+        <span class="str">"hydration_beacon"</span>: session.beacon_received,  <span class="cm"># bool</span>
+        <span class="str">"scroll_events"</span>: session.scroll_count,
+        <span class="str">"click_events"</span>: session.click_count,
+
+        <span class="cm"># TLS fingerprint</span>
+        <span class="str">"ja4_hash"</span>: session.tls_fingerprint,
+
+        <span class="cm"># BigPipe completeness (did they receive all chunks?)</span>
+        <span class="str">"chunk_receipt_ratio"</span>: session.chunks_received / session.chunks_sent,
+
+        <span class="cm"># Referrer plausibility</span>
+        <span class="str">"referrer_chain_valid"</span>: validate_referrers(session),
+
+        <span class="cm"># Search-to-profile ratio</span>
+        <span class="str">"search_to_profile_ctr"</span>: session.profile_clicks / max(session.searches, <span class="num">1</span>),
+    }</div>
+
+  <p>The LSTM processes <code>page_type_seq</code> as a sequence and the scalar features as auxiliary inputs. Profile-profile-profile-profile is a distinctive signature, but sophisticated scrapers randomize page types. The timing distribution and asset ratio are harder to fake.</p>
+
+  <h3>The VENOM Feedback Loop</h3>
+  <p>Without VENOM, the label pipeline looks like this:</p>
+  <div class="code-block">Rule-based detection (rate limit, CAPTCHA, IP blocklist)
+    --&gt; noisy labels (FP: aggressive humans, FN: slow scrapers)
+        --&gt; LSTM trains on noise
+            --&gt; mediocre classifier</div>
+
+  <p>With VENOM:</p>
+  <div class="code-block">VENOM watermark detected in LLM output or leaked dataset
+    --&gt; HMAC(secret, session_id) identifies the exact session
+        --&gt; CONFIRMED POSITIVE label (zero ambiguity)
+            --&gt; LSTM trains on ground truth
+                --&gt; catches behavioral patterns invisible to rules
+                    --&gt; those scrapers' sessions produce more watermark hits
+                        --&gt; more confirmed labels --&gt; loop tightens</div>
+
+  <div class="callout callout-green">
+    <strong>Key insight</strong>
+    Content-based detection (watermarking) creates ground truth labels for behavioral detection. Without VENOM, the LSTM is guessing based on rules. With VENOM, it's learning from proven scrapers.
+  </div>
+
+  <h3>Coverage</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead><tr><th>vs. Headless Browsers</th><th>vs. Extensions</th><th>vs. Training Pipelines</th><th>JVM Effort</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="cell-survive">STRONG SIGNAL</span>: distinctive timing, missing JS events, no asset loads, homogeneous navigation</td>
+        <td><span class="cell-mapped">WEAKER SIGNAL</span>: extensions piggyback on real user's browser, inherit human timing patterns</td>
+        <td>N/A (detection, not content marking)</td>
+        <td>Medium: LSTM infra exists at LinkedIn, integration is the work</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="sw-grid">
+    <div class="sw-col strengths">
+      <h4>Strengths</h4>
+      <ul>
+        <li>LinkedIn already has the LSTM infrastructure — VENOM enhances it, doesn't replace it</li>
+        <li>Catches scrapers before they get content (behavioral) and after (watermark), covering both ends</li>
+        <li>Confirmed labels eliminate the noisy-heuristic problem that plagues all bot classifiers</li>
+        <li>Self-improving: more watermark detections produce more training data produce better detection</li>
+        <li>Real-time classification: LSTM inference is sub-millisecond per session</li>
+        <li>Headless browsers are easy targets (no JS events, no asset loads, mechanical timing)</li>
+        <li>TLS fingerprinting (JA4) is nearly impossible for scrapers to spoof without native browser stacks</li>
+        <li>Works even if individual watermarking techniques are partially stripped</li>
+      </ul>
+    </div>
+    <div class="sw-col weaknesses">
+      <h4>Weaknesses</h4>
+      <ul>
+        <li>Extensions are the hard case: they inherit the real user's browser, TLS, and timing</li>
+        <li>Sophisticated scrapers (Multilogin, GoLogin) randomize timing and load assets</li>
+        <li>VENOM feedback loop has latency: weeks to months between scraping and watermark detection</li>
+        <li>Cold start problem: need initial watermark detections before the loop produces value</li>
+        <li>Feature drift: scrapers adapt, model needs continuous retraining</li>
+        <li>Privacy review required for logging granular behavioral signals per session</li>
+        <li>Not a standalone defense: depends on watermarking proposals (1-4) to generate confirmed labels</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>Key Researchers / Precedent</h4>
+  <div class="researcher">
+    <div class="initials">LI</div>
+    <div class="info">
+      <div class="name">LinkedIn Engineering</div>
+      <div class="affiliation">LinkedIn</div>
+      <div class="contribution">"Fighting Abuse @Scale" blog series. LinkedIn's existing LSTM-based bot detection system, which this proposal extends with VENOM-confirmed labels.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">IFA</div>
+    <div class="info">
+      <div class="name">Iliou, Foroglou, Anastasiadis</div>
+      <div class="affiliation">2021</div>
+      <div class="contribution">"Detection of Advanced Web Bots by Combining Web Logs with Mouse Behavioural Biometrics." LSTM applied to bot detection using behavioral sequences. Published in IEEE Access.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">HS</div>
+    <div class="info">
+      <div class="name">Hochreiter & Schmidthuber</div>
+      <div class="affiliation">1997</div>
+      <div class="contribution">Long Short-Term Memory networks. The foundational architecture. Still competitive for sequence classification despite transformer hype, because session sequences are short (dozens of requests, not thousands of tokens).</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">CF</div>
+    <div class="info">
+      <div class="name">Cloudflare Bot Management</div>
+      <div class="affiliation">Cloudflare</div>
+      <div class="contribution">TLS fingerprinting (JA3, then JA4) combined with behavioral scoring. Public documentation on using TLS fingerprints as bot signals. JA4 is the current standard.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">G3</div>
+    <div class="info">
+      <div class="name">Google reCAPTCHA v3</div>
+      <div class="affiliation">Google</div>
+      <div class="contribution">Invisible behavioral scoring with no user interaction. Proves that behavioral signals alone can separate humans from bots at scale without CAPTCHAs.</div>
+    </div>
+  </div>
+
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(7)"><span class="arrow">←</span> 5. Token Inflation</button>
+    <button class="tab-nav-btn" onclick="switchTab(9)">Evidence <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -1362,6 +2029,10 @@ body {
       <div class="detail">Comply with disallow-all (IMC study). 72% figure is from a smaller 47-site vendor study.</div>
     </div>
   </div>
+<div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(8)"><span class="arrow">←</span> 6. Behavioral</button>
+    <button class="tab-nav-btn" onclick="switchTab(10)">Integration Path <span class="arrow">→</span></button>
+  </div>
 </div>
 
 <div class="panel" id="panel-integration">
@@ -1455,6 +2126,10 @@ body {
   </table>
   </div>
   <p>LinkedIn's SSR response is 200-500ms (p50-p95). VENOM adds 0.1-0.25ms: 0.05% of p50. Below measurement noise.</p>
+  <div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(9)"><span class="arrow">←</span> Evidence</button>
+    <button class="tab-nav-btn" disabled></button>
+  </div>
 </div>
 
 <!-- ============================================================ -->
@@ -1462,9 +2137,9 @@ body {
 <!-- ============================================================ -->
 <div class="shortcuts-overlay" id="shortcutsOverlay">
   <div class="shortcuts-box">
-    <h3>Keyboard Shortcuts</h3>
-    <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr;</span></div>
-    <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr;</span></div>
+    <h3>Navigation</h3>
+    <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr; or swipe left</span></div>
+    <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr; or swipe right</span></div>
     <div class="shortcut-row"><span>Go to tab N</span><span class="shortcut-key">1-9, 0</span></div>
     <div class="shortcut-row"><span>Toggle shortcuts</span><span class="shortcut-key">?</span></div>
     <div class="shortcut-row"><span>Close overlay</span><span class="shortcut-key">Esc</span></div>
@@ -1476,59 +2151,131 @@ body {
 </div>
 
 <script>
-(function() {
-  var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration'];
-  var currentTab = 0;
-
-  function switchTab(idx) {
-    if (idx < 0 || idx >= tabs.length) return;
-    currentTab = idx;
-    document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
-      btn.classList.toggle('active', i === idx);
+// Service worker for offline support
+if ('serviceWorker' in navigator) {
+  var swCode = `
+    self.addEventListener('install', function(e) {
+      e.waitUntil(
+        caches.open('venom-v1').then(function(cache) {
+          return cache.addAll(['/']);
+        })
+      );
+      self.skipWaiting();
     });
-    document.querySelectorAll('.panel').forEach(function(p, i) {
-      p.classList.toggle('active', i === idx);
+    self.addEventListener('activate', function(e) {
+      self.clients.claim();
     });
-    // Scroll tab into view
-    var activeBtn = document.querySelectorAll('.tab-btn')[idx];
-    if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    window.scrollTo(0, 0);
+    self.addEventListener('fetch', function(e) {
+      e.respondWith(
+        caches.match(e.request).then(function(response) {
+          return response || fetch(e.request).then(function(response) {
+            return caches.open('venom-v1').then(function(cache) {
+              cache.put(e.request, response.clone());
+              return response;
+            });
+          });
+        }).catch(function() {
+          return caches.match(e.request);
+        })
+      );
+    });
+  `;
+  var blob = new Blob([swCode], { type: 'application/javascript' });
+  var swUrl = URL.createObjectURL(blob);
 
-    // Close mobile menu after selection
-    if (window.innerWidth <= 768) {
-      var tabBar = document.getElementById('tabBar');
-      var menuToggle = document.getElementById('menuToggle');
-      tabBar.classList.remove('open');
-      menuToggle.classList.remove('open');
+  navigator.serviceWorker.register(swUrl).then(function(reg) {
+    reg.onupdatefound = function() {
+      var worker = reg.installing;
+      worker.onstatechange = function() {
+        if (worker.state === 'activated') {
+          var banner = document.getElementById('offlineBanner');
+          banner.classList.add('show');
+          setTimeout(function() { banner.classList.remove('show'); }, 3000);
+        }
+      };
+    };
+  }).catch(function(err) {
+    console.log('SW registration failed:', err);
+  });
+}
+
+// Tab navigation with touch gestures
+var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration'];
+var currentTab = 0;
+var touchStartX = 0;
+var touchStartY = 0;
+
+function switchTab(idx) {
+  if (idx < 0 || idx >= tabs.length) return;
+  currentTab = idx;
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.panel').forEach(function(p, i) {
+    p.classList.toggle('active', i === idx);
+  });
+  var activeBtn = document.querySelectorAll('.tab-btn')[idx];
+  if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  window.scrollTo(0, 0);
+
+  if (window.innerWidth <= 768) {
+    var tabBar = document.getElementById('tabBar');
+    var menuToggle = document.getElementById('menuToggle');
+    tabBar.classList.remove('open');
+    menuToggle.classList.remove('open');
+  }
+}
+
+// Tab click handlers
+document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+  btn.addEventListener('click', function() { switchTab(i); });
+});
+
+// Touch gesture handlers
+document.addEventListener('touchstart', function(e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', function(e) {
+  if (!e.changedTouches || !e.changedTouches[0]) return;
+  var touchEndX = e.changedTouches[0].clientX;
+  var touchEndY = e.changedTouches[0].clientY;
+  var deltaX = touchEndX - touchStartX;
+  var deltaY = touchEndY - touchStartY;
+
+  // Only trigger if horizontal swipe > 50px and more horizontal than vertical
+  if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+    if (deltaX > 0) {
+      // Swipe right = previous tab
+      switchTab(currentTab - 1);
+    } else {
+      // Swipe left = next tab
+      switchTab(currentTab + 1);
     }
   }
+}, { passive: true });
 
-  // Tab click handlers
-  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
-    btn.addEventListener('click', function() { switchTab(i); });
-  });
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight') { switchTab(currentTab + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { switchTab(currentTab - 1); e.preventDefault(); }
+  else if (e.key === '?') {
+    var o = document.getElementById('shortcutsOverlay');
+    o.classList.toggle('visible');
+  }
+  else if (e.key === 'Escape') {
+    document.getElementById('shortcutsOverlay').classList.remove('visible');
+  }
+  else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
+  else if (e.key === '0') { switchTab(9); }
+});
 
-  // Keyboard navigation
-  document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (e.key === 'ArrowRight') { switchTab(currentTab + 1); e.preventDefault(); }
-    else if (e.key === 'ArrowLeft') { switchTab(currentTab - 1); e.preventDefault(); }
-    else if (e.key === '?') {
-      var o = document.getElementById('shortcutsOverlay');
-      o.classList.toggle('visible');
-    }
-    else if (e.key === 'Escape') {
-      document.getElementById('shortcutsOverlay').classList.remove('visible');
-    }
-    else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
-    else if (e.key === '0') { switchTab(9); }
-  });
-
-  // Close shortcuts overlay on click outside
-  document.getElementById('shortcutsOverlay').addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('visible');
-  });
-})();
+// Close shortcuts overlay on click outside
+document.getElementById('shortcutsOverlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('visible');
+});
 
 function toggleCard(header) {
   var card = header.parentElement;
