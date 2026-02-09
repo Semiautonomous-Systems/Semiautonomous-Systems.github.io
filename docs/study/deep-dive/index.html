@@ -604,6 +604,7 @@ body {
   <button class="tab-btn" data-tab="p6">6. Pipeline FP <span class="badge badge-proposal">PROPOSAL</span></button>
   <button class="tab-btn" data-tab="evidence">Evidence <span class="badge badge-research">REAL</span></button>
   <button class="tab-btn" data-tab="integration">Integration Path</button>
+  <button class="tab-btn" data-tab="detection">Detection <span class="badge badge-research">NEW</span></button>
   <button class="tab-btn" data-tab="glossary">Glossary <span class="badge badge-research">REF</span></button>
 </div>
 
@@ -1784,6 +1785,122 @@ differ per session  fullwidth->ASCII   persist as shifted
     <li>2^60 = ~1.15 quintillion unique sessions</li>
     <li><strong>Birthday bound for collision:</strong> 2^23 (~8.4 million) to 2^30 (~1 billion) sessions before 50% collision probability</li>
   </ul>
+
+  <h3>Placement Strategy</h3>
+  <p>Where on the profile, which characters, at what density? The algorithm must be concrete enough to implement in a single function call.</p>
+
+  <h4>Profile Target Zones</h4>
+  <p>Not all fields are equally valuable. Priority depends on scraper coverage (is this field always extracted?), character density (substitutable positions per field), and risk (will substitution break cross-source comparison?).</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 800 440" xmlns="http://www.w3.org/2000/svg">
+      <!-- Profile card outline -->
+      <rect x="50" y="10" width="700" height="420" rx="8" fill="white" stroke="#e2e5e9" stroke-width="2"/>
+
+      <!-- Banner -->
+      <rect x="50" y="10" width="700" height="65" rx="8" fill="#e8f0f8"/>
+      <rect x="50" y="67" width="700" height="8" fill="white"/>
+
+      <!-- Avatar placeholder -->
+      <circle cx="130" cy="75" r="38" fill="#d1d5db" stroke="white" stroke-width="4"/>
+
+      <!-- Name zone - GREY dashed (AVOID) -->
+      <rect x="190" y="50" width="190" height="22" rx="4" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4"/>
+      <text x="200" y="65" font-size="11" font-weight="700" fill="#9ca3af">Name</text>
+      <text x="370" y="65" font-size="9" fill="#9ca3af" text-anchor="end">AVOID</text>
+
+      <!-- Headline zone - RED (P1) -->
+      <rect x="190" y="80" width="490" height="24" rx="4" fill="#fde8e8" stroke="#c0392b" stroke-width="2"/>
+      <text x="200" y="96" font-size="11" font-weight="700" fill="#c0392b">Headline</text>
+      <text x="670" y="96" font-size="10" font-weight="700" fill="#c0392b" text-anchor="end">PRIORITY 1 &mdash; 10-12 bits</text>
+
+      <!-- Location (no zone) -->
+      <text x="190" y="122" font-size="10" fill="#999">San Francisco, CA &middot; 500+ connections</text>
+
+      <!-- Summary zone - ORANGE (P2) -->
+      <rect x="70" y="135" width="660" height="75" rx="4" fill="#fdf6e3" stroke="#c8980a" stroke-width="2"/>
+      <text x="80" y="155" font-size="11" font-weight="700" fill="#c8980a">Summary / About</text>
+      <text x="720" y="155" font-size="10" font-weight="700" fill="#c8980a" text-anchor="end">PRIORITY 2 &mdash; 30-40 bits</text>
+      <line x1="90" y1="168" x2="710" y2="168" stroke="#e8d5a0" stroke-width="1"/>
+      <line x1="90" y1="182" x2="710" y2="182" stroke="#e8d5a0" stroke-width="1"/>
+      <line x1="90" y1="196" x2="550" y2="196" stroke="#e8d5a0" stroke-width="1"/>
+
+      <!-- Experience zone - YELLOW (P3) -->
+      <rect x="70" y="225" width="660" height="110" rx="4" fill="#fefce8" stroke="#a16207" stroke-width="1.5"/>
+      <text x="80" y="245" font-size="11" font-weight="700" fill="#a16207">Experience</text>
+      <text x="720" y="245" font-size="10" font-weight="700" fill="#a16207" text-anchor="end">PRIORITY 3 &mdash; 45-60 bits cumul.</text>
+      <rect x="90" y="258" width="620" height="28" rx="3" fill="#fefef0" stroke="#e5d5a0" stroke-width="1"/>
+      <text x="100" y="276" font-size="10" fill="#666">Position 1: Title &middot; Company &middot; Duration &middot; Description</text>
+      <rect x="90" y="292" width="620" height="28" rx="3" fill="#fefef0" stroke="#e5d5a0" stroke-width="1"/>
+      <text x="100" y="310" font-size="10" fill="#666">Position 2: Title &middot; Company &middot; Duration &middot; Description</text>
+
+      <!-- Skills zone - GREEN (bonus) -->
+      <rect x="70" y="350" width="660" height="35" rx="4" fill="#eaf5ee" stroke="#1a7a3a" stroke-width="1"/>
+      <text x="80" y="372" font-size="11" font-weight="700" fill="#1a7a3a">Skills</text>
+      <text x="720" y="372" font-size="10" font-weight="700" fill="#1a7a3a" text-anchor="end">BONUS &mdash; 5-10 bits</text>
+
+      <!-- Company name callout -->
+      <rect x="70" y="395" width="660" height="25" rx="4" fill="#f3f4f6" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4"/>
+      <text x="80" y="412" font-size="10" fill="#9ca3af">Company names: AVOID (shared across all employees &mdash; inconsistency is trivially detectable)</text>
+
+      <!-- Legend -->
+      <rect x="55" y="430" width="10" height="10" rx="2" fill="#fde8e8" stroke="#c0392b"/>
+      <text x="70" y="439" font-size="9" fill="#666">Always in SSR, high density</text>
+      <rect x="230" y="430" width="10" height="10" rx="2" fill="#fdf6e3" stroke="#c8980a"/>
+      <text x="245" y="439" font-size="9" fill="#666">High capacity, may be partial SSR</text>
+      <rect x="440" y="430" width="10" height="10" rx="2" fill="#eaf5ee" stroke="#1a7a3a"/>
+      <text x="455" y="439" font-size="9" fill="#666">Redundancy / bonus</text>
+      <rect x="590" y="430" width="10" height="10" rx="2" fill="#f3f4f6" stroke="#9ca3af" stroke-dasharray="3"/>
+      <text x="605" y="439" font-size="9" fill="#666">Avoid (cross-source risk)</text>
+    </svg>
+  </div>
+
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Zone</th><th>Priority</th><th>Bits</th><th>SSR?</th><th>Rationale</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Headline</strong></td><td class="cell-survive">1 (always)</td><td>10-12</td><td>Yes</td><td>Highest char density. Always in SSR, always scraped. Job titles heavy on a, e, o ("Engineer", "Manager", "Director").</td></tr>
+      <tr><td><strong>Summary</strong></td><td class="cell-survive">2 (always)</td><td>30-40</td><td>Yes</td><td>Largest single field. Free-form text = maximum eligible positions. ~15% of profiles leave it empty.</td></tr>
+      <tr><td><strong>Experience</strong></td><td style="background:#fdf6e3">3 (partial)</td><td>45-60</td><td>Partial</td><td>Cumulative across entries. First 2-3 entries in SSR; older ones lazy-loaded.</td></tr>
+      <tr><td><strong>Skills</strong></td><td style="background:#fdf6e3">4 (bonus)</td><td>5-10</td><td>Sometimes</td><td>Short strings, many instances. Good for redundancy &mdash; skills are rarely edited.</td></tr>
+      <tr><td><strong>Name</strong></td><td class="cell-stripped">Avoid</td><td>3-4</td><td>Yes</td><td>Cross-referenced against email headers, HR systems, government records. Cyrillic "а" in "Jane Martinez" fails exact-match comparison. International names already contain non-Latin script.</td></tr>
+      <tr><td><strong>Company</strong></td><td class="cell-stripped">Avoid</td><td>3-4</td><td>Yes</td><td>Shared across all employees. A watermarked company name is inconsistent across profiles &mdash; trivially detectable by comparing two scrapes.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Position Selection Algorithm</h4>
+  <p>Given a text field and session ID, four steps select which characters to substitute:</p>
+  <ol>
+    <li><strong>Scan eligible positions:</strong> Walk text left-to-right. Record each index where the character appears in the PAIRS table (a, e, o, p, c, x, A, E, O, T, H, B, M).</li>
+    <li><strong>Generate bit stream:</strong> <code>HMAC-SHA256(secret, session_id || field_name)</code> produces 256 pseudorandom bits. If the field has more than 256 eligible positions (rare), extend with <code>HMAC-SHA256(secret, session_id || field_name || "1")</code>.</li>
+    <li><strong>Apply decisions:</strong> For eligible position <em>i</em>, consume bit <em>i</em>. Bit = 1 &rarr; substitute Latin with Cyrillic. Bit = 0 &rarr; leave as Latin.</li>
+    <li><strong>Both states encode:</strong> Latin at an eligible position = 0. Cyrillic at an eligible position = 1. The decoder reads the full bit pattern from the sequence of eligible positions.</li>
+  </ol>
+  <div class="code-block"><span class="cm">// The critical design choice: field_name is part of the HMAC input.</span>
+<span class="cm">// Same session_id → DIFFERENT bit patterns per field.</span>
+<span class="cm">// Losing one field doesn't affect watermark recovery from others.</span>
+
+<span class="kw">byte</span>[] headlineBits = hmacBits(secret, sessionId + <span class="str">"|headline"</span>);
+<span class="cm">// → 12 independent substitution decisions for headline</span>
+
+<span class="kw">byte</span>[] summaryBits = hmacBits(secret, sessionId + <span class="str">"|summary"</span>);
+<span class="cm">// → 40 independent substitution decisions for summary</span>
+
+<span class="cm">// Scraper grabs only headline? Headline watermark is self-contained.</span>
+<span class="cm">// Scraper grabs everything? Each field adds independent bits.</span>
+<span class="cm">// Total recoverable bits = sum of bits from all extracted fields.</span></div>
+
+  <h4>Density and Contiguity</h4>
+  <p><strong>Do you need contiguous blocks?</strong> No. Scattered substitutions are strictly better:</p>
+  <ul>
+    <li><strong>Robustness:</strong> If a scraper drops one field, the watermark from remaining fields is independently recoverable. Contiguous blocks fail catastrophically when the block boundary falls in a dropped region.</li>
+    <li><strong>Stealth:</strong> A cluster of Cyrillic characters mid-word is easier to flag with script boundary analysis. Scattered single-character substitutions produce no detectable spatial pattern.</li>
+    <li><strong>Graceful degradation:</strong> The Hamming distance decoder (30% mismatch threshold) handles random bit loss uniformly. No region is critical.</li>
+  </ul>
+  <p><strong>Density:</strong> The HMAC stream is pseudorandom &rarr; ~50% of eligible positions get substituted. This maximizes information capacity (1 bit of entropy per eligible position). In a typical 60-character headline with 10-12 eligible positions, 5-6 characters become Cyrillic. That's ~8-10% of characters being non-Latin &mdash; well below visual detection, well above reliable extraction.</p>
 
   <h3>BPE Fragmentation Effect</h3>
   <p>Homoglyph substitution has a bonus side effect on LLM training pipelines: it fragments the model's vocabulary by forcing the tokenizer to create cross-script token variants.</p>
@@ -3463,7 +3580,61 @@ Knowledge graph builder (Google, Perplexity):
   </table>
   </div>
 
-  <h3>Monitoring Dashboard</h3>
+<h3>Decision Points</h3>
+  <p>Explicit go/no-go criteria at each phase boundary. No phase transition without data review.</p>
+
+  <h4>Phase 0 → Phase 1</h4>
+  <ul>
+    <li>SSR injection point map complete and reviewed by Eugene's SSR team.</li>
+    <li>Legal sign-off obtained for canary profile injection.</li>
+    <li>Performance baseline collected for target page types.</li>
+    <li><strong>If blocked:</strong> legal review is the most likely blocker. Escalate to LinkedIn's deputy general counsel for data protection. Provide the A/B test analogy: canaries are structurally identical to test variations LinkedIn already deploys.</li>
+  </ul>
+
+  <h4>Phase 1 → Phase 2</h4>
+  <ul>
+    <li>Baseline scraping rate measured. If beacon-absent session rate &gt; 1%, proceed (scraping is measurable). If &lt; 1%, reassess.</li>
+    <li>Tripwire endpoints operational with zero false positives over 7 days.</li>
+    <li>Dashboard operational and reviewed.</li>
+  </ul>
+
+  <h4>Phase 2 → Phase 3</h4>
+  <ul>
+    <li>Canary injection system operational for 7+ days with zero UX complaints.</li>
+    <li>LLM probing pipeline running daily with no operational issues.</li>
+    <li>Zero accessibility complaints related to canary elements.</li>
+    <li><strong>If canary hits are detected:</strong> document immediately — this is the primary research result. Proceed to Phase 3 regardless; watermark data adds attribution capability on top of detection.</li>
+  </ul>
+
+  <h4>Phase 3 → Phase 4</h4>
+  <ul>
+    <li>UX regression &lt; 0.1% across all monitored metrics (p &lt; 0.05). If any metric exceeds threshold, roll back the offending proposal (P1, P2, or P5) and proceed with remaining proposals.</li>
+    <li>Performance regression &lt; 0.5ms at p95. If exceeded, profile the VENOM pipeline to identify the bottleneck (likely regex replacement in P3).</li>
+    <li>At least 2 weeks of watermark data at 50% treatment.</li>
+  </ul>
+
+  <h4>Phase 4 → Production</h4>
+  <ul>
+    <li>Watermark recovery rate &gt; 30% from scraped data samples AND/OR canary detection in at least one LLM. Either result justifies production deployment.</li>
+    <li>UX regression confirmed &lt; 0.1% over the full 4-week A/B period.</li>
+    <li>Legal review of final report confirms no new liability concerns.</li>
+    <li>Go/no-go decision made jointly by Eugene's team + Nick.</li>
+  </ul>
+
+  <div class="tab-nav">
+    <button class="tab-nav-btn" onclick="switchTab(9)"><span class="arrow">←</span> Evidence</button>
+    <button class="tab-nav-btn" onclick="switchTab(11)">Detection <span class="arrow">→</span></button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DETECTION & MEASUREMENT -->
+<!-- ============================================================ -->
+<div class="panel" id="panel-detection">
+  <h2>Detection &amp; Measurement</h2>
+  <p>Injection is half the system. The other half: how do you find your markers once they are in the wild?</p>
+
+<h3>Monitoring Dashboard</h3>
   <p>Five metric groups, all feeding into a single Grafana dashboard (or LinkedIn's internal equivalent).</p>
 
   <h4>1. Hydration Beacon Rate</h4>
@@ -3490,7 +3661,7 @@ Knowledge graph builder (Google, Perplexity):
   <p>Chart: difference-in-differences plot with confidence intervals. Green zone: delta within +/- 0.1%. Red zone: delta exceeding threshold.</p>
 
   <h3>Detection &amp; Measurement Plan</h3>
-  <p>Injection is half the system. The other half is: how do you find your markers once they're in the wild? Each proposal has a different detection timeline, detection method, and scale requirement.</p>
+  <p>Each proposal has a different detection timeline, detection method, and scale requirement.</p>
 
   <h4>Detection Timeline by Channel</h4>
   <p>The gap between injection and detection depends on <em>how</em> the scraped data is used. Three channels, three timelines:</p>
@@ -3602,47 +3773,6 @@ Knowledge graph builder (Google, Perplexity):
     <strong>Ongoing:</strong> Monthly Common Crawl scans catch canaries that propagated to the open web.
   </div>
 
-  <h3>Decision Points</h3>
-  <p>Explicit go/no-go criteria at each phase boundary. No phase transition without data review.</p>
-
-  <h4>Phase 0 → Phase 1</h4>
-  <ul>
-    <li>SSR injection point map complete and reviewed by Eugene's SSR team.</li>
-    <li>Legal sign-off obtained for canary profile injection.</li>
-    <li>Performance baseline collected for target page types.</li>
-    <li><strong>If blocked:</strong> legal review is the most likely blocker. Escalate to LinkedIn's deputy general counsel for data protection. Provide the A/B test analogy: canaries are structurally identical to test variations LinkedIn already deploys.</li>
-  </ul>
-
-  <h4>Phase 1 → Phase 2</h4>
-  <ul>
-    <li>Baseline scraping rate measured. If beacon-absent session rate &gt; 1%, proceed (scraping is measurable). If &lt; 1%, reassess.</li>
-    <li>Tripwire endpoints operational with zero false positives over 7 days.</li>
-    <li>Dashboard operational and reviewed.</li>
-  </ul>
-
-  <h4>Phase 2 → Phase 3</h4>
-  <ul>
-    <li>Canary injection system operational for 7+ days with zero UX complaints.</li>
-    <li>LLM probing pipeline running daily with no operational issues.</li>
-    <li>Zero accessibility complaints related to canary elements.</li>
-    <li><strong>If canary hits are detected:</strong> document immediately — this is the primary research result. Proceed to Phase 3 regardless; watermark data adds attribution capability on top of detection.</li>
-  </ul>
-
-  <h4>Phase 3 → Phase 4</h4>
-  <ul>
-    <li>UX regression &lt; 0.1% across all monitored metrics (p &lt; 0.05). If any metric exceeds threshold, roll back the offending proposal (P1, P2, or P5) and proceed with remaining proposals.</li>
-    <li>Performance regression &lt; 0.5ms at p95. If exceeded, profile the VENOM pipeline to identify the bottleneck (likely regex replacement in P3).</li>
-    <li>At least 2 weeks of watermark data at 50% treatment.</li>
-  </ul>
-
-  <h4>Phase 4 → Production</h4>
-  <ul>
-    <li>Watermark recovery rate &gt; 30% from scraped data samples AND/OR canary detection in at least one LLM. Either result justifies production deployment.</li>
-    <li>UX regression confirmed &lt; 0.1% over the full 4-week A/B period.</li>
-    <li>Legal review of final report confirms no new liability concerns.</li>
-    <li>Go/no-go decision made jointly by Eugene's team + Nick.</li>
-  </ul>
-
   <h3>What Eugene's Team Needs to Build</h3>
   <p>Six deliverables. The first two are the core; the rest are configuration, client-side, and operational tooling.</p>
 
@@ -3694,8 +3824,8 @@ Knowledge graph builder (Google, Perplexity):
   </div>
   <p>LinkedIn's SSR response is 200-500ms (p50-p95). VENOM adds 0.1-0.25ms: 0.05% of p50. Below measurement noise.</p>
   <div class="tab-nav">
-    <button class="tab-nav-btn" onclick="switchTab(9)"><span class="arrow">←</span> Evidence</button>
-    <button class="tab-nav-btn" onclick="switchTab(11)">Glossary <span class="arrow">→</span></button>
+    <button class="tab-nav-btn" onclick="switchTab(10)"><span class="arrow">←</span> Integration Path</button>
+    <button class="tab-nav-btn" onclick="switchTab(12)">Glossary <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -3966,7 +4096,7 @@ Knowledge graph builder (Google, Perplexity):
   </div>
 
   <div class="tab-nav">
-    <button class="tab-nav-btn" onclick="switchTab(10)"><span class="arrow">&#8592;</span> Integration Path</button>
+    <button class="tab-nav-btn" onclick="switchTab(11)"><span class="arrow">&#8592;</span> Detection</button>
     <button class="tab-nav-btn" disabled></button>
   </div>
 </div>
@@ -3980,6 +4110,7 @@ Knowledge graph builder (Google, Perplexity):
     <div class="shortcut-row"><span>Next tab</span><span class="shortcut-key">&rarr; or swipe left</span></div>
     <div class="shortcut-row"><span>Previous tab</span><span class="shortcut-key">&larr; or swipe right</span></div>
     <div class="shortcut-row"><span>Go to tab N</span><span class="shortcut-key">1-9, 0</span></div>
+    <div class="shortcut-row"><span>Detection</span><span class="shortcut-key">D</span></div>
     <div class="shortcut-row"><span>Glossary</span><span class="shortcut-key">G</span></div>
     <div class="shortcut-row"><span>Toggle shortcuts</span><span class="shortcut-key">?</span></div>
     <div class="shortcut-row"><span>Close overlay</span><span class="shortcut-key">Esc</span></div>
@@ -4040,7 +4171,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // Tab navigation with touch gestures
-var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration','glossary'];
+var tabs = ['overview','scrapers','pipeline','p1','p2','p3','p4','p5','p6','evidence','integration','detection','glossary'];
 var currentTab = 0;
 var touchStartX = 0;
 var touchStartY = 0;
@@ -4108,6 +4239,7 @@ document.addEventListener('keydown', function(e) {
   else if (e.key === 'Escape') {
     document.getElementById('shortcutsOverlay').classList.remove('visible');
   }
+  else if (e.key === 'd' || e.key === 'D') { switchTab(tabs.indexOf('detection')); }
   else if (e.key === 'g' || e.key === 'G') { switchTab(tabs.indexOf('glossary')); }
   else if (e.key >= '1' && e.key <= '9') { switchTab(parseInt(e.key) - 1); }
   else if (e.key === '0') { switchTab(9); }
