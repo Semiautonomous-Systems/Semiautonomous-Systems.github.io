@@ -315,6 +315,7 @@ body {
 .cell-stripped { color: var(--red); font-weight: 700; }
 .cell-mapped { color: var(--gold); font-weight: 700; }
 .cell-unknown { color: var(--muted); }
+.cell-na { color: var(--muted); font-style: italic; opacity: 0.6; }
 
 /* Code blocks */
 .code-block {
@@ -766,16 +767,27 @@ body {
 
       <h4>Detection Signals</h4>
       <ul>
-        <li><strong>CDP side effects</strong>: Chrome DevTools Protocol leaves traces. <code>Error.stack</code> getter trap, <code>__playwright__binding__</code> globals. (Castle.io, 2024)</li>
+        <li><strong>CDP side effects</strong>: Chrome DevTools Protocol leaves traces. <code>Error.stack</code> getter trap, <code>__playwright__binding__</code> globals. (<a href="https://blog.castle.io/how-to-detect-headless-chrome-bots-instrumented-with-playwright/">Castle.io, 2024</a>)</li>
         <li><strong>navigator.webdriver</strong>: Set to <code>true</code> by automation frameworks. Most anti-detect tools patch this, but inconsistently.</li>
         <li><strong>TLS fingerprint (JA4)</strong>: Every HTTP client has a unique TLS handshake signature. Headless Chrome JA4 differs from real Chrome.</li>
         <li><strong>Request sequence homogeneity</strong>: Scrapers follow identical patterns. Real users are heterogeneous. LinkedIn already uses an LSTM model for this.</li>
         <li><strong>Missing assets</strong>: Real sessions load CSS/JS/images. Scrapers request HTML only.</li>
       </ul>
 
+      <h4>Anti-Detect Variants</h4>
+      <p>The arms race has produced tools specifically designed to defeat the detection signals above:</p>
+      <ul>
+        <li><strong><a href="https://github.com/nicegui-support/nodriver">nodriver</a></strong> — avoids CDP entirely, uses native OS-level browser control. No <code>webdriver</code> flag, no CDP artifacts. Currently the hardest headless tool to fingerprint.</li>
+        <li><strong><a href="https://github.com/ultrafunkula/undetected-chromedriver">undetected-chromedriver</a></strong> — patches Selenium's Chromedriver to remove automation signatures.</li>
+        <li><strong><a href="https://github.com/pydoll-ai/pydoll">Pydoll</a></strong> — CDP-free browser automation. New entrant (2025).</li>
+        <li><strong><a href="https://camoufox.com/">Camoufox</a></strong> — Firefox-based, exploits the fact that most anti-bot systems focus exclusively on Chromium. C++-level fingerprint injection.</li>
+      </ul>
+
+      <p>Source: <a href="https://blog.castle.io/from-puppeteer-stealth-to-nodriver-how-anti-detect-frameworks-evolved-to-evade-bot-detection/">Castle.io — From Puppeteer Stealth to Nodriver</a></p>
+
       <div class="callout callout-gold">
         <strong>Scale estimate</strong>
-        A leaked 4.3B-record database (likely Apollo.io, found by Bob Diachenko, Nov 2023) contained ~732M unique LinkedIn profiles. At LinkedIn's ~1B members, that's 73% coverage from a single third-party aggregation. The data market for LinkedIn profiles is massive and sustained.
+        A leaked 4.3B-record database (likely Apollo.io, found by Bob Diachenko, Nov 2025) contained ~732M unique LinkedIn profiles. At LinkedIn's ~1B members, that's 73% coverage from a single third-party aggregation. The data market for LinkedIn profiles is massive and sustained.
       </div>
     </div>
   </div>
@@ -884,6 +896,393 @@ body {
       <p><strong>Key finding</strong>: Cross-script homoglyphs (Cyrillic, Greek) survive the entire pipeline. They are printable, pass NFKC normalization, and get distinct tokens in BPE vocabularies. This is the basis for Proposal 1.</p>
     </div>
   </div>
+
+  <!-- Card 4: Text Extraction Tools -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Text Extraction Tools</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <p>The critical pipeline between raw HTML and clean text. This is where most VENOM techniques either survive or die. Every scraper eventually runs extracted content through one of these tools.</p>
+
+      <h4>Trafilatura</h4>
+      <p><a href="https://trafilatura.readthedocs.io/">Trafilatura</a> — the gold standard for web text extraction. F1=0.96 on <a href="https://trafilatura.readthedocs.io/en/latest/evaluation.html">benchmarks</a>. Written in Python. Widely used in academic research and training data pipelines including Common Crawl processing, <a href="https://huggingface.co/datasets/HuggingFaceFW/fineweb">FineWeb</a> (HuggingFace), and others.</p>
+
+      <p><strong>What it strips:</strong></p>
+      <ul>
+        <li>All Unicode category Cf characters via Python's <code>str.isprintable()</code> filter: ZWS (U+200B), ZWNJ (U+200C), ZWJ (U+200D), soft hyphens (U+00AD), word joiners (U+2060), BOM (U+FEFF), bidi overrides (U+202D/U+202E)</li>
+        <li><code>display:none</code> elements (partial — depends on inline style detection)</li>
+        <li><code>visibility:hidden</code> elements (partial)</li>
+        <li>Boilerplate: nav bars, footers, sidebars, ads</li>
+      </ul>
+
+      <p><strong>What survives:</strong></p>
+      <ul>
+        <li>Cross-script homoglyphs (Cyrillic a/e/o, Greek omicron) — these are printable characters in distinct Unicode blocks</li>
+        <li><code>font-size:0</code> text — Trafilatura has no CSS computation engine</li>
+        <li><code>overflow:hidden</code> + <code>clip:rect(0,0,0,0)</code> content</li>
+        <li>Absolute positioning off-screen (<code>position:absolute; left:-9999px</code>)</li>
+        <li><code>aria-hidden="true"</code> content (Trafilatura ignores ARIA attributes)</li>
+        <li>JSON-LD in <code>&lt;script type="application/ld+json"&gt;</code> (extracted separately by downstream tools)</li>
+      </ul>
+
+      <h4>Beautiful Soup (.get_text())</h4>
+      <p><a href="https://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a> — Python HTML parser. No CSS awareness whatsoever. <code>.get_text()</code> concatenates all text nodes in the DOM tree regardless of visibility.</p>
+
+      <p><strong>What survives:</strong> Literally everything in the DOM that isn't inside a removed node. <code>display:none</code>, <code>visibility:hidden</code>, <code>font-size:0</code>, zero-width characters, Innamark whitespace, homoglyphs — all preserved. The only way to lose content is to not have it in the HTML at all.</p>
+
+      <p><strong>Used by:</strong> Quick-and-dirty scrapers, tutorials, beginners, small-scale operations. Not used in serious training pipelines.</p>
+
+      <h4>newspaper3k / newspaper4k</h4>
+      <p><a href="https://newspaper.readthedocs.io/">newspaper3k</a> — article-focused extraction. Identifies the "main content" of a news article and strips boilerplate.</p>
+
+      <p><strong>What it strips:</strong> Navigation, sidebars, <code>display:none</code> elements (via limited CSS parsing). Does not strip <code>font-size:0</code>.</p>
+
+      <p><strong>What survives:</strong> Homoglyphs, font-size:0 injections, most CSS-hidden content within the article body.</p>
+
+      <p><strong>Used by:</strong> News aggregators, content monitoring services, media intelligence platforms.</p>
+
+      <h4>readability-lxml</h4>
+      <p><a href="https://github.com/buriy/python-readability">readability-lxml</a> — Python port of Mozilla's <a href="https://github.com/mozilla/readability">Readability</a> algorithm (the engine behind Firefox Reader View).</p>
+
+      <p><strong>What it does:</strong> Scores DOM nodes by text density and semantic signals. Strips low-scoring nodes (nav, footer, sidebar). Content-focused.</p>
+
+      <p><strong>What survives:</strong> Varies by page structure. Content embedded within the main article body generally survives regardless of CSS visibility. Homoglyphs always survive.</p>
+
+      <h4>html2text</h4>
+      <p><a href="https://github.com/Alir3z4/html2text">html2text</a> — converts HTML to Markdown. Preserves structure (headings, lists, links) while stripping tags.</p>
+
+      <p><strong>What survives:</strong> Most hidden content including <code>display:none</code> text (it processes the DOM tree, not the rendered page). All Unicode characters including zero-width and homoglyphs. Used by dataset builders who want structured plain text.</p>
+
+      <h4>jusText / boilerpipe</h4>
+      <p>Older boilerplate removal tools. <a href="https://github.com/miso-belica/jusText">jusText</a> (Python) classifies text blocks as content or boilerplate based on link density and text length. <a href="https://github.com/kohlschutter/boilerpipe">boilerpipe</a> (Java) uses shallow text features. Both are still present in legacy pipelines.</p>
+
+      <p><strong>What survives:</strong> Content within the main text body, including all Unicode characters. Boilerplate in headers/footers/sidebars is stripped.</p>
+
+      <h4>Raw Regex Stripping</h4>
+      <p><code>re.sub('&lt;[^&gt;]+&gt;', ' ', html)</code> — the most naive approach. Strips all HTML tags, keeps everything else.</p>
+
+      <p><strong>What survives:</strong> Everything in the HTML source: hidden elements, script content, CSS content, HTML comments, style blocks. The resulting text is noisy but complete. Still used in quick prototyping and some legacy pipelines.</p>
+
+      <h4>JSON-LD Extractors</h4>
+      <p>Tools that specifically parse <code>&lt;script type="application/ld+json"&gt;</code> blocks for structured data (schema.org entities).</p>
+
+      <p><strong>Used by:</strong> Knowledge graph builders (Google, Bing), search engines, <a href="https://www.perplexity.ai/">Perplexity</a>, LLM retrieval-augmented generation (RAG) pipelines. Google explicitly <a href="https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data">documents</a> JSON-LD as the preferred structured data format.</p>
+
+      <p><strong>VENOM relevance:</strong> JSON-LD canaries persist even when all visible HTML is stripped. A synthetic entity like <code>{"@type": "Person", "name": "Meridian Castleford", "jobTitle": "quantum terrace designer"}</code> in JSON-LD will be ingested by knowledge graph builders and surface in LLM outputs independently of any HTML text extraction.</p>
+
+      <h4>Survival Matrix</h4>
+      <p>Which VENOM techniques survive which extraction tools:</p>
+
+      <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Technique</th>
+            <th>Trafilatura</th>
+            <th>Beautiful Soup</th>
+            <th>newspaper3k</th>
+            <th>readability</th>
+            <th>html2text</th>
+            <th>Raw regex</th>
+            <th>JSON-LD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Homoglyphs</strong> (Cyrillic/Greek)</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+          </tr>
+          <tr>
+            <td><strong>Innamark</strong> whitespace</td>
+            <td class="cell-stripped">X (collapsed)</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-unknown">?</td>
+            <td class="cell-unknown">?</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-na">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>ZWS/ZWNJ/ZWJ</strong> steganography</td>
+            <td class="cell-stripped">X</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-stripped">X</td>
+            <td class="cell-unknown">?</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-na">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>font-size:0</strong> injections</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-na">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>display:none</strong> content</td>
+            <td class="cell-stripped">X (partial)</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-stripped">X</td>
+            <td class="cell-stripped">X</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-na">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>clip:rect</strong> hidden</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-na">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>JSON-LD canaries</strong></td>
+            <td class="cell-na">N/A</td>
+            <td class="cell-na">N/A</td>
+            <td class="cell-na">N/A</td>
+            <td class="cell-na">N/A</td>
+            <td class="cell-na">N/A</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+          </tr>
+          <tr>
+            <td><strong>SSR pre-hydration</strong> traps</td>
+            <td class="cell-survive">S (pre-JS)</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-na">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>Fullwidth Latin</strong></td>
+            <td class="cell-survive">S (but M by NFKC)</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S</td>
+            <td class="cell-survive">S (but M)</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout callout-green">
+        <strong>Key finding</strong>
+        Cyrillic and Greek homoglyphs survive every extractor and every downstream normalization step (NFKC does not normalize across Unicode scripts). They also get distinct BPE tokens in tiktoken and SentencePiece, meaning watermarked text produces measurably different token distributions in trained models.
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 5: Proxy Infrastructure & Economics -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Proxy Infrastructure & Economics</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <h4>Residential Proxies</h4>
+      <p>Residential proxies route traffic through real consumer IP addresses. They're the backbone of large-scale scraping operations because residential IPs are not on datacenter blacklists.</p>
+
+      <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr><th>Provider</th><th>IP Pool</th><th>Pricing</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="https://brightdata.com/">Bright Data</a></td>
+            <td>72M+</td>
+            <td>$10-15/GB</td>
+            <td>Market leader. Won dismissals vs Meta and X.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.oxylabs.io/">Oxylabs</a></td>
+            <td>100M+</td>
+            <td>$8-12/GB</td>
+            <td>Second largest. Strong EU coverage.</td>
+          </tr>
+          <tr>
+            <td><a href="https://smartproxy.com/">Smartproxy</a></td>
+            <td>55M+</td>
+            <td>$7-12/GB</td>
+            <td>Budget-friendly.</td>
+          </tr>
+          <tr>
+            <td><a href="https://soax.com/">SOAX</a></td>
+            <td>190M+</td>
+            <td>$6-10/GB</td>
+            <td>99.95% success rate claimed.</td>
+          </tr>
+          <tr>
+            <td><a href="https://netnut.io/">NetNut</a></td>
+            <td>52M+</td>
+            <td>$8-15/GB</td>
+            <td>ISP proxies (static residential).</td>
+          </tr>
+          <tr>
+            <td><a href="https://packetstream.io/">PacketStream</a></td>
+            <td>Varies</td>
+            <td>$1/GB</td>
+            <td>Cheapest. Users sell bandwidth via SDK.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p><strong>How they work.</strong> Users "donate" bandwidth via SDKs embedded in free VPN apps, browser extensions, and mobile apps. The user installs an app (often without understanding the proxy implications), and their connection becomes part of the proxy pool. This is why residential proxy pools are so large — they're parasitic on consumer internet connections.</p>
+
+      <div class="callout callout-gold">
+        <strong>Market size</strong>
+        Global proxy services market: $2.9B (2024), projected $4.5B+ by end of 2026. 85% of data professionals consider rotating proxies essential (Zyte 2025 report).
+      </div>
+
+      <p><strong>Regulatory pressure.</strong> The Dutch Data Protection Authority opened an investigation into "IP leasing without informed consent" in early 2026. If regulations tighten, peer-to-peer proxy prices could jump 30-50%.</p>
+
+      <h4>Datacenter Proxies</h4>
+      <p>Cheaper ($0.50-2/GB) but easily detected. AWS, GCP, Azure, DigitalOcean, Hetzner — their IP ranges are <a href="https://docs.aws.amazon.com/vpc/latest/userguide/aws-ip-ranges.html">publicly known</a> and routinely blocked. Useful for targets with weak bot detection. Useless against LinkedIn, Cloudflare-protected sites, or anything running Akamai/Datadome.</p>
+
+      <h4>Mobile Proxies</h4>
+      <p>Real 4G/5G connections from mobile carriers. $20-50/GB. Hardest to block because mobile IPs are shared across thousands of legitimate users via CGNAT. Blocking a mobile IP risks blocking real users. Small proxy pools (carrier IP ranges are limited), but extremely high success rates.</p>
+
+      <h4>CAPTCHA-Solving Services</h4>
+      <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr><th>Service</th><th>Price</th><th>Method</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="https://2captcha.com/">2Captcha</a></td>
+            <td>$1-3 / 1,000 CAPTCHAs</td>
+            <td>Human solvers + ML</td>
+          </tr>
+          <tr>
+            <td><a href="https://anti-captcha.com/">Anti-Captcha</a></td>
+            <td>$1-2 / 1,000</td>
+            <td>Human solvers + ML</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.capsolver.com/">CapSolver</a></td>
+            <td>$0.80-2 / 1,000</td>
+            <td>ML-primary</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.hcaptcha.com/">hCaptcha solver</a></td>
+            <td>Built into platforms</td>
+            <td>Integrated with Bright Data, etc.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>Human solvers in developing countries handle the CAPTCHAs that ML can't crack. Average solve time: 10-30 seconds for reCAPTCHA v2, 5-15 seconds for image CAPTCHAs. ML-based solvers handle the easier variants instantly. The combination means CAPTCHAs impose a cost (cents per solve) but not a barrier.</p>
+    </div>
+  </div>
+
+  <!-- Card 6: LinkedIn Scraping Ecosystem -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>LinkedIn Scraping Ecosystem</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <h4>Commercial Tools</h4>
+
+      <p><strong><a href="https://phantombuster.com/">PhantomBuster</a></strong> — $69-439/month. 100+ automation templates. Cloud-based (no local browser needed). Safe rate: ~80 profiles/day to avoid LinkedIn restrictions. Supports LinkedIn, Twitter/X, Instagram, Google Maps. 14-day free trial.</p>
+
+      <p><strong>Proxycurl</strong> — SHUT DOWN July 2025. LinkedIn filed federal lawsuit January 2025. Identified fake accounts sending billions of bot requests. Court entered permanent injunction. CEO: "could not weather prolonged pressure from multi-billion dollar corporation." Pricing before shutdown: ~$0.02/profile. <a href="https://www.socialmediatoday.com/news/linkedin-wins-legal-case-data-scrapers-proxycurl/756101/">Source</a>.</p>
+
+      <p><strong><a href="https://www.apollo.io/">Apollo.io</a></strong> — maintains a database of ~732M unique LinkedIn profiles (from a larger 4.3B-record dataset, <a href="https://securityaffairs.com/154753/data-breach/apollo-data-breach.html">found exposed</a> by researcher Bob Diachenko in November 2025 in an unsecured MongoDB instance). Apollo operates as a "data enrichment" platform, not a direct scraper — it aggregates from multiple sources.</p>
+
+      <p><strong><a href="https://www.dux-soup.com/">Dux-Soup</a></strong> — Chrome extension, 279K+ users since 2015. ~EUR12.99/month. Operates inside the user's real browser session. LinkedIn cannot distinguish Dux-Soup activity from normal browsing without content-level watermarking.</p>
+
+      <p><strong><a href="https://octopuscrm.io/">Octopus CRM</a></strong> — $9.99-39.99/month. Auto connection requests, profile visits, skill endorsements, messaging. Campaign management with drag-and-drop interface.</p>
+
+      <p><strong><a href="https://www.linkedhelper.com/">Linked Helper</a></strong> — ~$15/month. Standalone desktop app (not a browser extension). Direct CRM integrations (HubSpot, Pipedrive). Advanced workflow builder.</p>
+
+      <h4>Known Scraping Volumes</h4>
+      <ul>
+        <li><strong>784M-1.06B Google SERPs/week</strong>: SerpApi's volume, from Google's own complaint in <a href="https://storage.courtlistener.com/recap/gov.uscourts.cand.423632/gov.uscourts.cand.423632.1.0.pdf">Google v. SerpApi</a> (December 2024). Google described the <a href="https://www.seroundtable.com/google-scraping-lawsuit-serpapi-37961.html">cost of serving these requests</a> as a significant infrastructure burden.</li>
+        <li><strong>Apollo.io database</strong>: ~732M unique profiles from 4.3B total records</li>
+        <li><strong>iFixit</strong>: <a href="https://twitter.com/kwiens/status/1816147902843654164">1M hits</a> from AI crawlers reported by CEO Kyle Wiens on X (July 24, 2024). <a href="https://www.404media.co/ifixit-ceo-ai-bots-scraping/">Confirmed by 404 Media</a> with server logs.</li>
+        <li><strong>Cloudflare crawl ratios</strong> (Jan-Jul 2025, <a href="https://blog.cloudflare.com/crawlers-click-ai-bots-training/">Cloudflare blog</a>): Anthropic peaked at 500,000:1 crawl-to-click ratio. OpenAI peaked at 3,700:1.</li>
+      </ul>
+
+      <h4>LinkedIn's Current Defenses</h4>
+      <ul>
+        <li>Rate limiting on profile views (triggers after ~80-100 views/day for new accounts)</li>
+        <li>CAPTCHA challenges after suspicious navigation patterns</li>
+        <li>Account restrictions and temporary bans for automated behavior</li>
+        <li>Behavioral analysis via LSTM models (sequence-based anomaly detection)</li>
+        <li>Fake account detection and removal</li>
+        <li>Legal enforcement (Proxycurl injunction, hiQ settlement)</li>
+      </ul>
+
+      <h4>Key Legal Outcomes</h4>
+      <p><strong>hiQ v. LinkedIn</strong> (Ninth Circuit, 2022): CFAA "without authorization" does not apply to publicly accessible websites. But the final consent judgment awarded LinkedIn $500K for breach of contract (ToS violations), CFAA violations (password-protected pages accessed with fake accounts), California law violations, and common law torts. <a href="https://www.zwillgen.com/alternative-data/hiq-v-linkedin-wrapped-up-web-scraping-lessons-learned/">Source</a>.</p>
+
+      <p><strong>Proxycurl</strong> (January 2025): Federal lawsuit. Permanent injunction. All scraped data deleted. Proxycurl shut down July 2025. At least the second such lawsuit LinkedIn filed in 2025. <a href="https://news.linkedin.com/2025/linkedin-takes-legal-action-to-defend-member-privacy">Source</a>.</p>
+
+      <p><strong>Thomson Reuters v. Ross Intelligence</strong> (2023): Thomson Reuters won on summary judgment. Ross used copyrighted Westlaw headnotes to train its legal AI. Not still litigating — decided. <a href="https://law.justia.com/cases/federal/district-courts/delaware/dedce/1:2020cv00613/73610/509/">Source</a>.</p>
+
+      <p><strong>Bright Data v. Meta and X</strong>: Bright Data won dismissals, arguing its proxy infrastructure is a neutral tool, not itself a scraping operation.</p>
+
+      <p><strong>Reddit v. unnamed AI companies</strong> (2024-2025): Reddit invoked DMCA Section 1201, arguing that bypassing rate limits constitutes circumventing "technological measures." Novel legal theory, outcome pending.</p>
+
+      <p><strong>U.S. Copyright Office</strong> (May 2025): Stated that unauthorized AI training on copyrighted works constitutes prima facie infringement.</p>
+
+      <p><strong>Anthropic settlement</strong>: ~$1.5B authors' class action (~$3,000/book for ~500K works). Settlement reached, not yet final as of February 2026.</p>
+    </div>
+  </div>
+
+  <!-- Card 7: Themes & Lessons -->
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Themes & Lessons</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <h4>Lesson 1: The Arms Race Treadmill</h4>
+      <p>Every detection method has a counter. Rate limits are defeated by residential proxies. Fingerprinting is defeated by anti-detect browsers. CAPTCHAs are defeated by solving services. TLS fingerprinting is defeated by protocol-level patching (nodriver, Camoufox). The only durable approaches either change the content itself (watermarking) or operate at the data layer (canaries). Detection-based defenses require continuous investment; content-based defenses degrade gracefully.</p>
+
+      <h4>Lesson 2: The Extraction Bottleneck</h4>
+      <p>All scrapers eventually run text through an extraction pipeline. That pipeline is the choke point for VENOM. Understanding which CSS hiding methods survive which extractors is the key to effective canary injection. The survival matrix above is not theoretical — it's empirically testable and should be verified against every new extractor version. The specific insight: Trafilatura's <code>str.isprintable()</code> filter is the single most important gate in the training data pipeline.</p>
+
+      <h4>Lesson 3: The Economics Favor Scrapers</h4>
+      <p>Scraping costs are falling every year. Residential proxies: $10/GB. Anti-detect browsers: $30/month. CAPTCHA solving: $1 per thousand. Cloud compute: $0.01-0.05/hour on spot instances. A determined scraper can extract millions of profiles for under $10K. The 4.3B-record Apollo.io database demonstrates the achievable scale. Defenders need approaches whose costs don't scale linearly with attacker volume — watermarking meets this criterion (inject once, detect everywhere).</p>
+
+      <h4>Lesson 4: Browser Extensions Are the Hardest Target</h4>
+      <p>Extensions run inside the user's real browser. They inherit the user's cookies, TLS fingerprint, timing, and IP. Server-side detection is nearly impossible — the traffic is genuine user traffic with a parasitic observer. Content-based approaches (watermarking, canaries) are the only reliable defense. Dux-Soup's 279K users demonstrate the scale of this threat. LinkedIn and Castle are <a href="https://securityboulevard.com/2026/01/detecting-browser-extensions-for-bot-detection-lessons-from-linkedin-and-castle/">exploring extension detection</a> as a new fingerprinting surface, but this remains nascent.</p>
+
+      <h4>Lesson 5: JSON-LD Is an Underexploited Channel</h4>
+      <p>Knowledge graph builders, search engines, and RAG pipelines explicitly extract JSON-LD structured data. It survives even when all visible HTML is stripped. Canary entities in JSON-LD persist into knowledge graphs and LLM retrieval indices. A synthetic <code>Person</code> entity with an improbable name and job title has zero real-world collisions, is trivially searchable, and constitutes unambiguous evidence of data extraction. Most anti-scraping research ignores this channel entirely.</p>
+
+      <h4>Lesson 6: Training Pipelines Are Predictable</h4>
+      <p>The training data pipeline is not a black box. Most pipelines use Trafilatura or a close equivalent. The filtering, dedup, and tokenization stages are documented in published papers (C4, FineWeb, RefinedWeb, CCNet). The survival characteristics of every Unicode character through every stage are known and testable. Build watermarks that survive the known pipeline, verify empirically, deploy with confidence. The pipeline's predictability is the defender's advantage.</p>
+
+      <h4>Lesson 7: Detection Does Not Equal Prevention</h4>
+      <p>You can detect a scraper without blocking it. Detection + watermarking gives you evidence for legal action without triggering an arms race escalation. Block a scraper, and they adapt. Watermark their extraction, and they don't know it happened until the evidence surfaces in court. This is the "measurement, not blocking" thesis: shift from perimeter defense to forensic capability. The legal landscape (hiQ, Proxycurl, Thomson Reuters) demonstrates that evidence of extraction is worth more than successful blocking.</p>
+    </div>
+  </div>
+
 <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(0)"><span class="arrow">←</span> Overview</button>
     <button class="tab-nav-btn" onclick="switchTab(2)">Pipeline Survival <span class="arrow">→</span></button>
