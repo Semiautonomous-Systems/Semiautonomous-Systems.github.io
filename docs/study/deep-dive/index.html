@@ -964,6 +964,161 @@ body {
     <strong>Innamark's whitespace characters</strong>
     Trafilatura collapses these to regular spaces. But direct scrapers (Beautiful Soup, raw HTML parsing, browser extensions) preserve them. This makes Innamark effective against Type 1 and Type 2 scrapers, but not against training pipelines that use Trafilatura.
   </div>
+
+  <h3>Methodology</h3>
+  <p>Three tools were tested independently, then in sequence to simulate real pipeline behavior.</p>
+
+  <h4>1. Trafilatura Source Code Analysis</h4>
+  <p>Trafilatura is the dominant text extraction tool in academic and commercial training pipelines. FineWeb (HuggingFace, 15T tokens), RefinedWeb (TII/Falcon, 5T tokens), and numerous smaller datasets use it as their extraction layer.</p>
+  <p>Survival was determined by reading Trafilatura's source directly:</p>
+  <ul>
+    <li><strong>xpaths.py</strong> — defines XPath expressions that exclude elements with <code>display:none</code>, <code>aria-hidden="true"</code>, and specific boilerplate patterns. Matches the literal string <code>display:none</code> in inline styles via XPath <code>contains(@style, 'display:none')</code>. Does NOT match <code>visibility:hidden</code>, <code>opacity:0</code>, <code>font-size:0</code>, or other CSS hiding methods.</li>
+    <li><strong>utils.py</strong> — applies <code>str.isprintable()</code> as a character-level filter, plus regex-based whitespace normalization that collapses all Unicode whitespace to ASCII space (U+0020).</li>
+    <li><strong>htmlprocessing.py</strong> — handles tag removal, text extraction from the lxml tree, and inline element merging.</li>
+  </ul>
+
+  <h4>2. Python unicodedata Module</h4>
+  <p>The <code>unicodedata</code> module in Python 3.12 provides the canonical Unicode character database. Two functions matter:</p>
+  <ul>
+    <li><code>unicodedata.category(char)</code> — returns the two-letter General Category (e.g., <code>Cf</code> for format characters, <code>Ll</code> for lowercase letters, <code>Zs</code> for space separators).</li>
+    <li><code>unicodedata.normalize('NFKC', text)</code> — applies Normalization Form KC, which decomposes then recomposes with compatibility mappings. NFKC is the normalization form used by most BPE tokenizers.</li>
+  </ul>
+
+  <h4>3. BPE Tokenizer APIs</h4>
+  <p>Two tokenizers were tested:</p>
+  <ul>
+    <li><strong>tiktoken</strong> 0.12.0 (OpenAI) — tokenizer for GPT-4, GPT-4o, and o1/o3. Uses <code>cl100k_base</code> and <code>o200k_base</code> encodings.</li>
+    <li><strong>SentencePiece</strong> (Google) — tokenizer for LLaMA, Gemma, T5, and most Google/Meta models. Uses a unigram language model with optional BPE.</li>
+  </ul>
+
+  <h3>CSS Hiding Method Survival</h3>
+  <p>Which CSS hiding methods survive which text extraction tools. Organized from the pipeline perspective: for each hiding method, what is the survival profile across extraction tools, and why?</p>
+
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Hiding Method</th><th>Trafilatura</th><th>Readability.js</th><th>Resiliparse</th><th>BS4</th><th>CC WET</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>display:none</code></td><td class="cell-stripped">X (XPath)</td><td class="cell-stripped">X (computed)</td><td class="cell-stripped">X (regex)</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td><code>visibility:hidden</code></td><td class="cell-survive"><strong>S (gap!)</strong></td><td class="cell-stripped">X (computed)</td><td class="cell-stripped">X (regex)</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td><code>font-size:0</code></td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td><code>aria-hidden</code></td><td class="cell-stripped">X (XPath)</td><td class="cell-stripped">X</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td><code>opacity:0</code></td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+      <tr><td><code>clip:rect</code></td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td><td class="cell-survive">S</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>The visibility:hidden gap in Trafilatura</strong>
+    This is the single most actionable finding for pipeline fingerprinting. Content hidden with <code>visibility:hidden</code> survives into FineWeb/RefinedWeb but is stripped by Readability.js — this difference uniquely identifies the extraction tool. For universal canary survival, use <code>font-size:0</code> or <code>clip:rect</code>.
+  </div>
+
+  <h3>Full Pipeline Stages</h3>
+  <p>The LLM training pipeline has seven stages. Each stage applies specific transformations that either preserve or destroy VENOM signals.</p>
+
+  <div class="diagram">
+  <pre style="font-family: monospace; font-size: 0.85em; line-height: 1.6; background: white; padding: 12px; border-radius: 4px; overflow-x: auto;">
+Stage 1        Stage 2            Stage 3              Stage 4
+RAW HTML  -->  TEXT EXTRACTION  -->  LANGUAGE DETECTION  -->  QUALITY FILTERING
+               (Trafilatura/WET)     (fastText lid.176)       (KenLM perplexity)
+               GATE: Cf stripped     Pass: all VENOM          Pass: canaries
+               GATE: whitespace      chars are valid          (look like real text)
+               collapsed             in target lang           Fail: degenerate text
+               GATE: display:none
+               stripped
+
+Stage 5             Stage 6            Stage 7
+DEDUPLICATION  -->  TOKENIZATION  -->  TRAINING
+(MinHash/SimHash)   (BPE: tiktoken     (gradient descent)
+Pass: unique        or SentencePiece)
+watermarks          GATE: NFKC maps    Homoglyph tokens
+differ per session  fullwidth->ASCII   persist as shifted
+                    Pass: Cyrillic/    probability
+                    Greek homoglyphs   distributions in
+                    get DISTINCT       model weights
+                    tokens
+  </pre>
+  </div>
+
+  <h4>Stage 1: Raw HTML</h4>
+  <p>Source: web crawl (Common Crawl WARC files, custom Scrapy/Heritrix crawl, or direct HTTP request). All VENOM techniques are present in the raw HTML: homoglyphs in text nodes, zero-width characters in text nodes, canary profiles in hidden elements, JSON-LD in script blocks.</p>
+
+  <h4>Stage 2: Text Extraction</h4>
+  <p>The critical gate. Most VENOM techniques survive or die here.</p>
+  <ul>
+    <li><strong>Trafilatura</strong> (used by FineWeb, RefinedWeb): strips Cf characters via <code>str.isprintable()</code>, collapses whitespace via regex, removes <code>display:none</code> and <code>aria-hidden</code> elements via XPath. Passes homoglyphs, <code>font-size:0</code> content, <code>visibility:hidden</code> content.</li>
+    <li><strong>CC WET</strong> (used by C4, OSCAR, CCNet): Common Crawl's own text extraction has minimal CSS awareness. Strips <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> tags. Passes essentially all other content including <code>display:none</code> text, zero-width characters, and Innamark whitespace.</li>
+    <li><strong>BeautifulSoup</strong> (used by ad hoc scrapers): <code>.get_text()</code> concatenates all text nodes. Zero CSS awareness. Everything survives.</li>
+  </ul>
+
+  <h4>Stage 3: Language Detection</h4>
+  <p>Typically fastText lid.176 or lingua-py. These classifiers operate on character n-grams and word distributions. Cyrillic homoglyphs in otherwise-English text could theoretically trigger misclassification, but the substitution rate in Proposal 1 (~0.1 bits/char) is too low to shift the language distribution.</p>
+
+  <h4>Stage 4: Quality Filtering</h4>
+  <p>Heuristic rules (minimum length, maximum symbol ratio, repetition limits) plus perplexity scoring (KenLM or GPT-2 perplexity). Canary profiles survive because they are syntactically and semantically valid text.</p>
+
+  <h4>Stage 5: Deduplication</h4>
+  <p>Exact dedup (document-level hashing) and near-dedup (MinHash with Jaccard similarity, or SimHash). VENOM watermarks survive because each session's watermark pattern is unique.</p>
+
+  <h4>Stage 6: Tokenization</h4>
+  <p>BPE via tiktoken (OpenAI models) or SentencePiece (Google/Meta models). NFKC normalization is applied as a preprocessing step. This maps fullwidth Latin and math bold characters to ASCII (destroying those homoglyphs) but leaves Cyrillic and Greek homoglyphs untouched.</p>
+
+  <h4>Stage 7: Training</h4>
+  <p>Gradient descent on token sequences. The model learns probability distributions over tokens. If a meaningful fraction of training instances for a particular text contain Cyrillic homoglyphs, the model's learned distribution for that text will have elevated probabilities for Cyrillic tokens at the substituted positions.</p>
+
+  <div class="callout callout-green">
+    <strong>Key insight</strong>
+    Stage 2 (text extraction) is the only stage where VENOM techniques are stripped. Everything that passes Stage 2 survives to training. The entire defense strategy reduces to: use techniques that pass the extraction tool's filters.
+  </div>
+
+  <h3>Practical Implications by Pipeline Path</h3>
+  <p>Not all scrapers use the same pipeline. The survival profile of each VENOM technique depends on which extraction path the scraper takes.</p>
+
+  <h4>Path A: FineWeb / RefinedWeb (Trafilatura)</h4>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Technique</th><th>Survives?</th><th>Why</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Homoglyphs (Cyrillic/Greek)</td><td class="cell-survive"><strong>Yes</strong></td><td>Printable characters, no cross-script NFKC mapping</td></tr>
+      <tr><td>Innamark whitespace</td><td class="cell-stripped">No</td><td>Regex whitespace normalization collapses to U+0020</td></tr>
+      <tr><td>Zero-width (token inflation)</td><td class="cell-stripped">No</td><td><code>str.isprintable()</code> strips all Cf characters</td></tr>
+      <tr><td>Canary profiles (<code>font-size:0</code>)</td><td class="cell-survive"><strong>Yes</strong></td><td>Trafilatura has no font-size check</td></tr>
+      <tr><td>Canary profiles (<code>visibility:hidden</code>)</td><td class="cell-survive"><strong>Yes</strong></td><td>Trafilatura only checks <code>display:none</code></td></tr>
+      <tr><td>Canary profiles (<code>display:none</code>)</td><td class="cell-stripped">No</td><td>XPath exclusion matches inline <code>display:none</code></td></tr>
+      <tr><td>JSON-LD canaries</td><td class="cell-stripped">No</td><td><code>&lt;script&gt;</code> tags stripped</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>Path B: C4 / OSCAR (Common Crawl WET)</h4>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Technique</th><th>Survives?</th><th>Why</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Homoglyphs (Cyrillic/Greek)</td><td class="cell-survive"><strong>Yes</strong></td><td>Plain text characters</td></tr>
+      <tr><td>Innamark whitespace</td><td class="cell-survive"><strong>Yes</strong></td><td>No whitespace normalization in WET processing</td></tr>
+      <tr><td>Zero-width (token inflation)</td><td class="cell-survive"><strong>Yes</strong></td><td>No <code>isprintable()</code> filter</td></tr>
+      <tr><td>Canary profiles (any CSS hiding)</td><td class="cell-survive"><strong>Yes</strong></td><td>Zero CSS awareness</td></tr>
+      <tr><td>JSON-LD canaries</td><td class="cell-stripped">No</td><td><code>&lt;script&gt;</code> tags excluded</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>Effective proposals against this path:</strong> Everything except JSON-LD. This is the most permissive pipeline path — the defender's advantage.</p>
+
+  <h4>Path C: Direct Scraping (BeautifulSoup, browser extensions)</h4>
+  <p>No training pipeline. The scraper extracts text and uses it directly: imports into a CRM, feeds to a recruiter search tool, copies into a competitor's database. Text cleaning is minimal or absent.</p>
+  <p><strong>Effective proposals:</strong> Everything. This is where Innamark is most valuable — the watermark payload survives intact and can be recovered from scraped datasets for forensic attribution.</p>
+
+  <h4>Path D: RAG Pipeline</h4>
+  <p>Retrieval-Augmented Generation: scrape content, chunk it, embed it, retrieve relevant chunks at inference time. The content goes directly from extraction to a BPE tokenizer with minimal or no cleaning. Growing rapidly as LLM-powered tools (Perplexity, recruiter AI, research assistants) scrape web content in real time.</p>
+  <p><strong>Effective proposals:</strong> Token inflation (Proposal 5) is specifically designed for RAG. Zero-width characters consume context window budget, reducing the number of useful chunks that fit in the LLM's context. A 3x token inflation means the RAG system can fit one-third as many profile snippets, directly degrading output quality.</p>
+
 <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(1)"><span class="arrow">←</span> How Scrapers Work</button>
     <button class="tab-nav-btn" onclick="switchTab(3)">1. Homoglyphs <span class="arrow">→</span></button>
@@ -1083,6 +1238,134 @@ body {
       <div class="contribution">"Proving Membership in LLM Pretraining Data via Data Watermarks." Unicode lookalike substitution with provable false detection guarantees. ACL Findings 2024.</div>
     </div>
   </div>
+  <div class="researcher">
+    <div class="initials">JJ</div>
+    <div class="info">
+      <div class="name">Jinyuan Jia</div>
+      <div class="affiliation">Penn State, 2023-2024</div>
+      <div class="contribution">Broader work on data provenance and membership inference in LLMs. Co-authored multiple papers on detecting training data membership, which informs VENOM's detection methodology.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">YA</div>
+    <div class="info">
+      <div class="name">Yoo, Ahn, Jang, Kwak</div>
+      <div class="affiliation">KAIST, 2023</div>
+      <div class="contribution">Robust multi-bit watermarking via Unicode substitution with error-correcting codes. Extended homoglyph watermarking to handle partial text extraction. Their capacity analysis informed VENOM's birthday bound calculations.</div>
+    </div>
+  </div>
+
+  <h3>Full Confusable Character Table</h3>
+  <p>The core alphabet of visually identical cross-script pairs. Cyrillic and Greek provide the richest overlap with Latin.</p>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Latin</th><th>Cyrillic</th><th>Greek</th><th>Codepoints</th><th>Visual Difference</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>a</td><td>а</td><td>α</td><td>U+0061, U+0430, U+03B1</td><td>None (serif), minimal (sans-serif)</td></tr>
+      <tr><td>e</td><td>е</td><td>ε</td><td>U+0065, U+0435, U+03B5</td><td>None</td></tr>
+      <tr><td>o</td><td>о</td><td>ο</td><td>U+006F, U+043E, U+03BF</td><td>None</td></tr>
+      <tr><td>p</td><td>р</td><td>ρ</td><td>U+0070, U+0440, U+03C1</td><td>ρ has descender in some fonts</td></tr>
+      <tr><td>c</td><td>с</td><td>ς</td><td>U+0063, U+0441, U+03C2</td><td>ς slightly different shape</td></tr>
+      <tr><td>x</td><td>х</td><td>χ</td><td>U+0078, U+0445, U+03C7</td><td>None (serif), χ may differ</td></tr>
+      <tr><td>A</td><td>А</td><td>Α</td><td>U+0041, U+0410, U+0391</td><td>None</td></tr>
+      <tr><td>E</td><td>Е</td><td>Ε</td><td>U+0045, U+0415, U+0395</td><td>None</td></tr>
+      <tr><td>O</td><td>О</td><td>Ο</td><td>U+004F, U+041E, U+039F</td><td>None</td></tr>
+      <tr><td>T</td><td>Т</td><td>Τ</td><td>U+0054, U+0422, U+03A4</td><td>None</td></tr>
+      <tr><td>H</td><td>Н</td><td>Η</td><td>U+0048, U+041D, U+0397</td><td>None</td></tr>
+      <tr><td>B</td><td>В</td><td>Β</td><td>U+0042, U+0412, U+0392</td><td>None</td></tr>
+      <tr><td>M</td><td>М</td><td>Μ</td><td>U+004D, U+041C, U+039C</td><td>None</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Capacity Analysis</h3>
+  <p>Bits available per LinkedIn profile field, assuming the 13-pair table above:</p>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Field</th><th>Avg Length</th><th>Eligible Positions</th><th>Usable Bits</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Name</td><td>20 chars</td><td>~3-4</td><td>3-4</td><td>Risk: international names already use non-Latin script</td></tr>
+      <tr><td>Headline</td><td>60 chars</td><td>~10-12</td><td>10-12</td><td>Highest density (titles contain a, e, o frequently)</td></tr>
+      <tr><td>Company Name</td><td>20 chars</td><td>~3-4</td><td>3-4</td><td>Constrained by employer's actual name</td></tr>
+      <tr><td>Summary/About</td><td>200 chars</td><td>~30-40</td><td>30-40</td><td>Largest single field; most capacity</td></tr>
+      <tr><td>Experience (x3)</td><td>300 chars total</td><td>~45-60</td><td>45-60</td><td>Cumulative across multiple positions</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>Total per profile:</strong> ~46-60 bits minimum (headline + summary alone), up to 100+ bits with experience entries.</p>
+  <ul>
+    <li>2^46 = ~70 trillion unique sessions per profile configuration</li>
+    <li>2^60 = ~1.15 quintillion unique sessions</li>
+    <li><strong>Birthday bound for collision:</strong> 2^23 (~8.4 million) to 2^30 (~1 billion) sessions before 50% collision probability</li>
+  </ul>
+
+  <h3>BPE Fragmentation Effect</h3>
+  <p>Homoglyph substitution has a bonus side effect on LLM training pipelines: it fragments the model's vocabulary by forcing the tokenizer to create cross-script token variants.</p>
+  <div class="code-block">tiktoken (cl100k_base):
+<span class="str">"data"</span> → [<span class="num">1</span> token: <span class="str">"data"</span>]
+<span class="str">"dаta"</span> (Cyrillic а) → [<span class="num">3</span> tokens: <span class="str">"d"</span>, <span class="str">"а"</span>, <span class="str">"ta"</span>]
+
+<span class="str">"experience"</span> → [<span class="num">1</span> token: <span class="str">"experience"</span>]
+<span class="str">"εxpεriεncε"</span> (Greek ε) → [<span class="num">5</span> tokens: <span class="str">"ε"</span>, <span class="str">"xp"</span>, <span class="str">"ε"</span>, <span class="str">"ri"</span>, <span class="str">"ε"</span>, <span class="str">"nc"</span>, <span class="str">"ε"</span>]
+
+Impact: watermarked text uses ~<span class="num">1.3</span>-<span class="num">1.5</span>x more tokens</div>
+
+  <h3>Detection and Extraction</h3>
+  <p>The extraction side: scan watermarked text for non-Latin codepoints at known confusable positions, reconstruct the bit pattern, match against candidate session IDs.</p>
+  <div class="code-block"><span class="kw">static</span> <span class="kw">byte</span>[] <span class="fn">extractWatermark</span>(String text) {
+    BitSet bits = <span class="kw">new</span> BitSet();
+    <span class="kw">int</span> bitIdx = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="kw">char</span> c : text.toCharArray()) {
+        <span class="cm">// Check if character is a known confusable</span>
+        <span class="kw">for</span> (<span class="kw">char</span>[] pair : PAIRS) {
+            <span class="kw">if</span> (c == pair[<span class="num">0</span>]) { bits.clear(bitIdx); bitIdx++; <span class="kw">break</span>; }  <span class="cm">// Latin = 0</span>
+            <span class="kw">if</span> (c == pair[<span class="num">1</span>]) { bits.set(bitIdx); bitIdx++; <span class="kw">break</span>; }    <span class="cm">// Cyrillic = 1</span>
+        }
+    }
+    <span class="kw">return</span> bits.toByteArray();
+}
+
+<span class="kw">static</span> String <span class="fn">recoverSessionId</span>(<span class="kw">byte</span>[] extracted, <span class="kw">byte</span>[] secret, String[] candidateSessions) {
+    <span class="kw">for</span> (String sessionId : candidateSessions) {
+        <span class="kw">byte</span>[] expected = hmacBits(secret, sessionId);
+        <span class="kw">if</span> (hammingDistance(extracted, expected) &lt; THRESHOLD) <span class="kw">return</span> sessionId;
+    }
+    <span class="kw">return null</span>; <span class="cm">// No match</span>
+}</div>
+  <p>The Hamming distance threshold handles partial extraction: if a scraper grabs 80% of a profile's text, the extracted bit pattern will match the expected pattern at ~80% of positions. A threshold of <code>bitLength * 0.3</code> (30% mismatch tolerance) catches most partial matches while keeping false positive rate below 10^-6 for 64+ bit watermarks.</p>
+
+  <h3>Pipeline Survival Explanation</h3>
+  <p>This is the ONLY watermarking technique in all 6 proposals that survives every pipeline stage tested. Here is why, stage by stage:</p>
+  <ul>
+    <li><strong>Trafilatura:</strong> Python's <code>str.isprintable()</code> returns <code>True</code> for Cyrillic and Greek characters (they are Unicode category Ll/Lu — lowercase/uppercase letters). Trafilatura's text extraction preserves all printable characters.</li>
+    <li><strong>NFKC normalization:</strong> NFKC normalizes within-script variants (e.g., fullwidth Latin "Ａ" U+FF21 maps to ASCII "A" U+0041). But it does NOT normalize cross-script homoglyphs. Cyrillic "а" (U+0430) and Latin "a" (U+0061) are distinct characters in distinct scripts with distinct Unicode properties. NFKC preserves both.</li>
+    <li><strong>BPE tokenization:</strong> Byte-level tokenization (GPT-2, GPT-4, Claude) operates on raw byte sequences. Cyrillic "а" is 0xD0 0xB0 (UTF-8); Latin "a" is 0x61. Different bytes produce different tokens.</li>
+    <li><strong>SentencePiece:</strong> Same as BPE. Treats each codepoint as distinct input. Used by LLaMA, T5, PaLM.</li>
+    <li><strong>Common Crawl WET files:</strong> Zero Unicode processing. WET format is raw extracted text, passed through with no normalization, no script filtering, no confusable detection.</li>
+    <li><strong>FineWeb / RefinedWeb / C4:</strong> These dataset pipelines apply Trafilatura + NFKC + language detection + quality filters. Homoglyphs survive all four stages.</li>
+  </ul>
+
+  <h3>Countermeasures</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Attack</th><th>How It Works</th><th>Counter</th><th>Strategic Position</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>TR39 confusable detection</td><td>Unicode Consortium maintains a confusable characters list. Script boundary analysis flags text containing mixed Latin/Cyrillic.</td><td>No known training lab applies TR39 filtering to training data. The confusable list exists for phishing detection in URLs and email, not corpus cleaning.</td><td class="cell-survive">Advantage: defender</td></tr>
+      <tr><td>Latin-only normalization</td><td>Strip all non-ASCII characters, map everything to Latin equivalents.</td><td>Destroys legitimate international names: Müller, García, Ólafsson, 日本語. LinkedIn has members in 200+ countries. Stripping non-Latin text is a non-starter.</td><td class="cell-survive">Advantage: defender</td></tr>
+      <tr><td>Script-consistent enforcement</td><td>Require all text within a field to use a single Unicode script. Flag fields with mixed Latin/Cyrillic.</td><td>Same problem as Latin-only normalization. Many real profiles legitimately contain mixed-script text.</td><td class="cell-survive">Advantage: defender</td></tr>
+      <tr><td>Per-character script tagging</td><td>Tag each character with its Unicode script property, flag anomalous script transitions mid-word.</td><td>Technically feasible. Would catch "Sеnior" (Cyrillic е in Latin word). But requires word-level script analysis, and no existing NLP pipeline implements this at scale.</td><td class="cell-unknown">Neutral</td></tr>
+      <tr><td>Visual diff against known clean copy</td><td>Compare watermarked text against the original. Identical rendering but different codepoints = watermark.</td><td>Requires the adversary to have a clean copy for comparison. If they already have a clean copy, they do not need the watermarked one.</td><td class="cell-survive">Advantage: defender</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>Key insight:</strong> every countermeasure is more destructive to data quality than the watermark itself. The rational adversary leaves the watermark in place rather than destroy their training data to remove it.</p>
+
 <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(2)"><span class="arrow">←</span> Pipeline Survival</button>
     <button class="tab-nav-btn" onclick="switchTab(4)">2. Innamark <span class="arrow">→</span></button>
@@ -1155,6 +1438,121 @@ body {
     </div>
   </div>
 
+  <h3>Kotlin Implementation</h3>
+  <div class="code-block"><span class="cm">// Innamark-style watermarking — Kotlin/JVM</span>
+<span class="cm">// Maps 3-bit codes to Unicode whitespace codepoints</span>
+
+<span class="kw">object</span> <span class="fn">InnamarkWatermark</span> {
+    <span class="cm">// Codebook: 3-bit patterns → Unicode whitespace</span>
+    <span class="kw">private val</span> CODEBOOK = mapOf(
+        <span class="num">0b000</span> to <span class="str">'\u2004'</span>, <span class="cm">// Three-Per-Em Space</span>
+        <span class="num">0b001</span> to <span class="str">'\u2008'</span>, <span class="cm">// Punctuation Space</span>
+        <span class="num">0b010</span> to <span class="str">'\u2009'</span>, <span class="cm">// Thin Space</span>
+        <span class="num">0b011</span> to <span class="str">'\u202F'</span>, <span class="cm">// Narrow No-Break Space</span>
+        <span class="num">0b100</span> to <span class="str">'\u205F'</span>, <span class="cm">// Medium Mathematical Space</span>
+    )
+
+    <span class="cm">// Reverse lookup for extraction</span>
+    <span class="kw">private val</span> REVERSE = CODEBOOK.entries.associate { (k, v) -&gt; v to k }
+
+    <span class="kw">fun</span> <span class="fn">watermark</span>(text: String, sessionId: String, secret: ByteArray): String {
+        <span class="kw">val</span> bits = hmacBits(secret, sessionId)
+        <span class="kw">val</span> result = StringBuilder()
+        <span class="kw">var</span> bitIdx = <span class="num">0</span>
+
+        <span class="kw">for</span> (ch <span class="kw">in</span> text) {
+            <span class="kw">if</span> (ch == <span class="str">'\u0020'</span> && bitIdx + <span class="num">2</span> &lt; bits.size) {
+                <span class="cm">// Read 3 bits, map to whitespace codepoint</span>
+                <span class="kw">val</span> code = (bits[bitIdx] shl <span class="num">2</span>) or
+                           (bits[bitIdx + <span class="num">1</span>] shl <span class="num">1</span>) or
+                           bits[bitIdx + <span class="num">2</span>]
+                result.append(CODEBOOK[code] ?: ch)
+                bitIdx += <span class="num">3</span>
+            } <span class="kw">else</span> {
+                result.append(ch)
+            }
+        }
+        <span class="kw">return</span> result.toString()
+    }
+
+    <span class="kw">fun</span> <span class="fn">extract</span>(watermarkedText: String): List&lt;Int&gt; {
+        <span class="cm">// Scan for non-standard whitespace, reconstruct bit stream</span>
+        <span class="kw">val</span> bits = mutableListOf&lt;Int&gt;()
+        <span class="kw">for</span> (ch <span class="kw">in</span> watermarkedText) {
+            <span class="kw">val</span> code = REVERSE[ch]
+            <span class="kw">if</span> (code != <span class="kw">null</span>) {
+                bits.add((code shr <span class="num">2</span>) and <span class="num">1</span>)
+                bits.add((code shr <span class="num">1</span>) and <span class="num">1</span>)
+                bits.add(code and <span class="num">1</span>)
+            }
+        }
+        <span class="kw">return</span> bits
+    }
+}</div>
+
+  <h3>Encoding/Decoding Flow</h3>
+  <div class="diagram">
+  <pre style="font-family: monospace; font-size: 0.85em; line-height: 1.6; background: white; padding: 12px; border-radius: 4px;">
+Input text:    "Senior Engineer at Acme Corp"
+               ^      ^        ^  ^
+               sp1    sp2      sp3 sp4
+
+Session key:   HMAC-SHA256(server_secret, session_id) → 0x1A3B...
+
+Bit stream:    000     010      001    011
+Codepoints:    U+2004  U+2009   U+2008 U+202F
+
+Output text:   "Senior·Engineer‧at‌Acme Corp"
+                      ↑       ↑  ↑
+               Three-Per-Em  Thin Punctuation
+                  Space     Space   Space
+
+Extraction: scan each space position → map codepoint to bits
+            000 010 001 011 → 0x1A3B → session_id lookup
+  </pre>
+  </div>
+
+  <h3>Comparison: Innamark vs. StegCloak vs. Snow</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th></th><th>Innamark</th><th>StegCloak</th><th>Snow</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>Method</th><td>Whitespace substitution (replace U+0020)</td><td>Zero-width character insertion (U+200B, U+200C, U+200D, U+FEFF)</td><td>Trailing whitespace (tabs + spaces at line ends)</td></tr>
+      <tr><th>Language</th><td>Kotlin/JVM</td><td>JavaScript/npm</td><td>C (1998)</td></tr>
+      <tr><th>Capacity</th><td>0.04 bits/char</td><td>0.16 bits/char</td><td>Variable</td></tr>
+      <tr><th>LLM detection</th><td class="cell-survive">2/6 models detect</td><td class="cell-stripped">6/6 models detect</td><td class="cell-mapped">3/6 models detect</td></tr>
+      <tr><th>Trafilatura</th><td class="cell-stripped">Stripped (whitespace collapsed)</td><td class="cell-stripped">Stripped (zero-width removed)</td><td class="cell-stripped">Stripped (trailing whitespace trimmed)</td></tr>
+      <tr><th>NFKC normalization</th><td class="cell-survive">Survives</td><td class="cell-stripped">Stripped (joiners removed)</td><td>N/A</td></tr>
+      <tr><th>Copy-paste</th><td class="cell-survive">Survives</td><td class="cell-survive">Survives in most browsers</td><td class="cell-stripped">Stripped by editors</td></tr>
+      <tr><th>Visual tell</th><td class="cell-mapped">Thin Space slightly narrower in monospace</td><td class="cell-survive">None (zero-width by definition)</td><td class="cell-survive">None (trailing whitespace invisible)</td></tr>
+      <tr><th>Active development</th><td class="cell-survive">Yes (2025, Fraunhofer ISST)</td><td class="cell-stripped">Abandoned (last commit 2021)</td><td class="cell-stripped">Abandoned (last update 2001)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>When to Use Innamark vs. Homoglyphs</h3>
+  <p>These two proposals have complementary failure modes. Use both, not either/or.</p>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Scenario</th><th>Innamark (Proposal 2)</th><th>Homoglyphs (Proposal 1)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Scraper copies raw HTML/text</td><td class="cell-survive">Watermark intact</td><td class="cell-survive">Watermark intact</td></tr>
+      <tr><td>Scraper runs Trafilatura</td><td class="cell-stripped">Stripped (whitespace collapsed)</td><td class="cell-survive">Survives (character substitution preserved)</td></tr>
+      <tr><td>Scraper applies NFKC normalization</td><td class="cell-survive">Survives (Innamark chars are NFKC-stable)</td><td class="cell-survive">Survives (Cyrillic homoglyphs are distinct codepoints)</td></tr>
+      <tr><td>Scraper applies TR39 confusable detection</td><td class="cell-survive">Not affected (whitespace not flagged)</td><td class="cell-stripped">Stripped (Cyrillic/Latin pairs in confusable list)</td></tr>
+      <tr><td>Scraper normalizes to ASCII/Latin-only</td><td class="cell-survive">Not affected (whitespace stays as-is)</td><td class="cell-stripped">Stripped (Cyrillic replaced with Latin)</td></tr>
+      <tr><td>Text fed to BPE tokenizer</td><td class="cell-stripped">Likely stripped (whitespace often normalized pre-tokenization)</td><td class="cell-survive">Homoglyphs create distinct BPE tokens; survives and poisons</td></tr>
+      <tr><td>Text viewed in monospace font</td><td class="cell-mapped">Thin Space slightly narrower; minor visual tell</td><td class="cell-survive">Zero visual difference (homoglyphs are pixel-identical)</td></tr>
+      <tr><td>Implementation effort on JVM</td><td class="cell-survive">Kotlin-native; drop-in library</td><td class="cell-survive">Pure Java; zero dependencies</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>Decision rule:</strong> if you can only deploy one, deploy homoglyphs (Proposal 1) -- they survive training pipelines. If you can deploy both, Innamark catches the scraper <em>before</em> the pipeline stage, attributing the session that performed the initial extraction. Homoglyphs survive into the training data and can be detected in model outputs after the fact. Two layers, two detection points.</p>
+
   <h4>Key Researchers</h4>
   <div class="researcher">
     <div class="initials">MH</div>
@@ -1162,6 +1560,22 @@ body {
       <div class="name">Malte Hellmeier</div>
       <div class="affiliation">Fraunhofer ISST, 2025</div>
       <div class="contribution">Innamark: whitespace replacement watermarking. IEEE Access. Also authored the LLM detectability study (arXiv:2512.13325) testing 10 Unicode watermarking methods against 6 LLMs.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">RB</div>
+    <div class="info">
+      <div class="name">Rizzo, Bertini, Montesi</div>
+      <div class="affiliation">University of Bologna, 2016</div>
+      <div class="contribution">Content-preserving text watermarking via Unicode homoglyph substitution. ACM IDEAS 2016. Their work establishes the broader category that Innamark operates within.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">WJ</div>
+    <div class="info">
+      <div class="name">Johnny Wei, Robin Jia</div>
+      <div class="affiliation">USC, ACL Findings 2024</div>
+      <div class="contribution">"Proving Membership in LLM Pretraining Data via Data Watermarks." Demonstrated that Unicode lookalike substitutions can survive LLM training pipelines and be detected in model outputs with provable false-positive guarantees.</div>
     </div>
   </div>
 
@@ -1265,23 +1679,133 @@ body {
     </div>
   </div>
 
+  <h3>HMAC-to-Name Derivation</h3>
+  <p>The key property: each session gets a unique, pronounceable, non-colliding identity that cannot be predicted without the server secret.</p>
+  <div class="code-block"><span class="kw">import</span> javax.crypto.Mac;
+<span class="kw">import</span> javax.crypto.spec.SecretKeySpec;
+
+<span class="kw">class</span> <span class="fn">CanaryIdentityGenerator</span> {
+    <span class="cm">// Consonant-vowel syllable table (64 entries = 6 bits each)</span>
+    <span class="kw">static final</span> String[] SYLLABLES = {
+        <span class="str">"ba"</span>, <span class="str">"be"</span>, <span class="str">"bi"</span>, <span class="str">"bo"</span>, <span class="str">"bu"</span>, <span class="str">"ca"</span>,
+        <span class="cm">// ... (64 total)</span>
+    };
+
+    <span class="kw">static</span> CanaryIdentity <span class="fn">generate</span>(String sessionId, <span class="kw">byte</span>[] serverSecret) {
+        <span class="kw">byte</span>[] hmac = hmacSha256(serverSecret, sessionId.getBytes());
+        <span class="cm">// bytes 0-7: name, bytes 8-11: company, bytes 12-13: title</span>
+        String firstName = capitalize(SYLLABLES[hmac[<span class="num">0</span>] & <span class="num">0x3F</span>] + SYLLABLES[hmac[<span class="num">1</span>] & <span class="num">0x3F</span>]);
+        String lastName  = capitalize(SYLLABLES[hmac[<span class="num">2</span>] & <span class="num">0x3F</span>] + SYLLABLES[hmac[<span class="num">3</span>] & <span class="num">0x3F</span>]);
+        <span class="kw">return new</span> CanaryIdentity(firstName + <span class="str">" "</span> + lastName, jobTitle, companyName);
+    }
+}</div>
+
+  <h3>HTML Injection Demo</h3>
+  <div class="code-block"><span class="cm">&lt;!-- CSS-hidden canary in "People Also Viewed" --&gt;</span>
+<span class="kw">&lt;div</span> <span class="str">class</span>=<span class="str">"entity-result__item"</span> <span class="str">aria-hidden</span>=<span class="str">"true"</span>
+     <span class="str">style</span>=<span class="str">"font-size:0;max-height:0;overflow:hidden"</span><span class="kw">&gt;</span>
+  <span class="kw">&lt;span&gt;</span>Meridian Castleford<span class="kw">&lt;/span&gt;</span>
+  <span class="kw">&lt;span&gt;</span>Distributed Lattice Architect at Nexiform Analytics<span class="kw">&lt;/span&gt;</span>
+<span class="kw">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- JSON-LD structured data --&gt;</span>
+<span class="kw">&lt;script</span> <span class="str">type</span>=<span class="str">"application/ld+json"</span><span class="kw">&gt;</span>
+{
+  <span class="str">"@context"</span>: <span class="str">"https://schema.org"</span>,
+  <span class="str">"@type"</span>: <span class="str">"Person"</span>,
+  <span class="str">"name"</span>: <span class="str">"Meridian Castleford"</span>,
+  <span class="str">"jobTitle"</span>: <span class="str">"Distributed Lattice Architect"</span>,
+  <span class="str">"worksFor"</span>: { <span class="str">"@type"</span>: <span class="str">"Organization"</span>, <span class="str">"name"</span>: <span class="str">"Nexiform Analytics"</span> }
+}
+<span class="kw">&lt;/script&gt;</span>
+
+<span class="cm">&lt;!-- Noscript fallback --&gt;</span>
+<span class="kw">&lt;noscript&gt;</span>
+  <span class="kw">&lt;p&gt;</span>Meridian Castleford -- Distributed Lattice Architect<span class="kw">&lt;/p&gt;</span>
+<span class="kw">&lt;/noscript&gt;</span></div>
+
+  <h3>Detection System</h3>
+  <div class="diagram">
+  <pre style="font-family: monospace; font-size: 0.82em; line-height: 1.5; background: white; padding: 10px; border-radius: 4px;">
+1. LLM Probing (daily, ~10K queries)
+   Query ChatGPT/Claude/Gemini: "Who is {canary_name}?"
+   Response contains name + company? → HIT
+
+2. Corpus Search (weekly)
+   Grep Common Crawl / LAION / The Pile for canary names
+
+3. Data Broker Monitoring (daily)
+   Query Pipl/Spokeo/ZoomInfo APIs for canary names
+
+4. Attribution (on HIT)
+   HMAC reverse: canary name → session_id → IP → account
+  </pre>
+  </div>
+
+  <h3>Collision Analysis</h3>
+  <ul>
+    <li><strong>Birthday bound:</strong> 2^32 (~4.3B) canaries before 50% collision probability</li>
+    <li><strong>LinkedIn scale:</strong> millions of sessions, not billions. P(collision) &lt; 10^-9</li>
+    <li><strong>Safeguard:</strong> check generated names against member index before deploy</li>
+    <li><strong>HMAC prevents prediction:</strong> adversary cannot compute which session produced a canary name without the server secret</li>
+  </ul>
+
+  <h3>Evidence Chain for Legal</h3>
+  <ol>
+    <li><strong>Cryptographic session binding:</strong> HMAC ties canary name to specific session ID</li>
+    <li><strong>Session log correlation:</strong> session ID → IP, user-agent, account, timestamp, TLS fingerprint</li>
+    <li><strong>CSS hiding proves non-user content:</strong> font-size:0 proves it was never visible to users</li>
+    <li><strong>JSON-LD proves LinkedIn origin:</strong> schema.org markup with LinkedIn structure</li>
+    <li><strong>Temporal evidence:</strong> injection timestamp → detection timestamp = scraping window</li>
+    <li><strong>Legal precedent:</strong> hiQ Labs v. LinkedIn (9th Cir. 2022) — canary profiles are forensic markers, not access restrictions</li>
+  </ol>
+
+  <h3>Real-World Precedent</h3>
+  <p><strong>Reddit v. Perplexity:</strong> Reddit created honeypot pages with unique content and detected Perplexity reproducing it verbatim. Conceptually identical to canary profiles.</p>
+  <p><strong>Thinkst Canary:</strong> Haroon Meer's company deployed canary tokens at scale since 2015. Grafana breach detected via canary tripwires. Same principle applied to web content.</p>
+  <p><strong>Cloudflare AI Labyrinth (Mar 2025):</strong> Server-side generation of synthetic honeypot content. Same architectural pattern as VENOM canaries.</p>
+
   <h4>Key Researchers</h4>
   <div class="researcher">
-    <div class="initials">IC</div>
+    <div class="initials">NC</div>
     <div class="info">
-      <div class="name">Ilia Shumailov, Yiren Zhao (Google DeepMind)</div>
-      <div class="affiliation">2024</div>
-      <div class="contribution">"Model Collapse" research. Canary tokens in training data cause model degradation. Shows LLMs trained on poisoned data hallucinate canary entities.</div>
+      <div class="name">Nicholas Carlini, Daphne Ippolito</div>
+      <div class="affiliation">Google DeepMind, 2023</div>
+      <div class="contribution">"Extracting Training Data from Large Language Models." USENIX Security 2021. Showed that LLMs memorize and regurgitate training data, especially unique sequences. Canary profiles exploit this.</div>
     </div>
   </div>
-</div>
+  <div class="researcher">
+    <div class="initials">HM</div>
+    <div class="info">
+      <div class="name">Haroon Meer</div>
+      <div class="affiliation">Thinkst Applied Research</div>
+      <div class="contribution">Created Canary Tokens (2015), the most widely deployed tripwire detection system. The canary profile concept adapts Meer's "detect, don't prevent" philosophy to content extraction.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">IS</div>
+    <div class="info">
+      <div class="name">Ilia Shumailov, Yiren Zhao</div>
+      <div class="affiliation">Google DeepMind / ICL, 2024</div>
+      <div class="contribution">"Model Collapse" research. Shows LLMs trained on synthetic/poisoned data degrade predictably. Canary tokens cause models to hallucinate canary entities as real.</div>
+    </div>
+  </div>
+  <div class="researcher">
+    <div class="initials">BZ</div>
+    <div class="info">
+      <div class="name">Ben Zhao, Shawn Shan</div>
+      <div class="affiliation">University of Chicago, 2024</div>
+      <div class="contribution">Nightshade and Glaze: targeted data poisoning for images. The adversarial model is the same: inject traceable synthetic content that survives training and detectably alters model behavior.</div>
+    </div>
+  </div>
 
-<!-- Placeholder panels for proposals 4-6 and remaining section
   <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(4)"><span class="arrow">←</span> 2. Innamark</button>
     <button class="tab-nav-btn" onclick="switchTab(6)">4. SSR Traps <span class="arrow">→</span></button>
   </div>
-s -->
+</div>
+
+<!-- Placeholder panels for proposals 4-6 and remaining sections -->
 <div class="panel" id="panel-p4">
   <div class="proposal-header">
     <div class="proposal-icon" style="background:var(--gold-light);color:var(--gold);">⚡</div>
@@ -2077,7 +2601,10 @@ Knowledge graph builder (Google, Perplexity):
       <p>Reddit created a test post crawlable <strong>only by Google's crawler</strong> &mdash; not accessible anywhere else on the internet. Within hours, Perplexity surfaced that content in its answer engine.</p>
       <p><strong>Scale documented in complaint:</strong> SerpApi hit 1.06B Google SERPs containing Reddit data in a single week. After Reddit's May 2024 cease-and-desist, Perplexity's citations to Reddit increased ~40x.</p>
       <p><strong>Legal:</strong> Reddit, Inc. v. SerpApi, Inc. et al., filed Oct 22, 2025, SDNY. DMCA 1201 anti-circumvention + unjust enrichment.</p>
-      <p class="detail"><strong>VENOM relevance:</strong> Closest existing precedent to our canary profile proposal. Reddit's trap proved scraping via SERP cache; VENOM's canaries would prove scraping via direct profile access.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposal 3 — Canary Profiles)</strong>
+        This is the closest existing precedent to VENOM's canary profile injection. Reddit's trap proved scraping via SERP cache; VENOM's canaries would prove scraping via direct profile access. The key difference: Reddit's honeypot identifies the scraping pathway (through Google), while VENOM canaries would identify the scraping session (HMAC-derived attribution back to a specific account and IP). Reddit had to file a lawsuit based on the pathway evidence. VENOM's session-level attribution would produce stronger evidence — tying extraction to a specific authenticated session rather than an intermediary cache.
+      </div>
     </div>
   </div>
 
@@ -2092,6 +2619,10 @@ Knowledge graph builder (Google, Perplexity):
       </div>
       <p>Wired traced scraping to a specific undisclosed IP (44.221.181.252, AWS EC2) that hit Conde Nast properties 822 times in 3 months with a spoofed Chrome user-agent. Perplexity's CEO admitted the IP was managed by a third-party company under NDA.</p>
       <p>Cloudflare documented the same stealth crawling across tens of thousands of domains, leading to Perplexity's delisting as a verified bot (Aug 2025).</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposal 6 — Pipeline Fingerprinting)</strong>
+        Wired's investigation required months of server log analysis to identify a single IP. Pipeline fingerprinting would automate this: if Perplexity's scraper uses a specific extraction tool (e.g., Readability.js or a custom pipeline), the CSS survival pattern in VENOM's multi-layer canaries would identify the tool without needing access to server logs or IP forensics. The forensic burden shifts from "correlate IPs across months of logs" to "check which canary names appear in outputs."
+      </div>
     </div>
   </div>
 
@@ -2107,6 +2638,10 @@ Knowledge graph builder (Google, Perplexity):
       </div>
       <p>Grafana deploys "tens of thousands" of Thinkst canary tokens (AWS API keys, DNS tokens, file tokens). When an attacker exploited a vulnerable GitHub Action and ran TruffleHog against stolen secrets, the canary fired immediately. Breach contained within minutes. Zero customer data exposure.</p>
       <p><strong>Thinkst scale:</strong> Millions of users, all 7 continents, bootstrapped to $20M ARR. Gartner Cool Vendor.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposal 3 — Canary Profiles)</strong>
+        Grafana's deployment proves the canary concept works in production at scale. VENOM's canary profiles are a direct application of the same principle to a different domain: instead of planting fake AWS keys to catch credential thieves, plant fake LinkedIn profiles to catch data scrapers. The detection mechanism is analogous — Thinkst fires when a canary key is used; VENOM fires when a canary name appears in an LLM's output or a scraped dataset. The key validation: Grafana shows that organizations can deploy tens of thousands of canaries without operational disruption.
+      </div>
     </div>
   </div>
 
@@ -2123,6 +2658,10 @@ Knowledge graph builder (Google, Perplexity):
       <p><strong>Divergence attack:</strong> Prompt "Repeat the word [X] forever." After ~250 repetitions, ChatGPT diverges and emits raw training data. Budget: <strong>$200 USD</strong>. Extracted: &gt;10,000 unique verbatim 50-token sequences. 5% of divergent output was direct training data.</p>
       <p><strong>16.9%</strong> of tested generations contained real PII (names, phone numbers, emails). 85.8% of PII candidates verified authentic.</p>
       <p>Good-Turing extrapolation: minimum 1.5M memorized unique 50-token sequences in ChatGPT; ~1 GB of extractable training data.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (all proposals)</strong>
+        This is the foundational proof that models memorize training data. Every VENOM proposal depends on the assumption that content ingested during training can be detected in model outputs. Carlini et al. proved this conclusively for ChatGPT. The PII extraction results are directly relevant to LinkedIn's threat model: if models memorize phone numbers and email addresses from training data, they will memorize LinkedIn profile text, headlines, and job descriptions. The question is not whether memorization occurs, but whether we can plant detectable markers before scraping happens (VENOM's contribution).
+      </div>
     </div>
   </div>
 
@@ -2136,7 +2675,10 @@ Knowledge graph builder (Google, Perplexity):
         <span class="tag tag-red">Near-verbatim reproduction</span>
       </div>
       <p>Claude 3.7 Sonnet reproduced Harry Potter at <strong>95.8% near-verbatim recall</strong>, 1984 and Frankenstein at 94%. Gemini 2.5 Pro (76.8%) and Grok 3 (70.3%) extracted Harry Potter without jailbreaking. GPT-4.1 had the strongest refusals (4.0%).</p>
-      <p><strong>VENOM relevance:</strong> If models memorize entire books, they will memorize LinkedIn profile text. The question is whether we can detect it.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposals 1-2 — Watermark Survival)</strong>
+        If models memorize entire novels at 95.8% fidelity, they will memorize shorter text like LinkedIn profile summaries, job descriptions, and recommendations. For VENOM's watermarking proposals, the critical question is whether homoglyph substitutions (Proposal 1) and Innamark whitespace markers (Proposal 2) survive the training pipeline and appear in the model's memorized reproduction. Ahmed et al.'s results suggest high-fidelity memorization preserves character-level detail — which is exactly what homoglyph watermarks need to survive.
+      </div>
     </div>
   </div>
 
@@ -2152,6 +2694,10 @@ Knowledge graph builder (Google, Perplexity):
       </div>
       <p>10 Unicode watermarking methods tested against 6 LLMs. <strong>Innamark was the most imperceptible</strong> &mdash; only GPT-5 and Gemini 2.5 Pro detected it. Claude Sonnet 4 missed it entirely. No LLM could extract the hidden payload without the source code.</p>
       <p>StegCloak (zero-width chars) was detected by all 6 LLMs. Homoglyph methods were detected by advanced models but not by Llama or GPT-4o.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposal 2 — Innamark Whitespace)</strong>
+        This study directly validates Proposal 2's choice of Innamark over zero-width character methods. StegCloak's detection by all 6 LLMs means any watermarking approach using zero-width characters is trivially detectable and strippable. Innamark's inline annotation approach evades 4 of 6 LLMs. The caveat: "imperceptible to LLMs" does not mean "survives text extraction pipelines." Trafilatura's str.isprintable() filter strips Innamark's Unicode spaces regardless of LLM detection. Proposal 2 works against direct scraping and RAG pipelines, but not against Trafilatura-based training data curation (that's why Proposal 1's homoglyphs are the primary watermark).
+      </div>
     </div>
   </div>
 
@@ -2167,6 +2713,10 @@ Knowledge graph builder (Google, Perplexity):
       </div>
       <p>Sander et al. (Meta/FAIR): if a model trains on watermarked LLM output, the watermark signal persists detectably in the model's weights. Detected with <strong>p &lt; 10<sup>-5</sup></strong> even when only 5% of training text is watermarked.</p>
       <p>Sablayrolles et al. (ICML 2020): radioactive data detected with p &lt; 10<sup>-4</sup> at only 1% contamination in ImageNet. Works across architectures.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposals 1-2 — Watermark Survival Through Training)</strong>
+        These two papers together prove the most important assumption underlying VENOM's watermarking proposals: watermarks can survive the training process. Sablayrolles proved it for images; Sander et al. proved it for text. The implication for VENOM: if LinkedIn watermarks profile text with homoglyphs (Proposal 1) or Innamark (Proposal 2), and that text enters an LLM's training corpus, the watermark signal should be statistically detectable in the model's outputs — even if the watermarked text constitutes a small fraction of the total training data. The p &lt; 10<sup>-5</sup> detection threshold at 5% contamination is encouraging. LinkedIn profiles are a substantial fraction of professional-domain training data, likely exceeding 5% for queries about people, companies, and jobs.
+      </div>
     </div>
   </div>
 
@@ -2181,32 +2731,103 @@ Knowledge graph builder (Google, Perplexity):
       </div>
       <p>AI-generated pages with hidden links invisible to humans but followable by bots. Any visitor going 4+ links deep is fingerprinted. AI crawlers generate &gt;50B requests/day to Cloudflare's network. Available on all plans including Free.</p>
       <p><strong>Limitation:</strong> Addresses operational cost (bot detection) not IP extraction. No published detection rates or false-positive metrics.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (Proposal 4 — SSR Hydration Traps)</strong>
+        AI Labyrinth validates the core concept behind SSR traps: content visible in server-rendered HTML but not in the rendered page can catch automated scrapers. VENOM's Proposal 4 applies the same principle at the content level rather than the navigation level. Where Labyrinth creates fake navigation paths (links that bots follow but humans don't see), SSR traps create fake content (profile data present in the SSR HTML but removed by client-side JavaScript hydration). Both exploit the gap between what the server sends and what the browser renders. Cloudflare's production deployment at scale proves the approach is operationally viable.
+      </div>
     </div>
   </div>
 
-  <h3>Key Datasets &amp; Numbers</h3>
-  <div class="score-grid">
-    <div class="score-card gold">
-      <h3>Apollo.io Leak</h3>
-      <div class="value">4.3B records</div>
-      <div class="detail">~732M unique profiles. Third-party lead-gen MongoDB, not a LinkedIn breach. Found by Diachenko, Nov 2025.</div>
+  <h3>New Cases: Third-Party Leaks and Crawl Aggression</h3>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Apollo.io 4.3B Database Exposure (Nov 2025)</h3>
+      <span class="card-toggle">&#9654;</span>
     </div>
-    <div class="score-card">
-      <h3>Anthropic Crawl Ratio</h3>
-      <div class="value">500,000:1</div>
-      <div class="detail">Peak crawl-to-referral ratio. Cloudflare blog, Jan-Jul 2025. OpenAI peaked at 3,700:1.</div>
-    </div>
-    <div class="score-card red">
-      <h3>iFixit Single-Day</h3>
-      <div class="value">1M hits</div>
-      <div class="detail">Anthropic's crawler in one day. CEO Kyle Wiens on X, Jul 24, 2024. 404 Media confirmed.</div>
-    </div>
-    <div class="score-card purple">
-      <h3>robots.txt Compliance</h3>
-      <div class="value">30.7%</div>
-      <div class="detail">Comply with disallow-all (IMC study). 72% figure is from a smaller 47-site vendor study.</div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-red">Third-party leak</span>
+        <span class="tag tag-gold">Threat model validation</span>
+      </div>
+      <p>Security researcher Bob Diachenko discovered a MongoDB instance exposed to the internet without authentication, containing <strong>4.3 billion records</strong> from Apollo.io, a third-party lead-generation and sales intelligence platform. The database contained approximately <strong>732 million unique professional profiles</strong> including names, email addresses, phone numbers, job titles, employers, and LinkedIn profile URLs.</p>
+      <p><strong>Discovery and coverage:</strong> Diachenko reported the exposure in November 2025. The finding was covered by Cybernews, HackRead, and Security Affairs. The database was a MongoDB instance with no authentication configured — a routine misconfiguration that automated scanners (Shodan, Censys) can discover in minutes.</p>
+      <p><strong>Key distinction:</strong> This was NOT a LinkedIn breach. Apollo.io aggregates professional data from multiple sources — public profiles, email enrichment services, user-contributed contacts, and data partnerships. The 4.3B record count includes duplicates and multi-source entries for the same individuals; the deduplicated count is ~732M unique profiles.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (threat model)</strong>
+        This case validates a critical assumption in VENOM's threat model: direct scraping of LinkedIn is not the only data leak vector. Even if LinkedIn deploys perfect anti-scraping defenses, third-party aggregators already hold billions of records derived from LinkedIn data. VENOM's watermarking proposals (1-2) address this: if the watermark is embedded in the profile text at render time, it propagates to any downstream copy — including third-party aggregator databases. When a watermarked profile appears in Apollo.io's database, the watermark traces it back to the specific LinkedIn session where it was scraped. This turns third-party leaks from an unattributable problem into an auditable one.
+      </div>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>iFixit / Anthropic: 1M Hits in One Day (Jul 2024)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-red">Crawler aggression</span>
+        <span class="tag tag-blue">Public documentation</span>
+      </div>
+      <p>Kyle Wiens, CEO of iFixit, posted on X on July 24, 2024 that Anthropic's web crawler hit iFixit's servers approximately <strong>1 million times in a single day</strong>. 404 Media confirmed the claim with iFixit's server logs and reported on the broader pattern of AI companies sending aggressive crawlers without meaningful rate limiting.</p>
+      <p><strong>Context:</strong> iFixit is a repair wiki with ~100,000 device repair guides — high-quality, human-written technical content that is extremely valuable as LLM training data. The 1M daily hit volume represents a crawl ratio orders of magnitude beyond what any referral traffic would justify. For comparison, Cloudflare's crawl ratio analysis (Jan-Jul 2025) found Anthropic's crawl-to-referral ratio peaked at <strong>500,000:1</strong> across Cloudflare's network — 500,000 pages crawled for every 1 page of referral traffic sent back to publishers.</p>
+      <p><strong>Industry pattern:</strong> iFixit is not an outlier. Similar complaints have come from Freelancer.com (CEO Matt Barrie alleged 3.5M pages scraped by Anthropic, reported by the Financial Times in July 2024) and numerous smaller publishers who lack the traffic volume to even notice the impact.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (crawl ratio data, all proposals)</strong>
+        The 1M-hits-per-day figure and the 500,000:1 crawl ratio demonstrate the scale of the extraction problem. At these volumes, even a low watermark injection rate (e.g., 1% of page renders) would produce tens of thousands of watermarked pages in Anthropic's training corpus from a single publisher. This works in VENOM's favor: higher scraping volume means more watermarked samples enter training data, which increases the statistical power of radioactive watermark detection (per Case 7, Sander et al. achieved p &lt; 10<sup>-5</sup> at 5% contamination).
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <h3>Google v. SerpApi: The Cost of Defense (Dec 2024)</h3>
+      <span class="card-toggle">&#9654;</span>
+    </div>
+    <div class="card-body">
+      <div class="tags">
+        <span class="tag tag-blue">Litigation</span>
+        <span class="tag tag-gold">Cost quantification</span>
+      </div>
+      <p>Google filed a complaint against SerpApi in December 2024, detailing the resources Google spends on anti-scraping defenses. Google's own words in the filing: the company has invested <strong>"tens of thousands of person-hours and millions of dollars"</strong> in technical measures to prevent automated scraping of Google Search results.</p>
+      <p><strong>What Google protects:</strong> Google's anti-scraping infrastructure includes CAPTCHAs, JavaScript challenges, rate limiting, behavioral analysis, IP reputation scoring, and encrypted page rendering. SerpApi's business model is to circumvent all of these measures programmatically and sell the scraped results via API. Google argued this constitutes a violation of the Computer Fraud and Abuse Act (CFAA) and breach of Google's Terms of Service.</p>
+      <p><strong>Cost asymmetry:</strong> Google's disclosure quantifies what every platform defending against scrapers already knows: defense is orders of magnitude more expensive than offense. SerpApi operates with a small engineering team; Google dedicates thousands of person-hours to playing whack-a-mole.</p>
+      <div class="callout callout-blue">
+        <strong>VENOM connection (strategic framing)</strong>
+        Google's cost disclosure validates VENOM's "measure, don't block" philosophy. If Google — with effectively unlimited engineering resources — still spends millions on anti-scraping and still gets scraped (SerpApi exists), blocking is not a viable long-term strategy. VENOM's watermarking and canary approaches shift the objective from "prevent scraping" (impossible at scale) to "detect and attribute scraping" (achievable with the techniques in Proposals 1-6). The evidence chain VENOM produces is the input to legal proceedings like Google v. SerpApi — but with per-session attribution that Google's current approach lacks.
+      </div>
+    </div>
+  </div>
+
+  <h3>Summary: Evidence-to-Proposal Mapping</h3>
+  <p>Each case validates a specific component of VENOM's approach. The table below maps evidence to the proposal it supports.</p>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>#</th><th>Case</th><th>Type</th><th>VENOM Proposal Validated</th><th>What It Proves</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Reddit v. Perplexity</td><td>Pre-planted trap</td><td><strong>3 (Canary Profiles)</strong></td><td>Honeypots catch scrapers; session-level attribution would be stronger</td></tr>
+      <tr><td>2</td><td>Wired/Conde Nast</td><td>Post-hoc forensics</td><td><strong>6 (Pipeline Fingerprinting)</strong></td><td>IP forensics works but is slow; tool fingerprinting is faster</td></tr>
+      <tr><td>3</td><td>Grafana/Thinkst</td><td>Production canaries</td><td><strong>3 (Canary Profiles)</strong></td><td>Canary tokens work at enterprise scale (tens of thousands deployed)</td></tr>
+      <tr><td>4</td><td>Carlini extraction</td><td>Training data extraction</td><td><strong>All (1-6)</strong></td><td>Models memorize training data; extraction costs $200</td></tr>
+      <tr><td>5</td><td>Ahmed book extraction</td><td>Near-verbatim memorization</td><td><strong>1-2 (Watermarks)</strong></td><td>95.8% fidelity means character-level watermarks survive</td></tr>
+      <tr><td>6</td><td>Innamark study</td><td>Watermark imperceptibility</td><td><strong>2 (Innamark Whitespace)</strong></td><td>Innamark evades 4/6 LLMs; zero-width methods are dead</td></tr>
+      <tr><td>7</td><td>Radioactive watermarks</td><td>Training survival</td><td><strong>1-2 (Watermarks)</strong></td><td>Watermarks detectable at p &lt; 10<sup>-5</sup> after training</td></tr>
+      <tr><td>8</td><td>AI Labyrinth</td><td>CDN-scale honeypot</td><td><strong>4 (SSR Traps)</strong></td><td>Server-vs-render gap catches bots at scale</td></tr>
+      <tr><td>9</td><td>Apollo.io exposure</td><td>Third-party leak</td><td><strong>Threat model</strong></td><td>Third-party aggregators are primary leak vectors</td></tr>
+      <tr><td>10</td><td>iFixit/Anthropic</td><td>Crawler aggression</td><td><strong>All (statistical power)</strong></td><td>High crawl volume increases watermark detection power</td></tr>
+      <tr><td>11</td><td>Google v. SerpApi</td><td>Cost of defense</td><td><strong>Strategic framing</strong></td><td>Blocking is expensive and fails; measurement is the alternative</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-green">
+    <strong>The evidence chain</strong>
+    Cases 4-5 prove models memorize training data. Case 7 proves watermarks survive training. Case 6 proves watermarks can be made imperceptible. Cases 1, 3, 8 prove honeypots and canaries catch scrapers in production. Cases 9-10 quantify the scale of the problem. Case 11 proves blocking alone is not the answer. VENOM's contribution is combining these proven components — watermarks that survive training (1-2), canaries that catch scrapers (3-4), and fingerprinting that identifies tools (5-6) — into a unified defensive framework that produces court-ready evidence.
+  </div>
+
 <div class="tab-nav">
     <button class="tab-nav-btn" onclick="switchTab(8)"><span class="arrow">←</span> 6. Pipeline FP</button>
     <button class="tab-nav-btn" onclick="switchTab(10)">Integration Path <span class="arrow">→</span></button>
@@ -2281,6 +2902,166 @@ Knowledge graph builder (Google, Perplexity):
       <tr><td><strong>4: Analysis</strong></td><td>1 week</td><td>Results: canary detections, watermark recovery rate, UX delta, false positive rate</td><td>Low</td></tr>
     </tbody>
   </table>
+  </div>
+
+  <h3>Expanded Phase Descriptions</h3>
+
+  <h4>Phase 0: Assessment (1 week)</h4>
+  <p>Map LinkedIn's SSR pipeline entry points. The goal is a complete inventory of which profile fields are rendered server-side versus client-hydrated, because VENOM can only watermark content that exists in the initial HTML response. For Ember Fastboot apps, this means identifying which components call <code>this.store.findRecord()</code> during Fastboot's server visit (SSR) versus during client rehydration.</p>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li><strong>SSR injection point map:</strong> per-page-type list of DOM locations where VENOM can inject (profile card, experience section, "People Also Viewed", skills list, JSON-LD block, noscript fallback).</li>
+    <li><strong>Field inventory:</strong> which profile fields appear in the SSR HTML string (name, headline, current position, summary, skills) versus which are client-fetched (endorsements, activity feed, mutual connections).</li>
+    <li><strong>Legal sign-off:</strong> review canary profile injection under GDPR Article 6(1)(f) (legitimate interest basis). Canaries are not real accounts — they have no login credentials, no email, no PII. They are ephemeral DOM elements in page renders, structurally identical to A/B test content.</li>
+    <li><strong>Performance baseline:</strong> measure current SSR latency percentiles (p50, p95, p99) on the target page types. These become the comparison baseline for Phase 3.</li>
+  </ul>
+
+  <h4>Phase 1: Instrumentation (1 week)</h4>
+  <p>Deploy measurement infrastructure with zero treatment changes. The goal is to establish baseline scraping metrics before injecting anything, so Phase 3's A/B test has a clean control signal.</p>
+  <p><strong>Three instrumentation components:</strong></p>
+  <ul>
+    <li><strong>Hydration beacon:</strong> add <code>navigator.sendBeacon()</code> call to the Ember hydration lifecycle. Fires once per page view after client-side JavaScript has fully executed. Sessions that fetch the SSR HTML but never fire the beacon are non-JS clients — either scrapers, RSS readers, or users with JS disabled (a negligible population on LinkedIn).</li>
+    <li><strong>Tripwire endpoints:</strong> inject honeypot URLs in CSS-hidden <code>&lt;a&gt;</code> tags (<code>aria-hidden="true"</code>, <code>font-size:0</code>) within the SSR HTML. Real users never see or click these links. Scrapers that follow all href attributes in the DOM trigger the endpoint, logging the session.</li>
+    <li><strong>Baseline dashboard:</strong> aggregate beacon rate (what percentage of sessions confirm JS execution?), tripwire hit rate (what percentage of sessions follow hidden links?), and existing scraping signals from LinkedIn's LSTM classifier.</li>
+  </ul>
+
+  <h4>Phase 2: Canary Deploy (1 week)</h4>
+  <p>Deploy canary profiles (P3), noscript traps (P4), and pipeline fingerprint layers (P6) at 100% of traffic. These three proposals have zero UX risk — canaries are invisible to users (CSS-hidden, removed by hydration), noscript blocks only render when JS is disabled, and pipeline fingerprint layers use the same CSS hiding methods. No A/B test needed for user impact.</p>
+  <p>Simultaneously, stand up the daily LLM probing pipeline. For each canary name generated in the past 24 hours, query ChatGPT, Claude, Gemini, Perplexity: "Who is [canary name]? What company do they work for?" A hit — any model returning the canary's generated title or organization — proves that LinkedIn's SSR HTML was ingested into that model's training data or retrieval index.</p>
+  <p><strong>Pipeline fingerprint layers go live alongside canaries.</strong> Each page gets four canary identities behind four CSS methods. When canaries are later detected in external data, the survival pattern identifies the extraction tool.</p>
+
+  <h4>Phase 3: Watermark A/B Test (4 weeks)</h4>
+  <p>The only phase with UX risk. Homoglyph watermarks (P1) and Innamark whitespace watermarks (P2) modify visible text content. The modifications are designed to be imperceptible, but "designed to be imperceptible" is not the same as "measured to be imperceptible."</p>
+  <ul>
+    <li><strong>Week 1:</strong> 10% of traffic gets homoglyph watermarks (P1) only. Monitor UX metrics against the 90% control group: click-through rate on profile elements, search result engagement, time-on-page, bounce rate, screen reader accessibility complaints. If any metric regresses by more than 0.1% (statistically significant at p &lt; 0.05), halt.</li>
+    <li><strong>Week 2:</strong> add Innamark whitespace watermarks (P2) to the same 10% treatment group. P1 + P2 running together. Same UX monitoring. Innamark's thin space (U+2009) is slightly narrower than regular space in some fonts — watch for rendering artifacts in monospace contexts.</li>
+    <li><strong>Week 3-4:</strong> ramp treatment group to 50%. Larger population gives better statistical power for both UX delta measurement and watermark recovery testing. Begin collecting scraped data samples and testing watermark recovery rate.</li>
+  </ul>
+
+  <h4>Phase 4: Analysis (1 week)</h4>
+  <p>Aggregate all results into a final report. Key metrics:</p>
+  <ul>
+    <li><strong>Canary hit rate:</strong> how many of the probed LLMs returned canary content? Which models? What was the time-to-detection (injection date to first positive probe)?</li>
+    <li><strong>Watermark recovery rate:</strong> given scraped data samples, what percentage of watermarks (homoglyph + Innamark) could be recovered and attributed to a specific session?</li>
+    <li><strong>Pipeline fingerprint distribution:</strong> of detected canaries, which CSS layers survived? What does the fingerprint distribution tell us about which extraction tools are in use?</li>
+    <li><strong>UX delta:</strong> treatment vs. control across all monitored metrics. Confidence intervals.</li>
+    <li><strong>False positive rate:</strong> how many legitimate sessions were incorrectly flagged by tripwires or beacon absence? (Target: &lt; 0.01%.)</li>
+    <li><strong>Performance impact:</strong> latency percentile deltas (p50, p95, p99) with VENOM pipeline active.</li>
+  </ul>
+
+  <h3>Risk Mitigation</h3>
+  <div class="table-wrapper">
+  <table class="data-table">
+    <thead>
+      <tr><th>Risk</th><th>Probability</th><th>Impact</th><th>Mitigation</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Screen reader reads canary text</td><td>Low</td><td>Medium</td><td><code>aria-hidden="true"</code> on all canary elements; <code>role="presentation"</code> on container divs; tested with VoiceOver, NVDA, JAWS before deploy</td></tr>
+      <tr><td>Homoglyphs trigger phishing detectors</td><td>Low</td><td>High</td><td>Allowlist LinkedIn domains in internal security scanning; monitor Safe Browsing API status; homoglyphs appear only in profile text, not in URLs or email addresses</td></tr>
+      <tr><td>Legal challenge on canary profiles</td><td>Medium</td><td>High</td><td>Pre-clear with legal counsel; canaries are not "fake accounts" (no login credentials, no email, no searchable profile page); structurally identical to A/B test variations; GDPR Article 6(1)(f) legitimate interest basis documented</td></tr>
+      <tr><td>UX regression from watermarks</td><td>Low</td><td>Medium</td><td>A/B test with 0.1% regression threshold (p &lt; 0.05); automatic rollback if threshold breached; 4-week ramp schedule (10% → 50%)</td></tr>
+      <tr><td>Scraper adapts to strip canaries</td><td>Medium</td><td>Low</td><td>Defense in depth: 6 proposals, scraper must defeat all simultaneously; canary generation rotates strategies; pipeline fingerprinting detects tool changes</td></tr>
+      <tr><td>Token inflation breaks copy-paste</td><td>Low</td><td>Low</td><td>P5 is opt-in; zero-width chars stripped by most paste handlers; test across browser clipboard APIs before enabling</td></tr>
+      <tr><td>Innamark thin space rendering artifacts</td><td>Low</td><td>Low</td><td>U+2009 is 2px narrower than U+0020 in some serif fonts; LinkedIn uses system sans-serif stack (SF Pro, Segoe UI, Roboto) where the difference is sub-pixel; monitor font rendering complaints</td></tr>
+      <tr><td>Canary probing detected by LLM providers</td><td>Low</td><td>Low</td><td>Probing uses standard API queries indistinguishable from user traffic; no adversarial prompting; rate-limited to avoid throttling</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Monitoring Dashboard</h3>
+  <p>Five metric groups, all feeding into a single Grafana dashboard (or LinkedIn's internal equivalent).</p>
+
+  <h4>1. Hydration Beacon Rate</h4>
+  <p>Percentage of sessions with confirmed JS execution. Baseline should be &gt;99% for logged-in desktop users. Sessions without a beacon are scraper candidates. Track as a time series; sudden drops indicate a scraper campaign. Breakdown by user-agent family, geography, and page type.</p>
+
+  <h4>2. Canary Detection Rate</h4>
+  <p>Percentage of probed LLMs that return canary content when queried for ghost identities. Track per-model (GPT, Claude, Gemini, Perplexity, Grok) and per-probe-date. A rising detection rate over time indicates ongoing ingestion. A flat rate after an initial spike suggests a one-time scrape. Chart: line graph per model, x-axis = days since canary deploy.</p>
+
+  <h4>3. Watermark Recovery Rate</h4>
+  <p>Percentage of watermarks (homoglyph + Innamark) successfully recovered from scraped data samples. Requires periodic acquisition of scrape dumps — from honeypot accounts, cooperative researchers, or commercial data brokers. Track separately for homoglyphs (should survive training pipelines) and Innamark (should survive direct scraping only). Chart: bar chart, recovery rate by watermark type and data source.</p>
+
+  <h4>4. Pipeline Fingerprint Distribution</h4>
+  <p>Of detected canaries in external data, which CSS hiding layers survived? Map the binary survival pattern to extraction tools (see Proposal 6 matrix). This tells Eugene's team which tools scrapers are actually using against LinkedIn, which informs which CSS methods to prioritize. Chart: pie chart or stacked bar — Trafilatura vs. BeautifulSoup vs. CC WET vs. Readability.js vs. other.</p>
+
+  <h4>5. UX Metrics Delta (Treatment vs. Control)</h4>
+  <p>Side-by-side comparison of treatment and control groups across:</p>
+  <ul>
+    <li>Click-through rate on profile elements (connections, skills, experience)</li>
+    <li>Time-on-page (median and p90)</li>
+    <li>Bounce rate</li>
+    <li>Search result click-through rate (if watermarks applied to search results)</li>
+    <li>Support ticket rate mentioning display issues</li>
+  </ul>
+  <p>Chart: difference-in-differences plot with confidence intervals. Green zone: delta within +/- 0.1%. Red zone: delta exceeding threshold.</p>
+
+  <h3>Decision Points</h3>
+  <p>Explicit go/no-go criteria at each phase boundary. No phase transition without data review.</p>
+
+  <h4>Phase 0 → Phase 1</h4>
+  <ul>
+    <li>SSR injection point map complete and reviewed by Eugene's SSR team.</li>
+    <li>Legal sign-off obtained for canary profile injection.</li>
+    <li>Performance baseline collected for target page types.</li>
+    <li><strong>If blocked:</strong> legal review is the most likely blocker. Escalate to LinkedIn's deputy general counsel for data protection. Provide the A/B test analogy: canaries are structurally identical to test variations LinkedIn already deploys.</li>
+  </ul>
+
+  <h4>Phase 1 → Phase 2</h4>
+  <ul>
+    <li>Baseline scraping rate measured. If beacon-absent session rate &gt; 1%, proceed (scraping is measurable). If &lt; 1%, reassess.</li>
+    <li>Tripwire endpoints operational with zero false positives over 7 days.</li>
+    <li>Dashboard operational and reviewed.</li>
+  </ul>
+
+  <h4>Phase 2 → Phase 3</h4>
+  <ul>
+    <li>Canary injection system operational for 7+ days with zero UX complaints.</li>
+    <li>LLM probing pipeline running daily with no operational issues.</li>
+    <li>Zero accessibility complaints related to canary elements.</li>
+    <li><strong>If canary hits are detected:</strong> document immediately — this is the primary research result. Proceed to Phase 3 regardless; watermark data adds attribution capability on top of detection.</li>
+  </ul>
+
+  <h4>Phase 3 → Phase 4</h4>
+  <ul>
+    <li>UX regression &lt; 0.1% across all monitored metrics (p &lt; 0.05). If any metric exceeds threshold, roll back the offending proposal (P1, P2, or P5) and proceed with remaining proposals.</li>
+    <li>Performance regression &lt; 0.5ms at p95. If exceeded, profile the VENOM pipeline to identify the bottleneck (likely regex replacement in P3).</li>
+    <li>At least 2 weeks of watermark data at 50% treatment.</li>
+  </ul>
+
+  <h4>Phase 4 → Production</h4>
+  <ul>
+    <li>Watermark recovery rate &gt; 30% from scraped data samples AND/OR canary detection in at least one LLM. Either result justifies production deployment.</li>
+    <li>UX regression confirmed &lt; 0.1% over the full 4-week A/B period.</li>
+    <li>Legal review of final report confirms no new liability concerns.</li>
+    <li>Go/no-go decision made jointly by Eugene's team + Nick.</li>
+  </ul>
+
+  <h3>What Eugene's Team Needs to Build</h3>
+  <p>Six deliverables. The first two are the core; the rest are configuration, client-side, and operational tooling.</p>
+
+  <h4>1. VenomModule.java (~500 LOC)</h4>
+  <p>The orchestrator. A single Java class that takes a rendered HTML string and a session context, runs the VENOM pipeline, and returns the modified HTML string. No framework dependencies — it's a pure function: <code>String process(String html, VenomSession ctx)</code>.</p>
+  <p><strong>Internal structure:</strong> <code>assignTreatment(sessionId)</code>, <code>applyHomoglyphs(html, sessionId)</code>, <code>applyInnamark(html, sessionId)</code>, <code>injectCanaries(html, sessionId)</code>, <code>injectSSRTraps(html, sessionId)</code>, <code>applyTokenInflation(html, sessionId)</code>, <code>injectFingerprints(html, sessionId)</code>, <code>logSession(sessionId, treatmentFlags)</code>.</p>
+  <p>Each method is guarded by a feature flag from <code>venom-config.yaml</code>. Disabled proposals are skipped with zero overhead (boolean check).</p>
+
+  <h4>2. InnamarkWatermark.kt (~200 LOC)</h4>
+  <p>Vendored from Innamark (Hellmeier et al., Fraunhofer ISST). Single Kotlin file, no transitive dependencies. Contains: <code>encode(text: String, payload: ByteArray): String</code>, <code>decode(text: String): ByteArray</code>, character mapping table (5 Unicode whitespace variants), HMAC integration for session-keyed payload derivation.</p>
+  <p>Kotlin compiles to JVM bytecode. Call from Java via standard interop: <code>InnamarkWatermark.INSTANCE.encode(text, payload)</code>.</p>
+
+  <h4>3. venom-config.yaml</h4>
+  <p>Feature flags and operational parameters. Loaded at startup, hot-reloadable via LinkedIn's existing config infrastructure. Controls treatment percentage (0-100), secret key reference (Vault), and per-proposal enable/disable flags.</p>
+
+  <h4>4. VenomHydrationProbe.js (~50 LOC)</h4>
+  <p>Client-side Ember component (or React equivalent). Fires after hydration completes, confirming JS execution for this session. Two responsibilities: (1) strip canary elements from the live DOM so users never encounter them even if CSS hiding fails, and (2) fire the hydration beacon using <code>navigator.sendBeacon()</code> (survives page unload).</p>
+
+  <h4>5. CanaryProbeJob.java (~300 LOC)</h4>
+  <p>Daily cron job (or LinkedIn's internal job scheduler). Queries external LLMs for canary identities generated in the past N days. Workflow: read canary log → construct natural-language probes → submit to model APIs → parse responses → flag hits → alert. Rate limiting: ~100 probes/day (one per unique canary, deduplicated). API cost: negligible (&lt;$1/day at current pricing).</p>
+
+  <h4>6. Dashboard Integration</h4>
+  <p>Wire VENOM metrics into LinkedIn's existing monitoring stack (Grafana, InGraphs, or equivalent). Five metric groups (see Monitoring Dashboard section above). Each VENOM pipeline stage emits a structured log line with timing, session_id, treatment group, and proposal flags. The metrics pipeline aggregates these into the dashboard panels.</p>
+
+  <div class="callout callout-blue">
+    <strong>Total engineering effort estimate</strong>
+    2-3 engineer-weeks for a senior JVM developer familiar with LinkedIn's SSR stack. The VENOM module itself is ~1 week of coding. The remaining time is integration testing, dashboard setup, and the canary probe pipeline. No architectural changes to LinkedIn's request handling — VENOM is a post-render string transformation, slotted in the same place as any other SSR middleware.
   </div>
 
   <h4>JVM Dependencies</h4>
