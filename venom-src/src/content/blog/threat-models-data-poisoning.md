@@ -50,6 +50,8 @@ This distinction matters for threat modeling. Adversarial attacks can originate 
 
 ### Threat Actor Capabilities
 
+![Poisoning efficiency chart showing samples required on logarithmic scale from 100,000 plus for traditional attacks down to 50 for Nightshade](/images/diagrams/poisoning-efficiency.png)
+
 Traditional threat models assumed backdoor attacks required sophisticated adversaries with access to the training pipeline. Recent research demonstrates this assumption no longer holds:
 
 - **Attack efficiency**: A 2024 study found that poisoning attacks require a near-constant number of documents regardless of dataset size. 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.

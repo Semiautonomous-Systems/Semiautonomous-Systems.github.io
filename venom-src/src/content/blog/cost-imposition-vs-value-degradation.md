@@ -195,6 +195,8 @@ The risk is that defensive measures intended to protect creators instead acceler
 
 ## Effectiveness: Measurements and Tradeoffs
 
+![Defense mechanism cost comparison table showing setup cost, ongoing cost, publisher burden, scraper burden, and collateral damage for each mechanism](/images/diagrams/cost-comparison.png)
+
 How well do these defenses actually work? Effectiveness depends on the adversary's resources, the scale of scraping, and the sophistication of detection and evasion techniques.
 
 ### Cost Imposition Effectiveness

@@ -36,6 +36,8 @@ Nightshade is the offensive companion to Glaze, a style-masking tool by the same
 
 ## Poison Fountain: From Individual Defense to Coordinated Action
 
+![The escalation ladder from signaling to coordinated poisoning showing five steps of increasing effectiveness and ethical complexity](/images/diagrams/escalation-ladder.png)
+
 In January 2026, a group of AI industry insiders announced Poison Fountain, an initiative to coordinate data poisoning across multiple content sources (https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/, https://www.scworld.com/brief/poison-fountain-initiative-aims-to-disrupt-ai-training-data).
 
 The shift from individual tools like Nightshade to coordinated initiatives like Poison Fountain marks an important escalation. Individual poisoning can be filtered or diluted by large training datasets. Coordinated poisoning at scale changes the threat model: it makes scraping indiscriminately more costly and forces AI companies to invest in data provenance, quality verification, and permission systems.
@@ -48,6 +50,8 @@ This escalation raises several questions:
 4. Reversibility: Can poisoning be calibrated or rolled back if behavior changes?
 
 ## Ethical Considerations
+
+![Collateral damage impact assessment showing concentric rings of affected parties from large AI labs at center to research and education at outer ring](/images/diagrams/collateral-damage.png)
 
 ### Proportionality and Intent
 

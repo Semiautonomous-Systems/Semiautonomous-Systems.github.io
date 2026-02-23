@@ -28,6 +28,8 @@ This report presents the state of defensive data poisoning in 2026: what tools e
 
 ## 1. The Compliance Crisis: Robots.txt Bypass Data
 
+![Timeline from robots.txt in 1994 to Poison Fountain in 2026 showing the evolution from voluntary signaling to active enforcement](/images/diagrams/timeline-1994-2026.png)
+
 The robots.txt protocol has been part of the web's social contract since Martijn Koster proposed it in 1994. For decades, search engines honored it. They had reputational incentives, business relationships with publishers, and a shared understanding that cooperation benefited everyone. That era is ending.
 
 ### Quantifying Non-Compliance
@@ -65,6 +67,8 @@ This creates structural asymmetry. AI companies know exactly what data they trai
 ---
 
 ## 2. Enforcement Mechanism Taxonomy
+
+![Signaling vs enforcement mechanisms comparison showing the shift from voluntary compliance to active enforcement](/images/diagrams/signaling-vs-enforcement.png)
 
 Understanding the current situation requires distinguishing between signaling and enforcement. This framework is central to VENOM's analysis.
 
