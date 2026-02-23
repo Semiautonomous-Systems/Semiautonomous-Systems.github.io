@@ -16,8 +16,6 @@ author: Semiautonomous Systems
 
 ## What Is Data Poisoning?
 
-![Data poisoning taxonomy showing three attack categories: availability attacks, targeted attacks, and backdoor attacks](/images/diagrams/poisoning-taxonomy.png)
-
 Data poisoning is the intentional corruption of training data to alter the behavior of machine learning models trained on that data. Unlike adversarial examples that manipulate inputs at inference time, data poisoning targets the training process itself, embedding systematic biases or backdoors that persist across deployments.
 
 Research distinguishes three categories of data poisoning attacks:

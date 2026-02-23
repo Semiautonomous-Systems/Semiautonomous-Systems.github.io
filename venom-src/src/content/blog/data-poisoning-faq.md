@@ -8,8 +8,6 @@ author: Semiautonomous Systems
 
 ## Overview
 
-![Key statistics: 13.26 percent AI bot non-compliance, 250 documents to backdoor LLMs, 50 samples for Nightshade, 5.6 million websites blocking GPTBot](/images/diagrams/key-statistics.png)
-
 This FAQ addresses the most common questions we receive about data poisoning, web crawling, and enforcement mechanisms. Our goal is to provide factual, technically accurate answers without marketing spin or speculation. Where evidence is limited or questions remain open, we say so.
 
 For foundational context, see our [What Is Data Poisoning in Machine Learning](/blog/what-is-data-poisoning/) explainer and [Threat Models for Training Data Poisoning](/blog/threat-models-data-poisoning/) analysis.

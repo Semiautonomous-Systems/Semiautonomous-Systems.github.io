@@ -22,8 +22,6 @@ This is why VENOM exists.
 
 ## The Enforcement vs Signaling Framework
 
-![Signaling vs enforcement mechanisms comparison showing the shift from voluntary compliance to active enforcement](/images/diagrams/signaling-vs-enforcement.png)
-
 Understanding the current situation requires a clear analytical framework. We distinguish between two different approaches to governing AI training data collection:
 
 **Signaling mechanisms** communicate preferences but rely on voluntary compliance. They include:
