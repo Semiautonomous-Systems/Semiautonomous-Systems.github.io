@@ -1,10 +1,13 @@
+# Data Poisoning FAQ: Technical and Legal Answers
+
+> Answers to common questions about data poisoning, web crawling, robots.txt, AIPREF, legal status, and enforcement mechanisms for AI training defense.
+
+Published: 2026-02-20 | Author: Semiautonomous Systems
+URL: https://semiautonomous.systems/blog/data-poisoning-faq/
+Keywords: data poisoning FAQ, robots.txt AI crawlers, AIPREF explained, Nightshade FAQ, AI training legal
+
 ---
-title: "Data Poisoning FAQ: Technical and Legal Answers"
-description: "Answers to common questions about data poisoning, web crawling, robots.txt, AIPREF, legal status, and enforcement mechanisms for AI training defense."
-publishDate: 2026-02-20
-keywords: [data poisoning FAQ, robots.txt AI crawlers, AIPREF explained, Nightshade FAQ, AI training legal]
-author: Semiautonomous Systems
----
+
 
 ## Overview
 

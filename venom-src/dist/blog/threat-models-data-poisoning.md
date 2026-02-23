@@ -1,10 +1,13 @@
+# AI Poisoning Threat Models: Backdoors and RAG
+
+> Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training.
+
+Published: 2026-02-13 | Author: Semiautonomous Systems
+URL: https://semiautonomous.systems/blog/threat-models-data-poisoning/
+Keywords: AI poisoning threat models, backdoor attacks AI, RAG poisoning, model degradation attacks, adversarial ML
+
 ---
-title: "AI Poisoning Threat Models: Backdoors and RAG"
-description: "Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training."
-publishDate: 2026-02-13
-keywords: [AI poisoning threat models, backdoor attacks AI, RAG poisoning, model degradation attacks, adversarial ML]
-author: Semiautonomous Systems
----
+
 
 ## Key Takeaways
 

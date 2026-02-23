@@ -8,9 +8,11 @@ interface Props {
   updatedDate?: Date;
   keywords?: string[];
   author?: string;
+  body?: string;
+  extraJsonLd?: string;
 }
 
-const { title, description, publishDate, updatedDate, keywords = [], author = 'Semiautonomous Systems' } = Astro.props;
+const { title, description, publishDate, updatedDate, keywords = [], author = 'Semiautonomous Systems', body, extraJsonLd } = Astro.props;
 const siteUrl = 'https://semiautonomous.systems';
 const currentPath = Astro.url.pathname;
 
@@ -25,6 +27,8 @@ const formattedUpdated = updatedDate?.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+const readingTime = body ? Math.ceil(body.trim().split(/\s+/).length / 200) : undefined;
 
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -44,6 +48,7 @@ const jsonLd = JSON.stringify({
     <meta name="keywords" content={keywords.join(', ')} />
     <link rel="canonical" href={`${siteUrl}${currentPath}`} />
     <script type="application/ld+json" set:html={jsonLd} />
+    {extraJsonLd && <script type="application/ld+json" set:html={extraJsonLd} />}
   </Fragment>
 
   <article class="blog-post">
@@ -54,6 +59,7 @@ const jsonLd = JSON.stringify({
         <div class="post-meta">
           <time datetime={publishDate.toISOString()}>{formattedDate}</time>
           {formattedUpdated && <span class="updated">Updated {formattedUpdated}</span>}
+          {readingTime && <span class="reading-time">{readingTime} min read</span>}
           <span class="author">{author}</span>
         </div>
       </div>
@@ -74,7 +80,7 @@ const jsonLd = JSON.stringify({
 
   .post-header {
     padding: var(--space-3xl) 0 var(--space-xl);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 3px solid var(--color-accent);
     margin-bottom: var(--space-xl);
   }
 
@@ -108,6 +114,18 @@ const jsonLd = JSON.stringify({
 
   .post-meta .updated {
     color: var(--color-safe);
+  }
+
+  .post-meta .reading-time {
+    font-family: var(--font-mono);
+    opacity: 0.7;
+  }
+
+  @media (max-width: 640px) {
+    .post-meta {
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
   }
 </style>
 
@@ -180,7 +198,11 @@ const jsonLd = JSON.stringify({
   .prose blockquote p {
     color: var(--color-text);
     font-weight: 500;
-    margin: 0;
+    margin-bottom: var(--space-md);
+  }
+
+  .prose blockquote p:last-child {
+    margin-bottom: 0;
   }
 
   .prose code {
@@ -221,6 +243,8 @@ const jsonLd = JSON.stringify({
     border-collapse: collapse;
     margin: var(--space-xl) 0;
     font-size: 15px;
+    display: block;
+    overflow-x: auto;
   }
 
   .prose th {
@@ -232,12 +256,17 @@ const jsonLd = JSON.stringify({
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
   }
 
   .prose td {
     padding: var(--space-md);
     border-bottom: 1px solid var(--color-border);
     color: var(--color-text-muted);
+  }
+
+  .prose tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.02);
   }
 
   .prose img {

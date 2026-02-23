@@ -1,10 +1,13 @@
+# State of Defensive Data Poisoning 2026 Report
+
+> Comprehensive analysis of AI training data enforcement: robots.txt bypass data, tool effectiveness, legal developments, and the shift from signaling to enforcement.
+
+Published: 2026-02-03 | Author: Semiautonomous Systems
+URL: https://semiautonomous.systems/blog/state-of-data-poisoning-2026/
+Keywords: state of data poisoning 2026, AI crawler compliance data, Poison Fountain, AI training litigation, IETF AIPREF 2026
+
 ---
-title: "State of Defensive Data Poisoning 2026 Report"
-description: "Comprehensive analysis of AI training data enforcement: robots.txt bypass data, tool effectiveness, legal developments, and the shift from signaling to enforcement."
-publishDate: 2026-02-03
-keywords: [state of data poisoning 2026, AI crawler compliance data, Poison Fountain, AI training litigation, IETF AIPREF 2026]
-author: Semiautonomous Systems
----
+
 
 **A VENOM Flagship Report**
 

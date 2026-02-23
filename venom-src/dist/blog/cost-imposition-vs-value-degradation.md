@@ -1,10 +1,13 @@
+# Publisher Defenses: Cost Imposition vs Poisoning
+
+> Comparing defense strategies against AI scraping: proof-of-work systems impose costs, data poisoning degrades value. Who pays and what works for publishers.
+
+Published: 2026-02-17 | Author: Semiautonomous Systems
+URL: https://semiautonomous.systems/blog/cost-imposition-vs-value-degradation/
+Keywords: AI scraping defense, Anubis proof-of-work, publisher AI defense, scraper cost imposition, Nightshade effectiveness
+
 ---
-title: "Publisher Defenses: Cost Imposition vs Poisoning"
-description: "Comparing defense strategies against AI scraping: proof-of-work systems impose costs, data poisoning degrades value. Who pays and what works for publishers."
-publishDate: 2026-02-17
-keywords: [AI scraping defense, Anubis proof-of-work, publisher AI defense, scraper cost imposition, Nightshade effectiveness]
-author: Semiautonomous Systems
----
+
 
 The escalating conflict between publishers and AI companies has produced two distinct categories of defensive mechanisms: cost imposition and value degradation. Understanding the difference matters because they impose burdens on different actors, scale differently with resources, and carry different risks of collateral damage.
 

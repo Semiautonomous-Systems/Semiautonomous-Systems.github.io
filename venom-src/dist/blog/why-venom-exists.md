@@ -1,10 +1,13 @@
+# Why VENOM Exists: AI Data Enforcement Analysis
+
+> When robots.txt fails, enforcement mechanisms emerge. VENOM analyzes data poisoning, proof-of-work, and technical countermeasures for AI training governance.
+
+Published: 2026-02-05 | Author: Semiautonomous Systems
+URL: https://semiautonomous.systems/blog/why-venom-exists/
+Keywords: AI data enforcement, enforcement vs signaling, robots.txt compliance, AI crawler defense, training data governance
+
 ---
-title: "Why VENOM Exists: AI Data Enforcement Analysis"
-description: "When robots.txt fails, enforcement mechanisms emerge. VENOM analyzes data poisoning, proof-of-work, and technical countermeasures for AI training governance."
-publishDate: 2026-02-05
-keywords: [AI data enforcement, enforcement vs signaling, robots.txt compliance, AI crawler defense, training data governance]
-author: Semiautonomous Systems
----
+
 
 The robots.txt file has been part of the web's social contract for over thirty years. [Proposed by Martijn Koster in 1994](https://www.greenhills.co.uk/posts/robotstxt-25/) and formalized as [RFC 9309 in 2022](https://datatracker.ietf.org/doc/html/rfc9309), it established a simple principle: if you respect my preferences, I'll make my content available to you. Search engines honored this agreement. They had reputational incentives, business relationships with publishers, and a shared understanding that cooperation benefited everyone.
 

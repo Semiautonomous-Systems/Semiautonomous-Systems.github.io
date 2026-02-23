@@ -5,6 +5,15 @@ import BlogCard from '../../components/BlogCard.astro';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+function getReadingTime(body: string): number {
+  const words = body.trim().split(/\s+/).length;
+  return Math.ceil(words / 200);
+}
+
+const featuredSlug = 'state-of-data-poisoning-2026';
+const featuredPost = posts.find(p => p.slug === featuredSlug);
+const remainingPosts = posts.filter(p => p.slug !== featuredSlug);
 ---
 
 <BaseLayout
@@ -15,20 +24,34 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   <section class="blog-hero">
     <div class="container">
       <h1>Blog</h1>
-      <p class="blog-intro">Analysis and research on data poisoning, AI crawler enforcement, and preference signaling.</p>
+      <p class="blog-intro">The latest on technical enforcement of crawling preferences.</p>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
+      {featuredPost && (
+        <div class="featured-section">
+          <BlogCard
+            title={featuredPost.data.title}
+            description={featuredPost.data.description}
+            publishDate={featuredPost.data.publishDate}
+            slug={featuredPost.slug}
+            keywords={featuredPost.data.keywords}
+            readingTime={getReadingTime(featuredPost.body)}
+            featured={true}
+          />
+        </div>
+      )}
       <div class="blog-grid grid grid-2">
-        {posts.map(post => (
+        {remainingPosts.map(post => (
           <BlogCard
             title={post.data.title}
             description={post.data.description}
             publishDate={post.data.publishDate}
             slug={post.slug}
             keywords={post.data.keywords}
+            readingTime={getReadingTime(post.body)}
           />
         ))}
       </div>
@@ -52,6 +75,14 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .blog-intro {
     font-size: clamp(16px, 2vw, 18px);
     max-width: 600px;
+  }
+
+  .featured-section {
+    margin-bottom: var(--space-xl);
+  }
+
+  .featured-section :global(.blog-card) {
+    max-width: 100%;
   }
 
   .blog-grid {

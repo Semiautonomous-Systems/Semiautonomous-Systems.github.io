@@ -1,10 +1,13 @@
+# What Is Data Poisoning in Machine Learning?
+
+> Data poisoning manipulates AI training data to alter model behavior. Learn how defensive tools like Nightshade protect content from unauthorized AI training.
+
+Published: 2026-02-07 | Author: Semiautonomous Systems
+URL: https://semiautonomous.systems/blog/what-is-data-poisoning/
+Keywords: data poisoning, AI data poisoning, machine learning poisoning, Nightshade tool, training data attacks
+
 ---
-title: "What Is Data Poisoning in Machine Learning?"
-description: "Data poisoning manipulates AI training data to alter model behavior. Learn how defensive tools like Nightshade protect content from unauthorized AI training."
-publishDate: 2026-02-07
-keywords: [data poisoning, AI data poisoning, machine learning poisoning, Nightshade tool, training data attacks]
-author: Semiautonomous Systems
----
+
 
 # What Is Data Poisoning in Machine Learning and Why It Matters for AI Training
 
