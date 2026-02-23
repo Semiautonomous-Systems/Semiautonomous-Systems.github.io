@@ -6,8 +6,6 @@ keywords: [defensive poisoning ethics, data poisoning collateral damage, Anubis 
 author: Semiautonomous Systems
 ---
 
-# Defensive Data Poisoning: Ethics, Limits, and Safer Alternatives
-
 ## Key Takeaways
 
 - Data poisoning is an established security research area with over 15 years of academic study, now being applied defensively by content creators against unauthorized AI training
@@ -162,4 +160,3 @@ Understanding these tradeoffs is essential for anyone navigating the rapidly evo
 - IETF AIPREF Blog - https://www.ietf.org/blog/aipref-wg/
 - AI Robots.txt GitHub List - https://github.com/ai-robots-txt/ai.robots.txt
 - Analysis of AI Agents Ignoring robots.txt - https://auto-post.io/blog/ai-agents-ignore-robots-txt
-

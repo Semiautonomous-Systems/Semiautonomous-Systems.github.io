@@ -9,8 +9,6 @@ Keywords: data poisoning, AI data poisoning, machine learning poisoning, Nightsh
 ---
 
 
-# What Is Data Poisoning in Machine Learning and Why It Matters for AI Training
-
 ## Key Takeaways
 
 - Data poisoning manipulates training datasets to degrade model performance, introduce backdoors, or defend against unauthorized use
@@ -133,4 +131,3 @@ The critical question is whether data poisoning represents a temporary escalatio
 - RFC 9309 (robots.txt): https://datatracker.ietf.org/doc/html/rfc9309
 - AI crawlers ignoring robots.txt: https://auto-post.io/blog/ai-agents-ignore-robots-txt
 - IETF AIPREF working group: https://datatracker.ietf.org/wg/aipref/about/
-
