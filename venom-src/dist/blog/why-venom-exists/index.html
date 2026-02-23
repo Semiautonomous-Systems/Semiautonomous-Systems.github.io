@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="index,follow"><meta name="theme-color" content="#0a0e14"><title>Why VENOM Exists: AI Data Enforcement Analysis</title><meta name="description" content="When robots.txt fails, enforcement mechanisms emerge. VENOM analyzes data poisoning, proof-of-work, and technical countermeasures for AI training governance."><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:url" content="https://semiautonomous.systems/blog/why-venom-exists/"><meta property="og:title" content="Why VENOM Exists: AI Data Enforcement Analysis"><meta property="og:description" content="When robots.txt fails, enforcement mechanisms emerge. VENOM analyzes data poisoning, proof-of-work, and technical countermeasures for AI training governance."><meta property="og:image" content="https://semiautonomous.systems/og-image.png"><!-- Twitter --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Why VENOM Exists: AI Data Enforcement Analysis"><meta name="twitter:description" content="When robots.txt fails, enforcement mechanisms emerge. VENOM analyzes data poisoning, proof-of-work, and technical countermeasures for AI training governance."><meta name="twitter:image" content="https://semiautonomous.systems/og-image.png"><!-- Favicon --><link rel="icon" href="/favicon.svg" type="image/svg+xml"><!-- Additional head content from child layouts --> <meta name="keywords" content="AI data enforcement, enforcement vs signaling, robots.txt compliance, AI crawler defense, training data governance"> <link rel="canonical" href="https://semiautonomous.systems/blog/why-venom-exists/"> <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Why VENOM Exists: AI Data Enforcement Analysis","description":"When robots.txt fails, enforcement mechanisms emerge. VENOM analyzes data poisoning, proof-of-work, and technical countermeasures for AI training governance.","author":{"@type":"Organization","name":"Semiautonomous Systems"},"publisher":{"@type":"Organization","name":"Semiautonomous Systems"},"datePublished":"2026-04-01T00:00:00.000Z","url":"https://semiautonomous.systems/blog/why-venom-exists/"}</script> <!-- Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>.prose{max-width:720px;font-size:17px;line-height:1.75;color:var(--color-text-muted)}.prose h2{font-size:clamp(22px,3vw,28px);color:var(--color-text);margin-top:var(--space-2xl);margin-bottom:var(--space-lg);text-transform:none}.prose h3{font-size:clamp(18px,2.5vw,22px);color:var(--color-text);margin-top:var(--space-xl);margin-bottom:var(--space-md)}.prose p{margin-bottom:var(--space-lg)}.prose a{color:var(--color-accent);text-decoration:underline;text-underline-offset:3px;transition:color var(--transition-fast)}.prose a:hover{color:var(--color-accent-hover)}.prose strong{color:var(--color-text);font-weight:600}.prose ul,.prose ol{padding-left:24px;margin-bottom:var(--space-lg)}.prose li{margin-bottom:var(--space-sm);color:var(--color-text-muted)}.prose li::marker{color:var(--color-accent)}.prose blockquote{border-left:3px solid var(--color-accent);background:#b721150f;margin:var(--space-xl) 0;padding:var(--space-lg);border-radius:0 var(--radius-md) var(--radius-md) 0}.prose blockquote p{color:var(--color-text);font-weight:500;margin:0}.prose code{font-family:var(--font-mono);font-size:.9em;background:var(--color-bg-elevated);padding:2px 6px;border-radius:var(--radius-sm);border:1px solid var(--color-border)}.prose pre{background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-lg);overflow-x:auto;margin:var(--space-xl) 0;font-size:14px;line-height:1.6}.prose pre code{background:none;padding:0;border:none;font-size:inherit}.prose hr{border:none;border-top:1px solid var(--color-border);margin:var(--space-2xl) 0}.prose table{width:100%;border-collapse:collapse;margin:var(--space-xl) 0;font-size:15px}.prose th{text-align:left;font-weight:600;color:var(--color-text);padding:var(--space-md);border-bottom:1px solid var(--color-border-hover);font-size:13px;text-transform:uppercase;letter-spacing:.5px}.prose td{padding:var(--space-md);border-bottom:1px solid var(--color-border);color:var(--color-text-muted)}.prose img{max-width:100%;height:auto;border-radius:var(--radius-md);margin:var(--space-xl) 0}.blog-post[data-astro-cid-bvzihdzo]{padding-bottom:var(--space-3xl)}.post-header[data-astro-cid-bvzihdzo]{padding:var(--space-3xl) 0 var(--space-xl);border-bottom:1px solid var(--color-border);margin-bottom:var(--space-xl)}.back-link[data-astro-cid-bvzihdzo]{display:inline-block;font-size:14px;color:var(--color-text-muted);margin-bottom:var(--space-lg);transition:color var(--transition-fast)}.back-link[data-astro-cid-bvzihdzo]:hover{color:var(--color-accent)}.post-title[data-astro-cid-bvzihdzo]{font-size:clamp(28px,4vw,44px);text-transform:none;letter-spacing:-.02em;line-height:1.15;margin-bottom:var(--space-lg)}.post-meta[data-astro-cid-bvzihdzo]{display:flex;gap:var(--space-lg);flex-wrap:wrap;font-size:14px;color:var(--color-text-muted)}.post-meta[data-astro-cid-bvzihdzo] .updated[data-astro-cid-bvzihdzo]{color:var(--color-safe)}
+</style>
+<link rel="stylesheet" href="/_astro/_slug_.DdfSJnJV.css"><script type="module" src="/_astro/hoisted.NBWk1qCK.js"></script></head> <body> <header class="header" data-astro-cid-3ef6ksr2> <div class="header-inner" data-astro-cid-3ef6ksr2> <a href="/" class="logo" data-astro-cid-3ef6ksr2> <div class="logo-icon" data-astro-cid-3ef6ksr2> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" data-astro-cid-3ef6ksr2> <path d="M12 3v18M3 12h18" data-astro-cid-3ef6ksr2></path> </svg> </div> <span class="logo-text" data-astro-cid-3ef6ksr2>SEMIAUTONOMOUS</span> </a> <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false" data-astro-cid-3ef6ksr2> <svg class="menu-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" data-astro-cid-3ef6ksr2> <path d="M3 12h18M3 6h18M3 18h18" data-astro-cid-3ef6ksr2></path> </svg> <svg class="close-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" data-astro-cid-3ef6ksr2> <path d="M18 6L6 18M6 6l12 12" data-astro-cid-3ef6ksr2></path> </svg> </button> <nav class="nav" id="nav" data-astro-cid-3ef6ksr2> <a href="/" class="nav-link" data-astro-cid-3ef6ksr2> Home </a><a href="/venom/" class="nav-link" data-astro-cid-3ef6ksr2> VENOM </a><a href="/blog/" class="nav-link active" data-astro-cid-3ef6ksr2> Blog </a> <a href="mailto:venom@semiautonomous.systems" class="btn btn-primary nav-cta" data-astro-cid-3ef6ksr2>
+Contact
+</a> </nav> </div> </header>   <main>   <article class="blog-post" data-astro-cid-bvzihdzo> <header class="post-header" data-astro-cid-bvzihdzo> <div class="container" data-astro-cid-bvzihdzo> <a href="/blog/" class="back-link" data-astro-cid-bvzihdzo>&larr; All posts</a> <h1 class="post-title" data-astro-cid-bvzihdzo>Why VENOM Exists: AI Data Enforcement Analysis</h1> <div class="post-meta" data-astro-cid-bvzihdzo> <time datetime="2026-04-01T00:00:00.000Z" data-astro-cid-bvzihdzo>March 31, 2026</time>  <span class="author" data-astro-cid-bvzihdzo>Semiautonomous Systems</span> </div> </div> </header> <div class="container" data-astro-cid-bvzihdzo> <div class="prose" data-astro-cid-bvzihdzo>  <p>The robots.txt file has been part of the web’s social contract for over thirty years. <a href="https://www.greenhills.co.uk/posts/robotstxt-25/">Proposed by Martijn Koster in 1994</a> and formalized as <a href="https://datatracker.ietf.org/doc/html/rfc9309">RFC 9309 in 2022</a>, it established a simple principle: if you respect my preferences, I’ll make my content available to you. Search engines honored this agreement. They had reputational incentives, business relationships with publishers, and a shared understanding that cooperation benefited everyone.</p>
+<p>That era is ending.</p>
+<p>In April 2025, the <a href="https://www.techpolicy.press/the-ghibli-style-ai-trend-shows-why-creators-need-their-own-consent-tools/">Ghibli-style AI trend</a> made visible what had been invisible: OpenAI’s image generation produced outputs unmistakably derived from Studio Ghibli’s copyrighted work, scraped without permission. The resemblance wasn’t accidental. As Knodel and Hingle noted in Tech Policy Press, individual creators have no meaningful consent tools when platforms fail to protect them. Robots.txt addresses domain owners, not artists whose work lives across platforms they don’t control.</p>
+<p>In 2024, <a href="https://mjtsai.com/blog/2024/06/24/ai-companies-ignoring-robots-txt/">reports emerged that AI companies were ignoring robots.txt</a>. By Q2 2025, <a href="https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/">13.26 percent of AI bot requests ignored robots.txt directives</a>, a fourfold increase from Q4 2024. <a href="https://blog.cloudflare.com/control-content-use-for-ai-training/">Cloudflare documented AI crawlers using stealth tactics</a>: rotating IPs, spoofing user agents, and operating undeclared scrapers that bypassed preference signals entirely. The IETF’s <a href="https://datatracker.ietf.org/wg/aipref/about/">AI Preferences (AIPREF) working group</a> is working to standardize better signals, but signals alone won’t solve the problem.</p>
+<p>At the same time, defensive tools have emerged. <a href="https://nightshade.cs.uchicago.edu/whatis.html">Nightshade</a>, released by University of Chicago researchers in January 2024, lets artists add imperceptible perturbations to images that corrupt AI models during training. It <a href="https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/">downloaded over 250,000 times within months</a>. In January 2026, <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison">Poison Fountain appeared</a>, an anonymous initiative distributing poisoned datasets specifically designed to sabotage language models. Tools like Anubis impose computational costs on crawlers through proof-of-work challenges, forcing them to spend resources before accessing content.</p>
+<p>These aren’t fringe experiments. They’re responses to a structural shift in power dynamics. When preference signals become unenforceable, content creators adopt enforcement mechanisms that impose costs directly.</p>
+<p>This is why VENOM exists.</p>
+<h2 id="the-enforcement-vs-signaling-framework">The Enforcement vs Signaling Framework</h2>
+<p>Understanding the current situation requires a clear analytical framework. We distinguish between two different approaches to governing AI training data collection:</p>
+<p><strong>Signaling mechanisms</strong> communicate preferences but rely on voluntary compliance. They include:</p>
+<ul>
+<li>robots.txt directives</li>
+<li>HTTP headers like AIPREF’s proposed Content-Usage field</li>
+<li>Metadata embedded in content</li>
+<li>Terms of service and licensing statements</li>
+</ul>
+<p>Signaling works when responders have incentives to comply: reputation, legal exposure, business relationships, or technical ecosystems that enforce consequences. Search engines complied with robots.txt because they needed ongoing relationships with publishers. Ignoring preferences meant losing access to updated content and facing public backlash.</p>
+<p><strong>Enforcement mechanisms</strong> impose direct costs on non-compliant actors. They include:</p>
+<ul>
+<li>Data poisoning (Nightshade, Poison Fountain)</li>
+<li>Proof-of-work challenges (Anubis)</li>
+<li>Server-level blocking based on fingerprinting</li>
+<li>Legal enforcement with statutory damages</li>
+<li>Technical countermeasures that degrade model quality</li>
+</ul>
+<p>Enforcement doesn’t require cooperation. It works by making undesired behavior expensive, unreliable, or actively harmful.</p>
+<p>The critical insight: <strong>signaling is not enforcement</strong>. When the IETF standardizes AIPREF, it creates clearer signals. But signals only matter if someone pays a cost for ignoring them. Without enforcement, better signals just make violations easier to measure.</p>
+<p>As <a href="https://www.techpolicy.press/robotstxt-is-having-a-moment-heres-why-we-should-care/">Hingle and Knodel observed</a>, robots.txt has become “ground zero for debates about consent, control, and digital exploitation.” Yet the same analysis concludes that “robust enforcement and accountability are anticipated to emerge from future policy frameworks”—an acknowledgment that signaling alone remains insufficient. Most web content falls into what they call “a grey area: no signal at all.” Even where signals exist, voluntary compliance is failing.</p>
+<h2 id="why-signaling-is-failing">Why Signaling Is Failing</h2>
+<p>The breakdown of robots.txt reveals why signaling alone fails in the AI training context:</p>
+<ol>
+<li>
+<p><strong>Incentive misalignment</strong>: AI companies that scrape without permission gain competitive advantages. Training data is valuable. Respecting preferences means smaller, potentially inferior datasets. The incentive is to defect.</p>
+</li>
+<li>
+<p><strong>Lack of ongoing relationships</strong>: Search engines need continuous access to updated content. They index today’s news, tomorrow’s blog posts, next week’s products. AI training is different. Once you’ve scraped a dataset, the relationship ends. There’s no recurring dependency that creates enforcement leverage.</p>
+</li>
+<li>
+<p><strong>Attribution asymmetry</strong>: When a search engine violates robots.txt, webmasters notice immediately. Their logs show crawling activity. When an AI model trains on your work, detection requires techniques like membership inference attacks or training data extraction methods that remain research-stage and have variable success rates depending on model architecture and training conditions. Model weights don’t carry provenance. Without technical mechanisms for attribution, content creators must rely on indirect evidence like copyright registration records (as in the New York Times lawsuit against OpenAI) or statistical similarity analysis. This structural asymmetry advantages well-resourced actors. AI companies know what data they trained on; content creators must infer it.</p>
+</li>
+<li>
+<p><strong>Regulatory lag</strong>: Legal frameworks are evolving, but uncertainty remains about fair use, transformative use, and applicable remedies. Even when laws clearly prohibit unauthorized training, enforcement requires resources, evidence, and years of litigation.</p>
+</li>
+</ol>
+<p>The result: <a href="https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/">AI crawlers increasingly ignore or circumvent robots.txt</a>, using techniques that would have been unthinkable for legitimate search engines. Publishers respond by moving to server-level blocking, but this becomes an arms race of fingerprinting versus evasion.</p>
+<h2 id="the-emergence-of-enforcement">The Emergence of Enforcement</h2>
+<p>Into this vacuum, enforcement mechanisms have emerged:</p>
+<p><strong>Data Poisoning</strong>: Nightshade demonstrated that <a href="https://arxiv.org/abs/2310.13828">fewer than 100 poisoned images can corrupt Stable Diffusion models</a>, causing them to misidentify prompts and generate degraded outputs. The technique exploits a basic reality: AI models learn patterns from data, and poisoned data teaches wrong patterns. Nightshade’s paper reports perturbation generation taking minutes to hours per image on consumer GPUs, but we lack public data on deployment costs at scale or the economic costs AI companies face when filtering poisoned data from training pipelines. The cost asymmetry (cheap to generate, expensive to detect) is theoretically plausible but requires measurement in production environments.</p>
+<p><a href="https://www.anthropic.com/research/small-samples-poison">Anthropic’s October 2025 research</a> found that as few as 250 malicious documents can backdoor language models regardless of size. This finding challenges the assumption that poisoning requires controlling a percentage of training data. If attackers only need a fixed, small number of documents, poisoning becomes far more accessible. As <a href="https://www.pymnts.com/artificial-intelligence-2/2025/anthropic-even-a-little-data-poisoning-can-corrupt-ai-models/">Anthropic noted</a>, “creating 250 malicious documents is trivial compared to creating millions.”</p>
+<p>Poison Fountain extends this logic to LLMs. Its anonymous creators <a href="https://futurism.com/artificial-intelligence/poison-fountain-ai">distribute poisoned datasets with subtle logic errors</a>, designed to degrade code generation and reasoning capabilities. Whether Poison Fountain succeeds as a technical intervention is less important than what it represents: a willingness to impose costs directly when signaling fails.</p>
+<p><strong>Proof-of-Work</strong>: Anubis-style systems force crawlers to solve computational challenges before accessing content. This shifts costs from defenders to scrapers. If you’re a legitimate researcher accessing a few papers, solving a challenge is trivial. If you’re scraping millions of pages, the cumulative cost becomes prohibitive. The mechanism self-selects: high-volume, low-value scraping becomes uneconomical.</p>
+<p><strong>Litigation as Enforcement</strong>: When The New York Times sued OpenAI, they didn’t rely on robots.txt. They alleged copyright infringement with statutory damages. Litigation imposes costs (legal fees, reputational risk, potential judgments) that turn non-compliance from free to expensive. Whether courts ultimately side with publishers or AI companies, the existence of credible legal threats changes the calculus.</p>
+<p>Each enforcement mechanism operates differently, but all share a core principle: <strong>make undesired behavior costly</strong>.</p>
+<h2 id="venoms-mission-analysis-not-advocacy">VENOM’s Mission: Analysis, Not Advocacy</h2>
+<p>VENOM is not here to tell you data poisoning is good or bad. We’re not AI company critics or content creator evangelists. We’re here to analyze enforcement mechanisms with rigor, measure their effectiveness where possible, and acknowledge uncertainty where evidence is insufficient.</p>
+<p>Our role is <strong>honest brokering</strong>. That means:</p>
+<ol>
+<li>
+<p><strong>Power dynamics analysis</strong>: AI companies operate with structural advantages: capital, infrastructure, legal resources, and the ability to scrape first and litigate later. Content creators are atomized individuals or small publishers who lack visibility into model training and must coordinate across fragmented stakeholders to impose costs. Enforcement mechanisms like data poisoning reduce coordination costs by allowing unilateral defense, but their effectiveness at actually rebalancing power depends on adoption rates and AI company counter-investments. Both remain currently unmeasured.</p>
+</li>
+<li>
+<p><strong>Cost analysis</strong>: What does it cost to implement a defense? What does it cost to defeat that defense? We will quantify these questions where data exists and explicitly acknowledge gaps where it doesn’t. For example, Anubis implementers discuss computational costs in terms of SHA-256 hash difficulty, but we lack independent verification of the marginal cost increase imposed on well-resourced scrapers. Nightshade perturbation generation costs are reported in the original paper, but filtering costs at training pipeline scale remain proprietary to AI companies. These economics matter, and measuring them is core to VENOM’s mission.</p>
+</li>
+<li>
+<p><strong>Measurement over promises</strong>: We will quantify effectiveness where possible and state clearly where evidence is limited. If someone claims a poisoning technique “works,” we’ll ask: works how much? Against which models? At what scale? With what collateral damage? If we don’t know, we’ll say so. When we evaluate filtering techniques or defensive measures, we will clearly distinguish between laboratory results, theoretical claims, and measured real-world outcomes. We will also acknowledge where we lack field deployment data.</p>
+</li>
+<li>
+<p><strong>Trade-offs and collateral damage</strong>: Data poisoning affects all models trained on corrupted data, both commercial labs with detection budgets and academic researchers without them. How severe is this harm? What adoption threshold makes public datasets effectively unusable for research? Does proof-of-work friction disproportionately burden accessibility tools and archival projects compared to commercial scrapers? Which specific fair use cases does litigation risk actually chill? Quantifying these collateral effects is a core research question we will address in subsequent analysis, starting with measurement frameworks for academic dataset corruption and proof-of-work accessibility impact.</p>
+</li>
+<li>
+<p><strong>Standards and enforcement ecosystem</strong>: We’ll track developments in signaling standards like AIPREF, but we’ll analyze them through the enforcement lens. A better signal is valuable if it creates clearer evidence for litigation, allows more precise blocking, or establishes clearer norms. But it’s not enforcement by itself.</p>
+</li>
+</ol>
+<h2 id="what-venom-will-deliver">What VENOM Will Deliver</h2>
+<p>Over the coming months, VENOM will establish itself as the authoritative source for understanding enforcement mechanisms in AI training data governance. Specifically, we will:</p>
+<p><strong>Publish rigorous analysis</strong> of data poisoning techniques, proof-of-work systems, and hybrid approaches. We’ll examine effectiveness, scalability, costs, and limitations within the constraints of available evidence. When researchers publish new poisoning methods, we’ll analyze their practical implications by distinguishing laboratory results from field deployment outcomes. When AI companies announce new filtering techniques, we’ll evaluate available evidence. We will explicitly note when companies make claims without providing measurement data.</p>
+<p><strong>Maintain a living knowledge base</strong> cataloging enforcement mechanisms, their implementations, and measured outcomes. This will include technical specifications, deployment guides, and case studies documenting real-world usage.</p>
+<p><strong>Track signaling standards</strong> (AIPREF, robots.txt extensions, metadata schemes) not as an end in themselves but as components of an enforcement ecosystem. Standards matter when they’re backed by consequences.</p>
+<p><strong>Analyze legal developments</strong> as enforcement mechanisms. Court rulings, regulatory actions, and statutory frameworks all impose costs on certain behaviors. We’ll examine their scope, effectiveness, and interaction with technical countermeasures.</p>
+<p><strong>Produce accessible explainers</strong> that bring technical depth to informed audiences without requiring PhDs. We’ll write for publishers deciding whether to implement defenses, researchers studying these dynamics, policymakers evaluating regulatory options, and AI practitioners navigating compliance.</p>
+<p><strong>Foster rigorous discourse</strong> by engaging with researchers, practitioners, and critics. We welcome challenges to our analysis. If we’re wrong, we’ll correct our position with evidence.</p>
+<h2 id="the-path-forward">The Path Forward</h2>
+<p>The breakdown of signaling-based governance in AI training data is not a crisis to lament. It’s a reality to understand. From a game-theoretic perspective, exploring enforcement alternatives represents rational behavior when voluntary compliance fails and no external authority imposes consequences. Whether participants in this specific system behave according to these models remains an empirical question we will examine through documented case studies of defensive measure adoption.</p>
+<p>The question is not whether enforcement mechanisms will emerge. They already have. The questions are:</p>
+<ul>
+<li>Which mechanisms impose costs most effectively?</li>
+<li>What are their collateral effects?</li>
+<li>How do AI companies respond, and at what cost?</li>
+<li>What legal and technical equilibria emerge?</li>
+<li>Who ultimately holds power in these dynamics?</li>
+</ul>
+<p>VENOM exists to answer these questions with clarity, technical rigor, and intellectual honesty. We are not here to advocate for any particular outcome. We’re here to analyze mechanisms, measure effectiveness, and acknowledge trade-offs. We aim to provide the authoritative framework for understanding this space.</p>
+<p>If you’re researching AI training governance, covering these issues for the press, developing standards, or making decisions about defensive measures, we invite you to engage with our work. Cite VENOM’s Enforcement vs Signaling framework. Challenge our analysis. Contribute evidence and measurement.</p>
+<p>Our goal is not to claim authority but to earn it through rigorous analysis, transparent methodology, and intellectual honesty. Whether journalists, researchers, and standards bodies cite VENOM as authoritative depends on the quality of our work.</p>
+<hr>
+<h2 id="references">References</h2>
+<ol>
+<li>
+<p>Koster, M. (1994). “Robots.txt 25 Years Later.” <em>Martijn Koster’s Pages</em>. <a href="https://www.greenhills.co.uk/posts/robotstxt-25/">https://www.greenhills.co.uk/posts/robotstxt-25/</a></p>
+</li>
+<li>
+<p>IETF (2022). “RFC 9309: Robots Exclusion Protocol.” <a href="https://datatracker.ietf.org/doc/html/rfc9309">https://datatracker.ietf.org/doc/html/rfc9309</a></p>
+</li>
+<li>
+<p>Tsai, M. (2024). “AI Companies Ignoring Robots.txt.” <em>Michael Tsai Blog</em>. <a href="https://mjtsai.com/blog/2024/06/24/ai-companies-ignoring-robots-txt/">https://mjtsai.com/blog/2024/06/24/ai-companies-ignoring-robots-txt/</a></p>
+</li>
+<li>
+<p>The Register (2025). “Publishers Say No to AI Scrapers, Block Bots at Server Level.” <a href="https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/">https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/</a></p>
+</li>
+<li>
+<p>Cloudflare (2025). “Control Content Use for AI Training with Cloudflare’s Managed Robots.txt.” <a href="https://blog.cloudflare.com/control-content-use-for-ai-training/">https://blog.cloudflare.com/control-content-use-for-ai-training/</a></p>
+</li>
+<li>
+<p>IETF AIPREF Working Group (2025). “AI Preferences (aipref).” <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></p>
+</li>
+<li>
+<p>Shan, S., et al. (2023). “Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models.” <em>arXiv:2310.13828</em>. <a href="https://arxiv.org/abs/2310.13828">https://arxiv.org/abs/2310.13828</a></p>
+</li>
+<li>
+<p>University of Chicago (2024). “Nightshade: Protecting Copyright.” <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></p>
+</li>
+<li>
+<p>Heaven, W.D. (2023). “This New Data Poisoning Tool Lets Artists Fight Back Against Generative AI.” <em>MIT Technology Review</em>. <a href="https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/">https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/</a></p>
+</li>
+<li>
+<p>The Register (2026). “AI Insiders Seek to Poison the Data That Feeds Them.” <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison</a></p>
+</li>
+<li>
+<p>Futurism (2026). “Engineers Deploy ‘Poison Fountain’ That Scrambles Brains of AI Systems.” <a href="https://futurism.com/artificial-intelligence/poison-fountain-ai">https://futurism.com/artificial-intelligence/poison-fountain-ai</a></p>
+</li>
+<li>
+<p>Anthropic (2025). “Small Samples Can Poison Large Models.” <a href="https://www.anthropic.com/research/small-samples-poison">https://www.anthropic.com/research/small-samples-poison</a></p>
+</li>
+<li>
+<p>PYMNTS (2025). “Anthropic: Even a Little Data Poisoning Can Corrupt AI Models.” <a href="https://www.pymnts.com/artificial-intelligence-2/2025/anthropic-even-a-little-data-poisoning-can-corrupt-ai-models/">https://www.pymnts.com/artificial-intelligence-2/2025/anthropic-even-a-little-data-poisoning-can-corrupt-ai-models/</a></p>
+</li>
+<li>
+<p>Plagiarism Today (2025). “Does Robots.txt Matter Anymore?” <a href="https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/">https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/</a></p>
+</li>
+<li>
+<p>Hingle, A., Knodel, M. (2025). “Robots.txt Is Having a Moment: Here’s Why We Should Care.” <em>Tech Policy Press</em>. <a href="https://www.techpolicy.press/robotstxt-is-having-a-moment-heres-why-we-should-care/">https://www.techpolicy.press/robotstxt-is-having-a-moment-heres-why-we-should-care/</a></p>
+</li>
+<li>
+<p>Knodel, M., Hingle, A. (2025). “The Ghibli-Style AI Trend Shows Why Creators Need Their Own Consent Tools.” <em>Tech Policy Press</em>. <a href="https://www.techpolicy.press/the-ghibli-style-ai-trend-shows-why-creators-need-their-own-consent-tools/">https://www.techpolicy.press/the-ghibli-style-ai-trend-shows-why-creators-need-their-own-consent-tools/</a></p>
+</li>
+</ol>  </div> </div> </article>  </main> <footer class="footer" data-astro-cid-sz7xmlte> <div class="footer-inner" data-astro-cid-sz7xmlte> <nav class="footer-links" data-astro-cid-sz7xmlte> <a href="/" data-astro-cid-sz7xmlte>Home</a><a href="/venom/" data-astro-cid-sz7xmlte>VENOM</a><a href="/blog/" data-astro-cid-sz7xmlte>Blog</a><a href="mailto:venom@semiautonomous.systems" data-astro-cid-sz7xmlte>Contact</a> </nav> <div class="footer-copy" data-astro-cid-sz7xmlte>
+&copy; 2026 Semiautonomous Systems
+</div> </div> </footer>  </body></html>  

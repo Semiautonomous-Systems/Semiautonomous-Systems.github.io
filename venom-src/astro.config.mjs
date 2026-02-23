@@ -1,9 +1,13 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://semiautonomous.systems',
   base: '/',
-  integrations: [tailwind({ applyBaseStyles: false })],
+  integrations: [
+    tailwind({ applyBaseStyles: false }),
+    sitemap(),
+  ],
   output: 'static'
 });
