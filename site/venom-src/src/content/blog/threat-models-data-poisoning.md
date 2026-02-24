@@ -84,6 +84,8 @@ Backdoor attacks are no longer limited to nation-state actors or sophisticated a
 
 This asymmetry means backdoor attacks disproportionately harm those with the least resources to defend, even when the intended target is a well-resourced commercial entity.
 
+![Backdoor attack vectors showing code repos, Wikipedia, and tool descriptions as injection points with sample counts](/images/diagrams/backdoor-supply-chain.png)
+
 ## Threat Model 2: Model Degradation (Availability Attacks)
 
 ### Attack Mechanism
@@ -131,6 +133,8 @@ While pure availability attacks are less common than targeted attacks in adversa
 - **Validation data requirements**: Certified defenses against poisoning require clean validation datasets, which are difficult to obtain at web scale. Research on certified defenses shows that effectiveness depends on the size and quality of trusted data, creating a bootstrapping problem.
 
 The power dynamic here is similar to backdoors: well-resourced actors can absorb filtering costs, while open-source and academic users inherit degraded models without the means to diagnose or repair them.
+
+![Bar chart showing model degradation by poison fraction: 3% baseline error, 11% at 1% poison, 24% at 3% poison, 53% at 10% poison](/images/diagrams/degradation-impact.png)
 
 ## Threat Model 3: Retrieval Poisoning (RAG System Attacks)
 
@@ -199,6 +203,8 @@ However, these detection systems are computationally expensive and require deplo
 - **Forensics and response**: When poisoning is detected, identifying and removing all compromised documents requires tracing attack provenance, which is resource-intensive and may be infeasible for large-scale systems.
 
 RAG systems are increasingly common in production applications across healthcare, finance, legal services, and customer support. Retrieval poisoning represents an active, practical threat with documented attack methods and limited deployed defenses.
+
+![Comparison matrix of three threat models: backdoor, degradation, and RAG poisoning across vector, samples, persistence, and detection](/images/diagrams/threat-model-comparison.png)
 
 ## Power Dynamics: Who Can Attack and Who Pays?
 

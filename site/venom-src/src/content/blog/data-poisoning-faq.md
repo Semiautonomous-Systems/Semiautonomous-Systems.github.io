@@ -93,6 +93,8 @@ Documented real-world cases include:
 
 These attacks illustrate supply chain risks where public platforms become vectors for injecting malicious training data.
 
+![Offensive vs defensive poisoning comparison: offensive corrupts model outputs via backdoors and supply chain compromise, defensive protects against extraction via Nightshade, Glaze, and Poison Fountain](/images/diagrams/attack-taxonomy.png)
+
 ---
 
 ## Effectiveness and Technical Details
@@ -352,6 +354,8 @@ Named after the carnivorous pitcher plant, Nepenthes generates pages with links 
 | **Poisoning** | Model degradation | High (affects all trainers) | Low (modify content) | Unmeasured |
 
 VENOM's position: Preference signals should be the first line of defense. Proof-of-work and tarpits impose measurable costs with limited collateral damage. Poisoning should be reserved for cases where other mechanisms have failed and collateral harm is acceptable.
+
+![Enforcement mechanism spectrum from robots.txt through AIPREF, Anubis, AI Labyrinth, to Nightshade showing increasing cost and collateral damage](/images/diagrams/enforcement-spectrum.png)
 
 ---
 

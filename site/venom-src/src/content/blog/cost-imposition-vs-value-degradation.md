@@ -52,6 +52,8 @@ Examples include:
 
 The key characteristic of value degradation is asymmetry: the burden affects all downstream uses of the data, not just the initial collection. A research team with limited filtering capacity may be harmed as much as or more than a well-resourced commercial scraper.
 
+![Two categories of defense: cost imposition makes scraping expensive with targeted measurable tools, value degradation makes scraped data useless with indiscriminate high collateral](/images/diagrams/defense-decision-tree.png)
+
 ## Who Bears the Costs?
 
 The choice between cost imposition and value degradation has major implications for who pays, how much, and whether costs can be targeted at bad actors versus imposed broadly.
@@ -137,6 +139,8 @@ Value degradation defenses are difficult to undo once deployed. A poisoned image
 - Incorporated into models that have already been trained and deployed
 
 If a scraper begins respecting preference signals in response to the threat of poisoning, there is no clear mechanism to remove already-poisoned data from circulation. This contrasts with cost imposition mechanisms such as proof-of-work and rate limiting, which can be dialed down or disabled dynamically if compliance improves.
+
+![Publisher defense capacity comparison: large publishers can afford WAF, licensed APIs, and legal teams while small publishers rely on robots.txt and poisoning as last resort](/images/diagrams/publisher-capacity.png)
 
 ## Publisher Economics: Who Can Afford Which Defenses?
 
@@ -267,6 +271,8 @@ Watermarking is best used as a complement to other defenses: it provides evidenc
 **Noise injection:**
 
 Simple noise injection is largely ineffective against large-scale training. As dataset size increases, the signal-to-noise ratio improves, and random noise averages out. Adversarial noise (optimized perturbations like Nightshade) is required for meaningful impact, which brings us back to data poisoning with all its tradeoffs.
+
+![Bar chart showing robots.txt non-compliance growing from 3.3% in Q4 2024 to 13.26% in Q2 2025, a 4x increase in 6 months](/images/diagrams/noncompliance-growth.png)
 
 ## Why Voluntary Signals Fail Predictably
 

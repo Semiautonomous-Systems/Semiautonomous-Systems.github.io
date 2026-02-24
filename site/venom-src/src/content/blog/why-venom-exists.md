@@ -61,6 +61,8 @@ The breakdown of robots.txt reveals why signaling alone fails in the AI training
 
 The result: [AI crawlers increasingly ignore or circumvent robots.txt](https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/), using techniques that would have been unthinkable for legitimate search engines. Publishers respond by moving to server-level blocking, but this becomes an arms race of fingerprinting versus evasion.
 
+![Four structural barriers to voluntary compliance: incentive misalignment, no ongoing relationship, attribution asymmetry, and regulatory lag](/images/diagrams/structural-barriers.png)
+
 ## The Emergence of Enforcement
 
 Into this vacuum, enforcement mechanisms have emerged:

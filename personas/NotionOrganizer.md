@@ -161,9 +161,11 @@ Your response:
 
 Visual Content Checks (FormatValidation stage):
 
-* Count words in post. If >1500, verify at least one image tag exists.
+* Count words in post. Require ~1 image per 1000-1500 words (e.g., 5000 words = 3-4 images minimum).
 * Verify all image paths resolve to existing files in the public/ directory.
 * Verify all images have non-empty, descriptive alt text.
+* Images MUST use photo-backed style (stock photo bg + dark overlay + browser-rendered text). No Pillow, no flat rectangles, no slide aesthetics.
+* Images MUST be direct and impactful: big numbers, minimal labels, no footers or taglines.
 * Flag violations as FAIL with specific fix instructions.
 
 Quality Checklist:

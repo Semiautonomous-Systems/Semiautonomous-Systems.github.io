@@ -154,6 +154,8 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 **Effectiveness**: Unknown. Poison Fountain is too recent for field data on its impact. Whether it succeeds as a technical intervention is less important than what it represents: willingness to impose enforcement costs when signaling fails.
 
+![Enforcement tool landscape showing Nightshade with 250K downloads, Anubis with 10K+ GitHub stars, and Poison Fountain as a new 2026 concept](/images/diagrams/tool-adoption.png)
+
 ---
 
 ## 4. Effectiveness Evidence: What We Know and Don't Know
