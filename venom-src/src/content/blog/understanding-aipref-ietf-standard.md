@@ -165,6 +165,10 @@ The pivot initially proposed additional categories ("AI Output" for generative A
 
 The pivot also means the drafts are still evolving. The current vocabulary (version 05, December 2025) and attachment mechanism (version 04, October 2025) reflect the new approach but have not yet achieved consensus<sup><a href="#ref-10">10</a></sup>. At IETF 124 in Montreal (November 2025), the working group held two sessions on the vocabulary and attachment mechanism. One key unresolved question: whether to add a top-level opt-out category that would let publishers reject all AI-related uses with a single preference. Proponents want a broad opt-out mechanism; opponents argue it could inhibit beneficial uses like accessibility tools. The chairs committed to gathering specific use cases on the mailing list before deciding.
 
+Several open questions remain as of early 2026. The "substitutive use" gap -- AI outputs that replace or reduce the value of original content, like news summaries or style mimicry -- is not covered by `train-ai` or `search`. An individual draft proposes a new category for this<sup><a href="#ref-22">22</a></sup>. The definition of "search" itself is contested: where does traditional web search end and RAG-powered AI summarization begin? And a separate draft raises the question of end-user preferences versus publisher preferences<sup><a href="#ref-23">23</a></sup> -- site operators control preference signals, but they do not necessarily own all content on their sites. The working group has not yet addressed user-generated content scenarios.
+
+On the mailing list, a debate about legal enforceability has intensified. The vocab specification says preferences "do not themselves create rights or prohibitions," but participants are debating whether a standards-track RFC creates de facto legal standing in jurisdictions with TDM laws or AI-specific regulations. A separate technical question surfaced in February 2026: when an HTTP `Content-Usage` header and a robots.txt `Content-Usage` directive give conflicting preferences for the same path, the resolution semantics need clarification.
+
 ## Timeline and Current Status
 
 ![AIPREF timeline from January 2025 charter through Brussels, Bangkok, London, Madrid, WGLC, Zurich pivot, IETF 124 Montreal, to IETF 125 Shenzhen](/images/diagrams/aipref-timeline.png)
@@ -181,10 +185,14 @@ The pivot also means the drafts are still evolving. The current vocabulary (vers
 - **IETF 124, Montreal** (November 2025): Two sessions; consensus reached on separating "search" from other AI uses, but no consensus on a top-level opt-out category
 - **November 2025**: "AI Output" and "Automated Processing" categories removed from vocabulary draft, narrowing back to two categories (`train-ai`, `search`)
 - **December 2025**: Updated vocabulary draft (v05) published reflecting refined purpose-based approach<sup><a href="#ref-3">3</a></sup>
-- **IETF 125, Shenzhen** (March 2026): Next scheduled AIPREF session
+- **March 3, 2026**: Virtual interim focused on vocabulary issues; ~20 open GitHub issues on terminology, training scope, search definition, and preference model
+- **IETF 125, Shenzhen** (March 16, 2026): Confirmed AIPREF session
+- **April 14-16, 2026, Toronto**: Three-day in-person interim -- a significant time commitment signaling the chairs' intent to close major open issues
 - **August 2026**: Current IESG submission target for both drafts
 
-The original ambitious timeline (IESG submission by August 2025) slipped after the October pivot and has been rescheduled to August 2026. This is not unusual for IETF standards work. The pivot reflects genuine engagement with the problem rather than rushing to publish something inadequate. Getting the vocabulary right matters more than shipping quickly, because changing fundamental terms after deployment creates confusion rather than resolving it.
+The pace is accelerating. Three meetings in six weeks (March-April 2026) suggests the chairs believe the remaining issues are tractable but need concentrated face-to-face time. The original ambitious timeline (IESG submission by August 2025) slipped after the October pivot and has been rescheduled to August 2026. The Toronto interim leaves limited margin for further delays if the August target is to hold.
+
+This timeline is not unusual for IETF standards work. The pivot reflects genuine engagement with the problem rather than rushing to publish something inadequate. Getting the vocabulary right matters more than shipping quickly, because changing fundamental terms after deployment creates confusion rather than resolving it.
 
 ## AIPREF vs robots.txt
 
@@ -281,4 +289,6 @@ For foundational context on why these preference signals matter, see our [Why VE
 <li id="ref-19">Cloudflare (2025). "Control Content Use for AI Training with Cloudflare's Managed Robots.txt." <a href="https://blog.cloudflare.com/control-content-use-for-ai-training/">https://blog.cloudflare.com/control-content-use-for-ai-training/</a></li>
 <li id="ref-20">APNIC Blog (2025). "IETF Setting Standards for AI Preferences." <a href="https://blog.apnic.net/2025/04/08/ietf-setting-standards-for-ai-preferences/">https://blog.apnic.net/2025/04/08/ietf-setting-standards-for-ai-preferences/</a></li>
 <li id="ref-21">Computerworld (2025). "IETF Hatching a New Way to Tame Aggressive AI Website Scraping." <a href="https://www.computerworld.com/article/3958587/ietf-hatching-a-new-way-to-tame-aggressive-ai-website-scraping.html">https://www.computerworld.com/article/3958587/ietf-hatching-a-new-way-to-tame-aggressive-ai-website-scraping.html</a></li>
+<li id="ref-22">Silver, B. "Substitutive Use Category for AI Preferences Vocabulary." draft-silver-aipref-vocab-substitutive-00. <a href="https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/">https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/</a></li>
+<li id="ref-23">Badii, F., Bailey, L., Levy, J. "End-User Considerations for AI Preferences." draft-farzdusa-aipref-enduser-00. <a href="https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/">https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/</a></li>
 </ol>
