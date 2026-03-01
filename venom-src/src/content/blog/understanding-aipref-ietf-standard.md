@@ -161,11 +161,13 @@ At an interim meeting in Zurich in October 2025, the group pivoted to a **purpos
 
 This reframing has practical implications. It allows publishers to say "you may use ML to rank my content in search results, but you may not use my content to train a general-purpose language model." The previous technology-based framing could not express this distinction cleanly.
 
-The pivot also means the drafts are still evolving. The current vocabulary (version 05, December 2025) and attachment mechanism (version 04, October 2025) are proposals that lack consensus<sup><a href="#ref-10">10</a></sup>. The working group is actively seeking feedback from publishers, AI vendors, and other stakeholders. Discussion is scheduled for IETF 124 in Montreal.
+The pivot initially proposed additional categories ("AI Output" for generative AI responses, "Automated Processing" for bot-like usage), but these were removed in November 2025 after the working group determined they were either too broad or insufficiently distinct. The vocabulary narrowed back to the two core categories: `train-ai` and `search`.
+
+The pivot also means the drafts are still evolving. The current vocabulary (version 05, December 2025) and attachment mechanism (version 04, October 2025) reflect the new approach but have not yet achieved consensus<sup><a href="#ref-10">10</a></sup>. At IETF 124 in Montreal (November 2025), the working group held two sessions on the vocabulary and attachment mechanism. One key unresolved question: whether to add a top-level opt-out category that would let publishers reject all AI-related uses with a single preference. Proponents want a broad opt-out mechanism; opponents argue it could inhibit beneficial uses like accessibility tools. The chairs committed to gathering specific use cases on the mailing list before deciding.
 
 ## Timeline and Current Status
 
-![AIPREF timeline from January 2025 charter through Brussels, Bangkok, London, Madrid, WGLC, Zurich pivot, to IETF 124 Montreal](/images/diagrams/aipref-timeline.png)
+![AIPREF timeline from January 2025 charter through Brussels, Bangkok, London, Madrid, WGLC, Zurich pivot, IETF 124 Montreal, to IETF 125 Shenzhen](/images/diagrams/aipref-timeline.png)
 
 - **January 2025**: IETF charters the AIPREF Working Group<sup><a href="#ref-1">1</a></sup>
 - **IETF 122, Bangkok**: First official WG meeting
@@ -176,10 +178,13 @@ The pivot also means the drafts are still evolving. The current vocabulary (vers
 - **August 2025**: Original target for IESG submission (missed)
 - **September 2025**: Working Group Last Call issued on both drafts
 - **October 2025, Zurich**: Interim meeting; fundamental reconceptualization from technology-based to purpose-based framework<sup><a href="#ref-10">10</a></sup>
-- **December 2025**: Updated vocabulary draft (v05) published reflecting new approach<sup><a href="#ref-3">3</a></sup>
-- **2026**: Ongoing refinement; discussion at IETF 124 Montreal
+- **IETF 124, Montreal** (November 2025): Two sessions; consensus reached on separating "search" from other AI uses, but no consensus on a top-level opt-out category
+- **November 2025**: "AI Output" and "Automated Processing" categories removed from vocabulary draft, narrowing back to two categories (`train-ai`, `search`)
+- **December 2025**: Updated vocabulary draft (v05) published reflecting refined purpose-based approach<sup><a href="#ref-3">3</a></sup>
+- **IETF 125, Shenzhen** (March 2026): Next scheduled AIPREF session
+- **August 2026**: Current IESG submission target for both drafts
 
-The original ambitious timeline (IESG submission by August 2025) slipped after the October pivot. This is not unusual for IETF standards work. The pivot reflects genuine engagement with the problem rather than rushing to publish something inadequate. Getting the vocabulary right matters more than shipping quickly, because changing fundamental terms after deployment creates confusion rather than resolving it.
+The original ambitious timeline (IESG submission by August 2025) slipped after the October pivot and has been rescheduled to August 2026. This is not unusual for IETF standards work. The pivot reflects genuine engagement with the problem rather than rushing to publish something inadequate. Getting the vocabulary right matters more than shipping quickly, because changing fundamental terms after deployment creates confusion rather than resolving it.
 
 ## AIPREF vs robots.txt
 
@@ -242,7 +247,7 @@ This allows all crawling but disallows AI training by default, with an exception
 
 **2. Add Content-Usage HTTP headers** for per-resource control. This requires server configuration (Nginx, Apache, Cloudflare Workers, etc.) to set headers based on content type or path.
 
-The AIPREF Generator at aipref.dev<sup><a href="#ref-18">18</a></sup> provides a free tool for generating compliant configurations. It walks through the preference categories and outputs ready-to-use robots.txt directives and HTTP header configurations.
+The AIPREF Generator at aipref.dev<sup><a href="#ref-18">18</a></sup> provides a tool for generating configurations. Note that the generator's interface currently shows categories from an earlier draft version (including "automated processing" and "generative AI training" which have since been removed). The core `train-ai` and `search` categories remain valid.
 
 Note that AIPREF is still an Internet-Draft, not a published RFC. The syntax and vocabulary may change before finalization. Early adoption helps shape the standard through real-world feedback, but implementations should be prepared to update as the drafts evolve.
 
@@ -256,7 +261,7 @@ For foundational context on why these preference signals matter, see our [Why VE
 
 <ol class="references">
 <li id="ref-1">IETF. "AI Preferences (aipref) Working Group Charter." <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></li>
-<li id="ref-2">Thomson, M., Keller, P. "Associating AI Usage Preferences with Content in HTTP." draft-ietf-aipref-attach-04. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-attach-04">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-attach-04</a></li>
+<li id="ref-2">Illyes, G., Thomson, M. "Associating AI Usage Preferences with Content in HTTP." draft-ietf-aipref-attach-04. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-attach-04">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-attach-04</a></li>
 <li id="ref-3">Keller, P., Thomson, M. "A Vocabulary For Expressing AI Usage Preferences." draft-ietf-aipref-vocab-05. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-05">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-05</a></li>
 <li id="ref-4">IETF Blog. "IETF Setting Standards for AI Preferences." <a href="https://www.ietf.org/blog/aipref-wg/">https://www.ietf.org/blog/aipref-wg/</a></li>
 <li id="ref-5">GitHub. "ai-robots-txt: A List of AI Agents and Robots to Block." <a href="https://github.com/ai-robots-txt/ai.robots.txt">https://github.com/ai-robots-txt/ai.robots.txt</a></li>
