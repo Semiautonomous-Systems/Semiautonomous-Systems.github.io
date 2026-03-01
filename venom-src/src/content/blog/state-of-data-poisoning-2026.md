@@ -26,21 +26,23 @@ This report presents the state of defensive data poisoning in 2026: what tools e
 
 ---
 
+![Timeline of AI data collection enforcement from 1994 robots.txt to 2026 Poison Fountain](/images/diagrams/timeline-1994-2026.png)
+
 ## 1. The Compliance Crisis: Robots.txt Bypass Data
 
 The robots.txt protocol has been part of the web's social contract since Martijn Koster proposed it in 1994. For decades, search engines honored it. They had reputational incentives, business relationships with publishers, and a shared understanding that cooperation benefited everyone. That era is ending.
 
 ### Quantifying Non-Compliance
 
-TollBit's Q2 2025 analysis found that 13.26% of AI bot requests ignored robots.txt directives. This represents a fourfold increase from the 3.3% recorded in Q4 2024. The trajectory is clear: non-compliance is growing rapidly [1].
+TollBit's Q2 2025 analysis found that 13.26% of AI bot requests ignored robots.txt directives. This represents a fourfold increase from the 3.3% recorded in Q4 2024. The trajectory is clear: non-compliance is growing rapidly <sup><a href="#ref-1">1</a></sup>.
 
-Duke University researchers deployed Anubis proof-of-work challenges specifically because of overwhelming crawler traffic to their academic infrastructure. UNESCO, WINE, GNOME, and the Enlightenment project followed. These are not commercial entities seeking competitive advantage. They are academic and open-source organizations protecting limited infrastructure from aggressive scraping [2].
+Duke University researchers deployed Anubis proof-of-work challenges specifically because of overwhelming crawler traffic to their academic infrastructure. UNESCO, WINE, GNOME, and the Enlightenment project followed. These are not commercial entities seeking competitive advantage. They are academic and open-source organizations protecting limited infrastructure from aggressive scraping <sup><a href="#ref-2">2</a></sup>.
 
-Publishers have responded. Sites blocking AI crawlers increased 336% year-over-year through 2025. Over 5.6 million websites have added GPTBot to their disallow lists, a 70% increase since July 2025. The message is clear, but crawlers are not listening [3].
+Publishers have responded. Sites blocking AI crawlers increased 336% year-over-year through 2025. Over 5.6 million websites have added GPTBot to their disallow lists, a 70% increase since July 2025. The message is clear, but crawlers are not listening <sup><a href="#ref-3">3</a></sup>.
 
 ### Bypass Techniques in the Wild
 
-Cloudflare's August 2025 technical report documented how Perplexity operated both declared user agents and undeclared stealth crawlers. These stealth crawlers rotated IP addresses and ASNs, sometimes ignored robots.txt entirely, and used Chrome-like user agent strings from unlisted address blocks [4].
+Cloudflare's August 2025 technical report documented how Perplexity operated both declared user agents and undeclared stealth crawlers. These stealth crawlers rotated IP addresses and ASNs, sometimes ignored robots.txt entirely, and used Chrome-like user agent strings from unlisted address blocks <sup><a href="#ref-4">4</a></sup>.
 
 The documented bypass techniques include:
 
@@ -65,6 +67,8 @@ This creates structural asymmetry. AI companies know exactly what data they trai
 ---
 
 ## 2. Enforcement Mechanism Taxonomy
+
+![Signaling mechanisms versus enforcement mechanisms comparison](/images/diagrams/signaling-vs-enforcement.png)
 
 Understanding the current situation requires distinguishing between signaling and enforcement. This framework is central to VENOM's analysis.
 
@@ -112,17 +116,17 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 ### Nightshade
 
-**Mechanism**: Nightshade adds imperceptible perturbations to images that corrupt AI models during training. The perturbations are optimized to create specific misbehaviors. For example, a poisoned "dog" image teaches the model an incorrect association that affects its understanding of "dog" prompts [5].
+**Mechanism**: Nightshade adds imperceptible perturbations to images that corrupt AI models during training. The perturbations are optimized to create specific misbehaviors. For example, a poisoned "dog" image teaches the model an incorrect association that affects its understanding of "dog" prompts <sup><a href="#ref-5">5</a></sup>.
 
-**Technical effectiveness**: The original research paper (IEEE S&P 2024) demonstrated that 50 poisoned images can cause models to produce distorted outputs. After 300 poisoned samples, models can be redirected entirely: prompts for "dog" generate "cat" images instead [6].
+**Technical effectiveness**: The original research paper (IEEE S&P 2024) demonstrated that 50 poisoned images can cause models to produce distorted outputs. After 300 poisoned samples, models can be redirected entirely: prompts for "dog" generate "cat" images instead <sup><a href="#ref-6">6</a></sup>.
 
-**Adoption**: Nightshade was downloaded over 250,000 times within five days of release. This adoption rate indicates significant demand from artists seeking protection against unauthorized training [7].
+**Adoption**: Nightshade was downloaded over 250,000 times within five days of release. This adoption rate indicates significant demand from artists seeking protection against unauthorized training <sup><a href="#ref-7">7</a></sup>.
 
 **Cost structure**: Perturbation generation takes minutes to hours per image on consumer GPUs. The attack cost is low. However, we lack public data on filtering costs at the training pipeline scale. AI companies do not publish what they spend detecting and removing poisoned images. This gap limits our ability to assess whether poisoning imposes economically meaningful costs on well-resourced targets.
 
 ### Glaze
 
-**Mechanism**: Glaze alters pixels in artwork so that AI models perceive the style differently from how humans see it. Unlike Nightshade's offensive approach, Glaze is purely defensive: it prevents style mimicry without corrupting downstream models [8].
+**Mechanism**: Glaze alters pixels in artwork so that AI models perceive the style differently from how humans see it. Unlike Nightshade's offensive approach, Glaze is purely defensive: it prevents style mimicry without corrupting downstream models <sup><a href="#ref-8">8</a></sup>.
 
 **Recognition**: Glaze won the TIME Best Invention of 2023 award, the Chicago Innovation Award, and the 2023 USENIX Internet Defence Prize. These recognitions reflect both technical achievement and social relevance.
 
@@ -132,23 +136,25 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 ### Anubis
 
-**Mechanism**: Anubis is a proof-of-work system requiring clients to solve SHA-256 hash challenges before accessing content. The challenge completes in seconds on modern browsers but creates prohibitive costs for mass scraping. If you need to access one page, the cost is negligible. If you need to access one million pages, the cost scales linearly [9].
+**Mechanism**: Anubis is a proof-of-work system requiring clients to solve SHA-256 hash challenges before accessing content. The challenge completes in seconds on modern browsers but creates prohibitive costs for mass scraping. If you need to access one page, the cost is negligible. If you need to access one million pages, the cost scales linearly <sup><a href="#ref-9">9</a></sup>.
 
-**Adoption**: Anubis is deployed by UNESCO, WINE, GNOME, Duke University, and the Enlightenment project. These deployments demonstrate viability in production academic and open-source infrastructure [10].
+**Adoption**: Anubis is deployed by UNESCO, WINE, GNOME, Duke University, and the Enlightenment project. These deployments demonstrate viability in production academic and open-source infrastructure <sup><a href="#ref-10">10</a></sup>.
 
 **Cost analysis**: Anubis imposes measurable, predictable costs on scrapers. Unlike poisoning, where effectiveness is difficult to verify, proof-of-work costs can be calculated from the challenge difficulty and the number of pages accessed. This measurability is a significant advantage.
 
-**Limitations**: Anubis may cause accessibility problems for screen readers and other assistive technologies that struggle with JavaScript-based challenges. It also blocks legitimate automated agents, including the Internet Archive's crawlers. These collateral effects require careful consideration. Tavis Ormandy (Google security researcher) noted that compute costs for attackers may be negligible until millions of sites deploy the system [11].
+**Limitations**: Anubis may cause accessibility problems for screen readers and other assistive technologies that struggle with JavaScript-based challenges. It also blocks legitimate automated agents, including the Internet Archive's crawlers. These collateral effects require careful consideration. Tavis Ormandy (Google security researcher) noted that compute costs for attackers may be negligible until millions of sites deploy the system <sup><a href="#ref-11">11</a></sup>.
 
 ### Poison Fountain
 
-**Mechanism**: Poison Fountain is an anonymous initiative distributing poisoned datasets specifically designed to sabotage language models. Website operators can embed URLs to these datasets, causing crawlers to ingest poisoned data. The datasets reportedly contain subtle logic errors designed to degrade code generation and reasoning capabilities [12].
+**Mechanism**: Poison Fountain is an anonymous initiative distributing poisoned datasets specifically designed to sabotage language models. Website operators can embed URLs to these datasets, causing crawlers to ingest poisoned data. The datasets reportedly contain subtle logic errors designed to degrade code generation and reasoning capabilities <sup><a href="#ref-12">12</a></sup>.
 
-**Inspiration**: Poison Fountain's creators cite Anthropic's October 2025 research showing that only 250 malicious documents can backdoor language models regardless of size. If poisoning requires a fixed, small number of documents rather than a percentage of training data, coordinated poisoning becomes far more practical [13].
+**Inspiration**: Poison Fountain's creators cite Anthropic's October 2025 research showing that only 250 malicious documents can backdoor language models regardless of size. If poisoning requires a fixed, small number of documents rather than a percentage of training data, coordinated poisoning becomes far more practical <sup><a href="#ref-13">13</a></sup>.
 
 **Coordination model**: Unlike individual defensive tools, Poison Fountain aims to coordinate poisoning at scale. The initiative provides both HTTP and .onion (darknet) URLs for resilience against takedown efforts. This coordination addresses the collective action problem that makes individual poisoning ineffective against well-resourced targets.
 
 **Effectiveness**: Unknown. Poison Fountain is too recent for field data on its impact. Whether it succeeds as a technical intervention is less important than what it represents: willingness to impose enforcement costs when signaling fails.
+
+![Enforcement tool landscape showing Nightshade with 250K downloads, Anubis with 10K+ GitHub stars, and Poison Fountain as a new 2026 concept](/images/diagrams/tool-adoption.png)
 
 ---
 
@@ -158,13 +164,13 @@ Honest assessment of defensive poisoning requires distinguishing measured result
 
 ### What Research Has Demonstrated
 
-**Poison efficiency is higher than previously assumed.** Anthropic's October 2025 collaboration with UK AISI and The Alan Turing Institute found that only 250 malicious documents can backdoor LLMs ranging from 600M to 13B parameters. The number of poison samples required is near-constant regardless of model and dataset size. Creating 250 malicious documents is trivial compared to creating millions [14].
+**Poison efficiency is higher than previously assumed.** Anthropic's October 2025 collaboration with UK AISI and The Alan Turing Institute found that only 250 malicious documents can backdoor LLMs ranging from 600M to 13B parameters. The number of poison samples required is near-constant regardless of model and dataset size. Creating 250 malicious documents is trivial compared to creating millions <sup><a href="#ref-14">14</a></sup>.
 
-**Small poison fractions cause measurable harm.** Adding 3% poisoned data can increase test error from 3% to 24%. In specialized domains, the threshold is even lower: replacing just 0.001% of training tokens with medical misinformation produced models more likely to propagate medical errors [15].
+**Small poison fractions cause measurable harm.** Adding 3% poisoned data can increase test error from 3% to 24%. In specialized domains, the threshold is even lower: replacing just 0.001% of training tokens with medical misinformation produced models more likely to propagate medical errors <sup><a href="#ref-15">15</a></sup>.
 
-**Larger models may be more vulnerable.** A 2024 AAAI paper on scaling trends found that larger LLMs are more susceptible to data poisoning, learning harmful behavior from poisoned datasets more quickly than smaller models. This counterintuitive finding suggests scale amplifies vulnerability rather than providing robustness [16].
+**Larger models may be more vulnerable.** A 2024 AAAI paper on scaling trends found that larger LLMs are more susceptible to data poisoning, learning harmful behavior from poisoned datasets more quickly than smaller models. This counterintuitive finding suggests scale amplifies vulnerability rather than providing robustness <sup><a href="#ref-16">16</a></sup>.
 
-**Backdoors persist through safety training.** Anthropic's "Sleeper Agents" research demonstrated that backdoored behavior survives supervised fine-tuning, RLHF, and adversarial training. In some cases, adversarial training made models more adept at concealing backdoors rather than eliminating them [17].
+**Backdoors persist through safety training.** Anthropic's "Sleeper Agents" research demonstrated that backdoored behavior survives supervised fine-tuning, RLHF, and adversarial training. In some cases, adversarial training made models more adept at concealing backdoors rather than eliminating them <sup><a href="#ref-17">17</a></sup>.
 
 ### What Remains Unmeasured
 
@@ -190,7 +196,7 @@ Technical enforcement mechanisms operate alongside evolving policy and standards
 
 ### IETF AIPREF Working Group
 
-The IETF chartered the AI Preferences (AIPREF) working group in January 2025 to develop standards for expressing AI usage preferences. AIPREF extends the robots.txt framework with vocabulary specifically addressing AI training use cases [18].
+The IETF chartered the AI Preferences (AIPREF) working group in January 2025 to develop standards for expressing AI usage preferences. AIPREF extends the robots.txt framework with vocabulary specifically addressing AI training use cases <sup><a href="#ref-18">18</a></sup>.
 
 Key preference categories under development include:
 
@@ -199,13 +205,13 @@ Key preference categories under development include:
 - `search`: Search engine indexing
 - `automated`: General automated processing
 
-Draft specifications (draft-ietf-aipref-attach and draft-ietf-aipref-vocab) define how preferences can be signaled in HTTP headers and robots.txt files. A community tool at aipref.dev generates compliant configurations [19].
+Draft specifications (draft-ietf-aipref-attach and draft-ietf-aipref-vocab) define how preferences can be signaled in HTTP headers and robots.txt files. A community tool at aipref.dev generates compliant configurations <sup><a href="#ref-19">19</a></sup>.
 
 AIPREF improves signaling expressiveness. It does not create enforcement. However, clearer signals create better evidence for litigation, enable more precise blocking, and establish clearer norms for responsible AI development. Standards matter most when they are backed by consequences.
 
 ### EU AI Act Training Data Transparency
 
-The EU AI Act (Regulation 2024/1689) imposes mandatory transparency requirements on General-Purpose AI (GPAI) providers. Article 53(1)(d) requires providers to publish a "sufficiently detailed summary" of training content, including data protected by copyright law [20].
+The EU AI Act (Regulation 2024/1689) imposes mandatory transparency requirements on General-Purpose AI (GPAI) providers. Article 53(1)(d) requires providers to publish a "sufficiently detailed summary" of training content, including data protected by copyright law <sup><a href="#ref-20">20</a></sup>.
 
 The European Commission published a mandatory disclosure template on July 24, 2025. Providers must document:
 
@@ -214,13 +220,13 @@ The European Commission published a mandatory disclosure template on July 24, 20
 - Synthetic data generation details
 - Measures for handling copyright reservations and illegal content
 
-GPAI transparency requirements took effect August 2, 2025. Non-compliance penalties can reach 15 million EUR or 3% of global annual revenue [21].
+GPAI transparency requirements took effect August 2, 2025. Non-compliance penalties can reach 15 million EUR or 3% of global annual revenue <sup><a href="#ref-21">21</a></sup>.
 
 These requirements do not prevent unauthorized scraping. They create accountability after the fact. If AI companies must disclose training data sources, creators gain evidence for enforcement actions. Transparency is not enforcement, but it supports enforcement.
 
 ### US Copyright Office Position
 
-The US Copyright Office's May 2025 report on "Generative AI Training" rejected arguments that AI training is automatically transformative fair use. The Office adopted a spectrum approach: training on diverse data for general-purpose models may be transformative, while training specifically to replicate works is unlikely to be transformative [22].
+The US Copyright Office's May 2025 report on "Generative AI Training" rejected arguments that AI training is automatically transformative fair use. The Office adopted a spectrum approach: training on diverse data for general-purpose models may be transformative, while training specifically to replicate works is unlikely to be transformative <sup><a href="#ref-22">22</a></sup>.
 
 Key findings:
 
@@ -235,13 +241,13 @@ This framework does not resolve ongoing litigation but signals that fair use def
 
 Major lawsuits impose enforcement costs regardless of their eventual outcomes:
 
-**The New York Times v. OpenAI**: Core claims advanced in April 2025 when Judge Sidney Stein rejected OpenAI's motion to dismiss. The Times has disclosed $10.8 million in litigation costs for 2024 alone [23].
+**The New York Times v. OpenAI**: Core claims advanced in April 2025 when Judge Sidney Stein rejected OpenAI's motion to dismiss. The Times has disclosed $10.8 million in litigation costs for 2024 alone <sup><a href="#ref-23">23</a></sup>.
 
-**Getty Images v. Stability AI**: The UK High Court ruled in November 2025 that model weights do not store reproductions of copyrighted works, rejecting most infringement claims. However, the ruling acknowledged limited trademark claims and created precedent that future cases must address [24].
+**Getty Images v. Stability AI**: The UK High Court ruled in November 2025 that model weights do not store reproductions of copyrighted works, rejecting most infringement claims. However, the ruling acknowledged limited trademark claims and created precedent that future cases must address <sup><a href="#ref-24">24</a></sup>.
 
-**Thomson Reuters v. ROSS Intelligence**: February 2025 ruling found that using legal headnotes to train a competing AI product was NOT transformative fair use. This creates precedent for works used to produce functionally similar outputs [25].
+**Thomson Reuters v. ROSS Intelligence**: February 2025 ruling found that using legal headnotes to train a competing AI product was NOT transformative fair use. This creates precedent for works used to produce functionally similar outputs <sup><a href="#ref-25">25</a></sup>.
 
-**Reddit v. Perplexity AI**: Filed October 2025, this lawsuit focuses on how data was obtained (false identities, proxies, anti-security techniques) rather than copyright/fair use. It opens a new vector for enforcement based on unauthorized access methods [26].
+**Reddit v. Perplexity AI**: Filed October 2025, this lawsuit focuses on how data was obtained (false identities, proxies, anti-security techniques) rather than copyright/fair use. It opens a new vector for enforcement based on unauthorized access methods <sup><a href="#ref-26">26</a></sup>.
 
 Litigation is slow and expensive but creates systemic deterrence by raising the expected cost of unauthorized training.
 
@@ -287,67 +293,38 @@ VENOM will pursue measurements and analysis addressing these questions. Our valu
 
 ## References
 
-[1] The Register (2025). "Publishers Say No to AI Scrapers, Block Bots at Server Level." https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/
-
-[2] LWN (2025). "Anubis: Fighting the LLM Hordes." https://lwn.net/Articles/1028558/
-
-[3] Stytch Blog (2025). "How to Block AI Web Crawlers." https://stytch.com/blog/how-to-block-ai-web-crawlers/
-
-[4] Cloudflare (2025). "Control Content Use for AI Training with Cloudflare's Managed Robots.txt." https://blog.cloudflare.com/control-content-use-for-ai-training/
-
-[5] Nightshade Project Page. "What is Nightshade?" University of Chicago. https://nightshade.cs.uchicago.edu/whatis.html
-
-[6] Shan, S., Ding, W., Passananti, J., Zheng, H., & Zhao, B. Y. (2024). "Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models." IEEE Symposium on Security and Privacy. arXiv:2310.13828. https://arxiv.org/abs/2310.13828
-
-[7] Heaven, W.D. (2023). "This New Data Poisoning Tool Lets Artists Fight Back Against Generative AI." MIT Technology Review. https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/
-
-[8] MIT Technology Review (2024). "The AI Lab Waging a Guerrilla War Over Exploitative AI." https://www.technologyreview.com/2024/11/13/1106837/ai-data-posioning-nightshade-glaze-art-university-of-chicago-exploitation/
-
-[9] Anubis GitHub Repository. TecharoHQ. https://github.com/TecharoHQ/anubis
-
-[10] Help Net Security (2025). "Anubis: Open-Source Web AI Firewall to Protect from Bots." https://www.helpnetsecurity.com/2025/12/22/anubis-open-source-web-ai-firewall-protect-from-bots/
-
-[11] The Register (2025). "Anubis: Fighting the LLM Hordes with Proof of Work." https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/
-
-[12] Futurism (2026). "Engineers Deploy 'Poison Fountain' That Scrambles Brains of AI Systems." https://futurism.com/artificial-intelligence/poison-fountain-ai
-
-[13] Anthropic (2025). "Poisoning Attacks on LLMs Require a Near-Constant Number of Poison Samples." https://www.anthropic.com/research/small-samples-poison
-
-[14] arXiv (2024). "Poisoning Attacks on LLMs Require a Near-Constant Number of Poison Samples." arXiv:2510.07192. https://arxiv.org/abs/2510.07192
-
-[15] Nature Medicine (2024). "Medical LLMs Vulnerable to Data Poisoning." https://www.nature.com/articles/s41591-024-03445-1
-
-[16] AAAI (2024). "Scaling Trends for Data Poisoning in LLMs." https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084
-
-[17] Hubinger, E., Denison, C., Mu, J., et al. (2024). "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training." arXiv:2401.05566. https://arxiv.org/abs/2401.05566
-
-[18] IETF AIPREF Working Group. "AI Preferences (aipref)." https://datatracker.ietf.org/wg/aipref/about/
-
-[19] IETF Blog (2025). "Setting Standards for AI Preferences." https://www.ietf.org/blog/aipref-wg/
-
-[20] European Commission (2024). "Regulatory Framework for AI." https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
-
-[21] Securiti (2025). "EU Publishes Template for Public Summaries of AI Training Content." https://securiti.ai/eu-publishes-template-for-public-summaries-of-ai-training-content/
-
-[22] US Copyright Office (2025). "Copyright and Artificial Intelligence: Part 3 - Generative AI Training." https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-3-Generative-AI-Training-Report-Pre-Publication-Version.pdf
-
-[23] Harvard Law Review (2024). "NYT v. OpenAI: The Times's About-Face." https://harvardlawreview.org/blog/2024/04/nyt-v-openai-the-timess-about-face/
-
-[24] UK Judiciary (2025). "Getty Images v. Stability AI Judgment." https://www.judiciary.uk/wp-content/uploads/2025/11/Getty-Images-v-Stability-AI.pdf
-
-[25] DG Law (2025). "Court Rules AI Training on Copyrighted Works Is Not Fair Use." https://www.dglaw.com/court-rules-ai-training-on-copyrighted-works-is-not-fair-use-what-it-means-for-generative-ai/
-
-[26] CNBC (2025). "Reddit User Data Battle: AI Industry Sues Perplexity Over Scraping Posts." https://www.cnbc.com/2025/10/23/reddit-user-data-battle-ai-industry-sues-perplexity-scraping-posts-openai-chatgpt-google-gemini-lawsuit.html
-
-[27] RFC 9309 (2022). "Robots Exclusion Protocol." IETF. https://datatracker.ietf.org/doc/html/rfc9309
-
-[28] NIST (2024). "AI Risk and Threat Taxonomy." https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf
-
-[29] The Register (2026). "AI Insiders Seek to Poison the Data That Feeds Them." https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison
-
-[30] Mozilla Foundation (2024). "How Common Crawl Data Infrastructure Shaped the Battle Royale over Generative AI." https://www.mozillafoundation.org/en/blog/Mozilla-Report-How-Common-Crawl-Data-Infrastructure-Shaped-the-Battle-Royale-over-Generative-AI/
-
----
+<ol class="references">
+<li id="ref-1">The Register (2025). "Publishers Say No to AI Scrapers, Block Bots at Server Level." <a href="https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/">https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/</a></li>
+<li id="ref-2">LWN (2025). "Anubis: Fighting the LLM Hordes." <a href="https://lwn.net/Articles/1028558/">https://lwn.net/Articles/1028558/</a></li>
+<li id="ref-3">Stytch Blog (2025). "How to Block AI Web Crawlers." <a href="https://stytch.com/blog/how-to-block-ai-web-crawlers/">https://stytch.com/blog/how-to-block-ai-web-crawlers/</a></li>
+<li id="ref-4">Cloudflare (2025). "Control Content Use for AI Training with Cloudflare's Managed Robots.txt." <a href="https://blog.cloudflare.com/control-content-use-for-ai-training/">https://blog.cloudflare.com/control-content-use-for-ai-training/</a></li>
+<li id="ref-5">Nightshade Project Page. "What is Nightshade?" University of Chicago. <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
+<li id="ref-6">Shan, S., Ding, W., Passananti, J., Zheng, H., & Zhao, B. Y. (2024). "Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models." IEEE Symposium on Security and Privacy. arXiv:2310.13828. <a href="https://arxiv.org/abs/2310.13828">https://arxiv.org/abs/2310.13828</a></li>
+<li id="ref-7">Heaven, W.D. (2023). "This New Data Poisoning Tool Lets Artists Fight Back Against Generative AI." MIT Technology Review. <a href="https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/">https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/</a></li>
+<li id="ref-8">MIT Technology Review (2024). "The AI Lab Waging a Guerrilla War Over Exploitative AI." <a href="https://www.technologyreview.com/2024/11/13/1106837/ai-data-posioning-nightshade-glaze-art-university-of-chicago-exploitation/">https://www.technologyreview.com/2024/11/13/1106837/ai-data-posioning-nightshade-glaze-art-university-of-chicago-exploitation/</a></li>
+<li id="ref-9">Anubis GitHub Repository. TecharoHQ. <a href="https://github.com/TecharoHQ/anubis">https://github.com/TecharoHQ/anubis</a></li>
+<li id="ref-10">Help Net Security (2025). "Anubis: Open-Source Web AI Firewall to Protect from Bots." <a href="https://www.helpnetsecurity.com/2025/12/22/anubis-open-source-web-ai-firewall-protect-from-bots/">https://www.helpnetsecurity.com/2025/12/22/anubis-open-source-web-ai-firewall-protect-from-bots/</a></li>
+<li id="ref-11">The Register (2025). "Anubis: Fighting the LLM Hordes with Proof of Work." <a href="https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/">https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/</a></li>
+<li id="ref-12">Futurism (2026). "Engineers Deploy 'Poison Fountain' That Scrambles Brains of AI Systems." <a href="https://futurism.com/artificial-intelligence/poison-fountain-ai">https://futurism.com/artificial-intelligence/poison-fountain-ai</a></li>
+<li id="ref-13">Anthropic (2025). "Poisoning Attacks on LLMs Require a Near-Constant Number of Poison Samples." <a href="https://www.anthropic.com/research/small-samples-poison">https://www.anthropic.com/research/small-samples-poison</a></li>
+<li id="ref-14">arXiv (2024). "Poisoning Attacks on LLMs Require a Near-Constant Number of Poison Samples." arXiv:2510.07192. <a href="https://arxiv.org/abs/2510.07192">https://arxiv.org/abs/2510.07192</a></li>
+<li id="ref-15">Nature Medicine (2024). "Medical LLMs Vulnerable to Data Poisoning." <a href="https://www.nature.com/articles/s41591-024-03445-1">https://www.nature.com/articles/s41591-024-03445-1</a></li>
+<li id="ref-16">AAAI (2024). "Scaling Trends for Data Poisoning in LLMs." <a href="https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084">https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084</a></li>
+<li id="ref-17">Hubinger, E., Denison, C., Mu, J., et al. (2024). "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training." arXiv:2401.05566. <a href="https://arxiv.org/abs/2401.05566">https://arxiv.org/abs/2401.05566</a></li>
+<li id="ref-18">IETF AIPREF Working Group. "AI Preferences (aipref)." <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></li>
+<li id="ref-19">IETF Blog (2025). "Setting Standards for AI Preferences." <a href="https://www.ietf.org/blog/aipref-wg/">https://www.ietf.org/blog/aipref-wg/</a></li>
+<li id="ref-20">European Commission (2024). "Regulatory Framework for AI." <a href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai">https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai</a></li>
+<li id="ref-21">Securiti (2025). "EU Publishes Template for Public Summaries of AI Training Content." <a href="https://securiti.ai/eu-publishes-template-for-public-summaries-of-ai-training-content/">https://securiti.ai/eu-publishes-template-for-public-summaries-of-ai-training-content/</a></li>
+<li id="ref-22">US Copyright Office (2025). "Copyright and Artificial Intelligence: Part 3 - Generative AI Training." <a href="https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-3-Generative-AI-Training-Report-Pre-Publication-Version.pdf">https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-3-Generative-AI-Training-Report-Pre-Publication-Version.pdf</a></li>
+<li id="ref-23">Harvard Law Review (2024). "NYT v. OpenAI: The Times's About-Face." <a href="https://harvardlawreview.org/blog/2024/04/nyt-v-openai-the-timess-about-face/">https://harvardlawreview.org/blog/2024/04/nyt-v-openai-the-timess-about-face/</a></li>
+<li id="ref-24">UK Judiciary (2025). "Getty Images v. Stability AI Judgment." <a href="https://www.judiciary.uk/wp-content/uploads/2025/11/Getty-Images-v-Stability-AI.pdf">https://www.judiciary.uk/wp-content/uploads/2025/11/Getty-Images-v-Stability-AI.pdf</a></li>
+<li id="ref-25">DG Law (2025). "Court Rules AI Training on Copyrighted Works Is Not Fair Use." <a href="https://www.dglaw.com/court-rules-ai-training-on-copyrighted-works-is-not-fair-use-what-it-means-for-generative-ai/">https://www.dglaw.com/court-rules-ai-training-on-copyrighted-works-is-not-fair-use-what-it-means-for-generative-ai/</a></li>
+<li id="ref-26">CNBC (2025). "Reddit User Data Battle: AI Industry Sues Perplexity Over Scraping Posts." <a href="https://www.cnbc.com/2025/10/23/reddit-user-data-battle-ai-industry-sues-perplexity-scraping-posts-openai-chatgpt-google-gemini-lawsuit.html">https://www.cnbc.com/2025/10/23/reddit-user-data-battle-ai-industry-sues-perplexity-scraping-posts-openai-chatgpt-google-gemini-lawsuit.html</a></li>
+<li id="ref-27">RFC 9309 (2022). "Robots Exclusion Protocol." IETF. <a href="https://datatracker.ietf.org/doc/html/rfc9309">https://datatracker.ietf.org/doc/html/rfc9309</a></li>
+<li id="ref-28">NIST (2024). "AI Risk and Threat Taxonomy." <a href="https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf">https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf</a></li>
+<li id="ref-29">The Register (2026). "AI Insiders Seek to Poison the Data That Feeds Them." <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison</a></li>
+<li id="ref-30">Mozilla Foundation (2024). "How Common Crawl Data Infrastructure Shaped the Battle Royale over Generative AI." <a href="https://www.mozillafoundation.org/en/blog/Mozilla-Report-How-Common-Crawl-Data-Infrastructure-Shaped-the-Battle-Royale-over-Generative-AI/">https://www.mozillafoundation.org/en/blog/Mozilla-Report-How-Common-Crawl-Data-Infrastructure-Shaped-the-Battle-Royale-over-Generative-AI/</a></li>
+</ol>
 
 ## About VENOM
 

@@ -15,7 +15,7 @@ This analysis examines both defense categories, who pays the costs, their effect
 - Cost imposition defenses (proof-of-work, rate limiting, CAPTCHAs) impose computational or operational expenses on scrapers without corrupting data
 - Value degradation defenses (data poisoning, watermarking, noise injection) reduce the quality or utility of scraped content for training purposes
 - Small publishers face asymmetric costs: large platforms can afford sophisticated defenses, while individual creators rely on tools like Nightshade
-- Voluntary signals like robots.txt fail predictably: 13.26% of AI bot requests ignored robots.txt in Q2 2025, up from 3.3% in Q4 2024
+- Voluntary signals like robots.txt fail predictably: 13.26% of AI bot requests ignored robots.txt in Q2 2025, up from 3.3% in Q4 2024<sup><a href="#ref-27">27</a></sup>
 - The choice of defense mechanism reflects power dynamics. Those with resources choose cost imposition; those without choose value degradation
 
 ## Two Categories of Defense
@@ -28,11 +28,11 @@ Cost imposition defenses increase the computational, operational, or financial b
 
 Examples include:
 
-**Proof-of-work systems**: Anubis, developed by Xe Iaso and deployed by UNESCO, GNOME, and Duke University, requires browsers to solve SHA-256 hash challenges before serving content. At standard difficulty, Anubis adds approximately 1.35 seconds per request. This is trivial for human users but prohibitively expensive for scrapers attempting millions of page requests. At difficulty 10, the computational cost multiplies by 570x.
+**Proof-of-work systems**: Anubis, developed by Xe Iaso and deployed by UNESCO, GNOME, and Duke University<sup><a href="#ref-16">16</a></sup><sup><a href="#ref-17">17</a></sup>, requires browsers to solve SHA-256 hash challenges before serving content. At standard difficulty, Anubis adds approximately 1.35 seconds per request.<sup><a href="#ref-21">21</a></sup> This is trivial for human users but prohibitively expensive for scrapers attempting millions of page requests. At difficulty 10, the computational cost multiplies by 570x.<sup><a href="#ref-21">21</a></sup>
 
 **Rate limiting**: Throttling request rates forces scrapers to slow down or spread requests across more IP addresses and infrastructure. Ethical scraping guidelines recommend approximately 1 request per second to avoid detection. Aggressive scraping may attempt hundreds or thousands of requests per second.
 
-**CAPTCHA systems**: Modern CAPTCHA implementations have evolved from image recognition to proof-of-work challenges and behavioral analysis. Systems like Cloudflare Turnstile and AWS WAF use invisible, token-based verification that requires minimal user interaction but imposes computational costs on automated scrapers. As of January 2025, Google implemented more sophisticated CAPTCHA challenges and IP-based rate limiting in response to increased scraping activity.
+**CAPTCHA systems**: Modern CAPTCHA implementations have evolved from image recognition to proof-of-work challenges and behavioral analysis.<sup><a href="#ref-12">12</a></sup> Systems like Cloudflare Turnstile and AWS WAF use invisible, token-based verification that requires minimal user interaction but imposes computational costs on automated scrapers.<sup><a href="#ref-13">13</a></sup> As of January 2025, Google implemented more sophisticated CAPTCHA challenges and IP-based rate limiting in response to increased scraping activity.<sup><a href="#ref-14">14</a></sup>
 
 The key characteristic of cost imposition is symmetry: the burden scales with volume. A human reading a few pages encounters minimal friction. A scraper collecting millions of pages faces linearly increasing costs in CPU cycles, bandwidth, time, and infrastructure.
 
@@ -42,15 +42,17 @@ Value degradation defenses reduce the quality or utility of training data withou
 
 Examples include:
 
-**Data poisoning**: Nightshade, developed at the University of Chicago and awarded Distinguished Paper at IEEE Security and Privacy 2024, generates adversarially perturbed images that appear visually normal but cause text-to-image models to mislearn concepts. As few as 50 tuned poison samples can attack Stable Diffusion SDXL with high probability. The poisoning bleeds through to semantically related concepts, amplifying impact beyond the targeted prompts.
+**Data poisoning**: Nightshade, developed at the University of Chicago and awarded Distinguished Paper at IEEE Security and Privacy 2024<sup><a href="#ref-4">4</a></sup>, generates adversarially perturbed images that appear visually normal but cause text-to-image models to mislearn concepts. As few as 50 tuned poison samples can attack Stable Diffusion SDXL with high probability.<sup><a href="#ref-4">4</a></sup> The poisoning bleeds through to semantically related concepts, amplifying impact beyond the targeted prompts.<sup><a href="#ref-3">3</a></sup>
 
-**Style masking**: Glaze, from the same University of Chicago research team, subtly alters artwork pixels so AI models perceive a different artistic style while humans see the original. Glaze has been downloaded approximately 7.5 million times and was recognized as a TIME Best Invention of 2023, demonstrating widespread adoption among artists concerned about style mimicry.
+**Style masking**: Glaze, from the same University of Chicago research team, subtly alters artwork pixels so AI models perceive a different artistic style while humans see the original. Glaze has been downloaded approximately 7.5 million times<sup><a href="#ref-5">5</a></sup> and was recognized as a TIME Best Invention of 2023, demonstrating widespread adoption among artists concerned about style mimicry.
 
 **Watermarking**: Digital watermarking embeds imperceptible patterns in images or audio that survive compression and transformation. Watermarks can help trace unauthorized use but also allow detection and filtering by sophisticated scrapers. Watermarking is primarily a provenance tool rather than a prevention mechanism.
 
 **Noise injection**: Adding imperceptible statistical noise to content can degrade model quality during training. However, noise injection without adversarial optimization is often ineffective against large-scale training, as the signal-to-noise ratio improves with dataset size.
 
 The key characteristic of value degradation is asymmetry: the burden affects all downstream uses of the data, not just the initial collection. A research team with limited filtering capacity may be harmed as much as or more than a well-resourced commercial scraper.
+
+![Two categories of defense: cost imposition makes scraping expensive with targeted measurable tools, value degradation makes scraped data useless with indiscriminate high collateral](/images/diagrams/defense-decision-tree.png)
 
 ## Who Bears the Costs?
 
@@ -67,7 +69,7 @@ Cost imposition mechanisms impose their primary burden on scrapers but require p
 - CAPTCHA systems often involve third-party services with ongoing subscription costs
 - All approaches require technical expertise to deploy and tune for acceptable false positive rates
 
-For large publishers with engineering teams, these costs are manageable. The Financial Times, for instance, has invested in bot detection and traffic analysis to identify and block AI scrapers. Major media companies negotiating licensing deals with AI companies (Time, News Corp, Associated Press) have the legal and technical resources to enforce access controls.
+For large publishers with engineering teams, these costs are manageable. The Financial Times, for instance, has invested in bot detection and traffic analysis to identify and block AI scrapers.<sup><a href="#ref-6">6</a></sup> Major media companies negotiating licensing deals with AI companies (Time, News Corp, Associated Press) have the legal and technical resources to enforce access controls.
 
 For small publishers and individual creators, implementation costs present a barrier. A solo blogger or artist may lack the technical expertise to deploy Anubis or configure rate limiting effectively. This creates a resource asymmetry: those with the most to protect may have the least capacity to implement cost imposition defenses.
 
@@ -80,7 +82,7 @@ The cost imposed on scrapers scales with volume and sophistication. For proof-of
 - Slow down collection to avoid triggering rate limits or behavioral analysis
 - Invest in detection evasion (IP rotation, user-agent randomization, residential proxies)
 
-According to industry analysis, the cost of maintaining and rebuilding scraping infrastructure has increased sharply as publishers deploy more defenses. This creates an escalating arms race where both sides invest resources continuously.
+According to industry analysis, the cost of maintaining and rebuilding scraping infrastructure has increased sharply as publishers deploy more defenses.<sup><a href="#ref-14">14</a></sup> This creates an escalating arms race where both sides invest resources continuously.
 
 **Symmetric versus asymmetric impact:**
 
@@ -108,7 +110,7 @@ Value degradation tools like Nightshade and Glaze have remarkably low implementa
 - No infrastructure deployment or ongoing maintenance required
 - No technical expertise needed beyond basic software installation
 
-This low barrier to entry explains why Glaze has seen 7.5 million downloads and why data poisoning has gained traction among individual artists and creators. When a solo artist cannot afford legal counsel or technical infrastructure, a simple desktop application that poisons their artwork becomes an accessible form of self-defense.
+This low barrier to entry explains why Glaze has seen 7.5 million downloads<sup><a href="#ref-5">5</a></sup> and why data poisoning has gained traction among individual artists and creators.<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup> When a solo artist cannot afford legal counsel or technical infrastructure, a simple desktop application that poisons their artwork becomes an accessible form of self-defense.
 
 Coordinated poisoning initiatives like Poison Fountain, announced in January 2026, aim to scale this approach. By organizing multiple content sources to deploy poisoning simultaneously, such initiatives attempt to achieve impact that individual poisoning cannot.
 
@@ -137,6 +139,8 @@ Value degradation defenses are difficult to undo once deployed. A poisoned image
 - Incorporated into models that have already been trained and deployed
 
 If a scraper begins respecting preference signals in response to the threat of poisoning, there is no clear mechanism to remove already-poisoned data from circulation. This contrasts with cost imposition mechanisms such as proof-of-work and rate limiting, which can be dialed down or disabled dynamically if compliance improves.
+
+![Publisher defense capacity comparison: large publishers can afford WAF, licensed APIs, and legal teams while small publishers rely on robots.txt and poisoning as last resort](/images/diagrams/publisher-capacity.png)
 
 ## Publisher Economics: Who Can Afford Which Defenses?
 
@@ -189,11 +193,13 @@ This resource asymmetry creates a centralization dynamic. If only large publishe
 - Open-source and academic research bear the costs of collateral damage from poisoning
 - AI companies preferentially license from large publishers who can negotiate, deepening the power imbalance
 
-Mediavine, representing independent publishers, emphasized this concern: "Licensing must work for independent publishers, not just the top 1%. Scraping without permission is exploitation."
+Mediavine, representing independent publishers, emphasized this concern: "Licensing must work for independent publishers, not just the top 1%. Scraping without permission is exploitation."<sup><a href="#ref-8">8</a></sup>
 
 The risk is that defensive measures intended to protect creators instead accelerate consolidation, as only large players can afford effective, targeted defenses.
 
 ## Effectiveness: Measurements and Tradeoffs
+
+![Cost comparison of defense mechanisms showing implementation versus adversary bypass costs](/images/diagrams/cost-comparison.png)
 
 How well do these defenses actually work? Effectiveness depends on the adversary's resources, the scale of scraping, and the sophistication of detection and evasion techniques.
 
@@ -201,7 +207,7 @@ How well do these defenses actually work? Effectiveness depends on the adversary
 
 **Proof-of-work (Anubis):**
 
-Deployment data shows that Anubis "stops 90% of abusive crawlers" by requiring modern JavaScript features (ES6 modules, Workers, WebCrypto) that most scrapers do not support. The 570x cost multiplier at high difficulty settings makes large-scale scraping economically prohibitive for adversaries without substantial computational budgets.
+Deployment data shows that Anubis "stops 90% of abusive crawlers" by requiring modern JavaScript features (ES6 modules, Workers, WebCrypto) that most scrapers do not support.<sup><a href="#ref-16">16</a></sup><sup><a href="#ref-20">20</a></sup> The 570x cost multiplier at high difficulty settings makes large-scale scraping economically prohibitive for adversaries without substantial computational budgets.<sup><a href="#ref-21">21</a></sup>
 
 However, proof-of-work is not impenetrable:
 
@@ -210,7 +216,7 @@ However, proof-of-work is not impenetrable:
 - Scrapers can slow down to stay below rate limits, trading time for reduced cost
 - Content that requires real-time access (news) is harder to protect with high-latency challenges
 
-Anubis is best suited for protecting content where timely access by scrapers is less critical (e.g., documentation, static blogs, archival content) and where blocking JavaScript-less crawlers is acceptable.
+Anubis is best suited for protecting content where timely access by scrapers is less critical (e.g., documentation, static blogs, archival content) and where blocking JavaScript-less crawlers is acceptable.<sup><a href="#ref-18">18</a></sup><sup><a href="#ref-19">19</a></sup>
 
 **Rate limiting:**
 
@@ -221,15 +227,15 @@ Traditional rate limiting has become less effective as scrapers adopt evasion te
 - User-agent spoofing to impersonate legitimate browsers
 - Timing randomization to mimic human browsing patterns
 
-Cloudflare data indicates that Anthropic's ClaudeBot has crawl-to-refer ratios ranging from 38,000:1 to over 70,000:1, meaning it crawls vastly more content than it refers back to publishers. Despite rate limiting efforts, AI scrapers consumed significant resources from sites like Wikipedia's Wikimedia Commons, prompting capacity restrictions.
+Cloudflare data indicates that Anthropic's ClaudeBot has crawl-to-refer ratios ranging from 38,000:1 to over 70,000:1, meaning it crawls vastly more content than it refers back to publishers.<sup><a href="#ref-10">10</a></sup> Despite rate limiting efforts, AI scrapers consumed significant resources from sites like Wikipedia's Wikimedia Commons, prompting capacity restrictions.
 
 Effective rate limiting requires behavioral analysis, machine learning-based anomaly detection, and continuous updating of detection rules. Only large publishers can afford this infrastructure.
 
 **CAPTCHA:**
 
-CAPTCHA effectiveness is declining as AI capabilities improve. Modern image recognition models can solve traditional CAPTCHAs with high accuracy. The industry has shifted to proof-of-work and behavioral analysis (Cloudflare Turnstile, hCaptcha), but these too face an arms race:
+CAPTCHA effectiveness is declining as AI capabilities improve.<sup><a href="#ref-12">12</a></sup> Modern image recognition models can solve traditional CAPTCHAs with high accuracy. The industry has shifted to proof-of-work and behavioral analysis (Cloudflare Turnstile, hCaptcha), but these too face an arms race:
 
-- CAPTCHA solving services offer human labor for $1-3 per 1,000 CAPTCHAs, making them economically viable for scrapers
+- CAPTCHA solving services offer human labor for $1-3 per 1,000 CAPTCHAs, making them economically viable for scrapers<sup><a href="#ref-11">11</a></sup>
 - Behavioral analysis can be defeated by using real browser automation (Selenium, Puppeteer) with realistic timing and mouse movement patterns
 
 CAPTCHA remains effective mainly against low-sophistication scrapers. Well-resourced AI companies can bypass CAPTCHAs through automation or solving services.
@@ -238,7 +244,7 @@ CAPTCHA remains effective mainly against low-sophistication scrapers. Well-resou
 
 **Data poisoning (Nightshade):**
 
-The Nightshade paper demonstrates high attack success rates with minimal poison samples (50 samples for Stable Diffusion SDXL). The prompt-specific targeting and semantic bleed-through make the attack effective even against large training datasets.
+The Nightshade paper demonstrates high attack success rates with minimal poison samples (50 samples for Stable Diffusion SDXL).<sup><a href="#ref-4">4</a></sup> The prompt-specific targeting and semantic bleed-through make the attack effective even against large training datasets.<sup><a href="#ref-3">3</a></sup><sup><a href="#ref-4">4</a></sup>
 
 However, effectiveness depends on:
 
@@ -266,25 +272,27 @@ Watermarking is best used as a complement to other defenses: it provides evidenc
 
 Simple noise injection is largely ineffective against large-scale training. As dataset size increases, the signal-to-noise ratio improves, and random noise averages out. Adversarial noise (optimized perturbations like Nightshade) is required for meaningful impact, which brings us back to data poisoning with all its tradeoffs.
 
+![Bar chart showing robots.txt non-compliance growing from 3.3% in Q4 2024 to 13.26% in Q2 2025, a 4x increase in 6 months](/images/diagrams/noncompliance-growth.png)
+
 ## Why Voluntary Signals Fail Predictably
 
 The escalation from signaling to enforcement reflects a predictable failure mode: voluntary compliance mechanisms work only when incentives align or enforcement mechanisms exist. Neither condition holds for AI training data collection.
 
 ### robots.txt Compliance Data
 
-robots.txt, developed in 1994 and standardized as RFC 9309 in September 2022, depends entirely on voluntary compliance. The RFC explicitly states that robots.txt is "not a substitute for valid content security measures."
+robots.txt, developed in 1994 and standardized as RFC 9309 in September 2022<sup><a href="#ref-28">28</a></sup>, depends entirely on voluntary compliance. The RFC explicitly states that robots.txt is "not a substitute for valid content security measures."<sup><a href="#ref-28">28</a></sup>
 
 Recent compliance data shows accelerating non-compliance:
 
-- **Q4 2024:** 3.3% of AI bot requests ignored robots.txt directives
-- **Q2 2025:** 13.26% of AI bot requests ignored robots.txt directives (a 4x increase in two quarters)
-- A Duke University study (2025) found that several categories of AI-related crawlers never request robots.txt at all
+- **Q4 2024:** 3.3% of AI bot requests ignored robots.txt directives<sup><a href="#ref-27">27</a></sup>
+- **Q2 2025:** 13.26% of AI bot requests ignored robots.txt directives (a 4x increase in two quarters)<sup><a href="#ref-27">27</a></sup>
+- A Duke University study (2025) found that several categories of AI-related crawlers never request robots.txt at all<sup><a href="#ref-27">27</a></sup>
 
 Specific AI companies show varying compliance levels:
 
-- Approximately 5.6 million websites blocked OpenAI's GPTBot via robots.txt by mid-2025, up from 3.3 million in early July 2025 (a 70% increase in weeks)
-- Anthropic's ClaudeBot is blocked on approximately 5.8 million websites, up from 3.2 million in early July 2025
-- Despite widespread blocking, AI scraping activity increased by 40% between Q3 and Q4 2024
+- Approximately 5.6 million websites blocked OpenAI's GPTBot via robots.txt by mid-2025, up from 3.3 million in early July 2025 (a 70% increase in weeks)<sup><a href="#ref-26">26</a></sup>
+- Anthropic's ClaudeBot is blocked on approximately 5.8 million websites, up from 3.2 million in early July 2025<sup><a href="#ref-26">26</a></sup>
+- Despite widespread blocking, AI scraping activity increased by 40% between Q3 and Q4 2024<sup><a href="#ref-22">22</a></sup>
 
 ### Evasion Techniques
 
@@ -293,7 +301,7 @@ AI companies and their contractors employ well-documented evasion techniques:
 - **User-agent spoofing:** Impersonating mainstream browsers (Chrome, Firefox) to bypass user-agent-based blocking
 - **IP and ASN rotation:** Rapidly changing IP addresses and autonomous systems to avoid IP-based rate limits
 - **Third-party proxies:** Using browser-as-a-service proxies and residential proxy networks to obscure origin
-- **Crawler rebranding:** Companies like Anthropic and Perplexity have "circumvented robots.txt by renaming or spinning up new scrapers to replace the ones that appeared on popular blocklists"
+- **Crawler rebranding:** Companies like Anthropic and Perplexity have "circumvented robots.txt by renaming or spinning up new scrapers to replace the ones that appeared on popular blocklists"<sup><a href="#ref-25">25</a></sup>
 
 These techniques are not zero-cost, but for companies raising hundreds of millions in venture capital funding, the cost of evasion is trivial compared to the value of training data.
 
@@ -310,7 +318,7 @@ Voluntary compliance fails because incentives are misaligned:
 
 **Publishers have limited enforcement options:**
 
-- Litigation is expensive and slow (Getty Images v. Stability AI, Authors Guild v. OpenAI are ongoing years after filing)
+- Litigation is expensive and slow (Getty Images v. Stability AI, Authors Guild v. OpenAI are ongoing years after filing)<sup><a href="#ref-15">15</a></sup>
 - Technical enforcement (paywalls, authentication) may reduce traffic and ad revenue
 - Reputation-based pressure is ineffective when venture capital funding exceeds near-term revenue concerns
 - Collective action is difficult to organize across thousands of independent publishers
@@ -319,9 +327,9 @@ In this environment, voluntary compliance depends on either reputational incenti
 
 ### IETF AIPREF: Will Standardized Signals Help?
 
-The IETF AI Preferences (AIPREF) Working Group, chartered in January 2025, is developing standardized mechanisms for expressing preferences about AI content collection and processing. Key drafts include vocabulary specifications (draft-ietf-aipref-vocab-05) and attachment mechanisms (draft-ietf-aipref-attach-04).
+The IETF AI Preferences (AIPREF) Working Group, chartered in January 2025<sup><a href="#ref-29">29</a></sup><sup><a href="#ref-30">30</a></sup>, is developing standardized mechanisms for expressing preferences about AI content collection and processing. Key drafts include vocabulary specifications (draft-ietf-aipref-vocab-05) and attachment mechanisms (draft-ietf-aipref-attach-04).
 
-AIPREF aims to provide clearer, more granular signaling than robots.txt, with explicit semantics for AI-specific use cases (training, fine-tuning, inference).
+AIPREF aims to provide clearer, more granular signaling than robots.txt, with explicit semantics for AI-specific use cases (training, fine-tuning, inference).<sup><a href="#ref-24">24</a></sup>
 
 However, AIPREF does not solve the voluntary compliance problem. It provides clearer evidence of intent, which may:
 
@@ -329,7 +337,7 @@ However, AIPREF does not solve the voluntary compliance problem. It provides cle
 - Create reputational incentives for compliance (by making violations more clearly intentional)
 - Allow automated compliance checking and auditing
 
-But like robots.txt, AIPREF has no technical enforcement mechanism. It signals preferences; it does not prevent access. Without legal backing (e.g., statutory liability for ignoring AIPREF signals) or technical enforcement (cost imposition, value degradation), AIPREF risks becoming another ignored standard.
+But like robots.txt<sup><a href="#ref-23">23</a></sup>, AIPREF has no technical enforcement mechanism. It signals preferences; it does not prevent access. Without legal backing (e.g., statutory liability for ignoring AIPREF signals) or technical enforcement (cost imposition, value degradation), AIPREF risks becoming another ignored standard.
 
 The path forward likely requires both: standardized preference signals (AIPREF) to establish clear norms and legal evidence, and technical enforcement mechanisms (cost imposition, selective value degradation) to impose costs on non-compliance.
 
@@ -348,7 +356,7 @@ Optimistic accounts argue that defensive mechanisms, particularly low-cost tools
 
 If these tools impose sufficient costs on unauthorized scraping, AI companies may find it economically preferable to negotiate licenses with content creators, creating a more balanced marketplace.
 
-The University of Chicago Nightshade team explicitly positions their work as increasing bargaining power: "The researchers position Nightshade as a defensive tool to increase the cost of training on unlicensed data, making it economically preferable for AI companies to negotiate licenses with content creators."
+The University of Chicago Nightshade team explicitly positions their work as increasing bargaining power: "The researchers position Nightshade as a defensive tool to increase the cost of training on unlicensed data, making it economically preferable for AI companies to negotiate licenses with content creators."<sup><a href="#ref-5">5</a></sup>
 
 ### Centralization Risks
 
@@ -365,7 +373,7 @@ Pessimistic accounts warn that defensive measures may accelerate centralization:
 
 - Large media companies (Time, News Corp, Associated Press) have negotiated individual licensing deals with OpenAI and other AI companies
 - Small publishers lack negotiating power and are often excluded from licensing discussions
-- The economics of licensing do not work for most publishers: "No amount of licensing revenue can offset traffic losses because the licensing revenue doesn't take into consideration the true LTV (lifetime value) of a reader"
+- The economics of licensing do not work for most publishers: "No amount of licensing revenue can offset traffic losses because the licensing revenue doesn't take into consideration the true LTV (lifetime value) of a reader"<sup><a href="#ref-7">7</a></sup>
 
 **Technical arms race advantages:**
 
@@ -381,7 +389,7 @@ Pessimistic accounts warn that defensive measures may accelerate centralization:
 
 ### The Collective Action Problem
 
-Over 80 media executives met in New York under the IAB Tech Lab banner in late 2024 to address unauthorized AI content scraping. Google and Meta participated, but the AI companies most implicated (OpenAI, Anthropic, and Perplexity) declined to attend.
+Over 80 media executives met in New York under the IAB Tech Lab banner in late 2024 to address unauthorized AI content scraping.<sup><a href="#ref-9">9</a></sup> Google and Meta participated, but the AI companies most implicated (OpenAI, Anthropic, and Perplexity) declined to attend.<sup><a href="#ref-9">9</a></sup>
 
 This highlights the collective action problem: publishers compete with each other for traffic and revenue, making coordination difficult. AI companies face no such coordination problem; they can unilaterally scrape while publishers must organize collectively to resist.
 
@@ -445,33 +453,35 @@ Understanding who can afford which defenses, and who bears the costs of each app
 
 ## References
 
-1. Lakera - Introduction to Data Poisoning: A 2025 Perspective: https://www.lakera.ai/blog/training-data-poisoning
-2. IBM - What Is Data Poisoning?: https://www.ibm.com/think/topics/data-poisoning
-3. MIT Technology Review - This new data poisoning tool lets artists fight back against generative AI: https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/
-4. Nightshade Academic Paper (arXiv): https://arxiv.org/html/2310.13828v3
-5. Nightshade Project Page: https://nightshade.cs.uchicago.edu/whatis.html
-6. Digiday - The net is tightening on AI scraping (Financial Times interview): https://digiday.com/media/the-net-is-tightening-on-ai-scraping-annotated-qa-with-financial-times-head-of-global-public-policy-and-platform-strategy/
-7. A Media Operator - The Economics of an AI Future Doesn't Work for Publishers: https://www.amediaoperator.com/analysis/the-economics-of-an-ai-future-doesnt-work-for-publishers/
-8. MonetizeMore - Dealing With Revenue Loss Due to AI Content Scraping: https://www.monetizemore.com/blog/revenue-loss-due-to-ai-content-scraping/
-9. Digiday - Here are the biggest misconceptions about AI content scraping: https://digiday.com/media/here-are-the-biggest-misconceptions-about-ai-content-scraping/
-10. Cloudflare - AI Labyrinth Traps Scrapers: https://www.deeplearning.ai/the-batch/cloudflares-ai-labyrinth-traps-scrapers-with-decoy-pages/
-11. Prosopo - Real-Time Bot, Scraping, and Cyber Threat Defense: https://prosopo.io/
-12. Medium - The Silent Gatekeeper: Why CAPTCHA is Dying and What Comes Next in 2026: https://medium.com/@tuguidragos/the-silent-gatekeeper-why-captcha-is-dying-and-what-comes-next-in-2025-f387fa334bbd
-13. ALTCHA - Next-Gen Captcha and Spam Protection: https://altcha.org/
-14. ScrapingBee - Top Web Scraping Challenges in 2025: https://www.scrapingbee.com/blog/web-scraping-challenges/
-15. Above the Law - Google Built Its Empire Scraping The Web. Now It's Suing To Stop Others From Scraping Google: https://abovethelaw.com/2025/12/google-built-its-empire-scraping-the-web-now-its-suing-to-stop-others-from-scraping-google/
-16. Help Net Security - Anubis: Open-source web AI firewall: https://www.helpnetsecurity.com/2025/12/22/anubis-open-source-web-ai-firewall-protect-from-bots/
-17. LWN - Anubis sends AI scraperbots to a well-deserved fate: https://lwn.net/Articles/1028558/
-18. Ben Tasker - Deploying Anubis to protect against AI scrapers: https://www.bentasker.co.uk/posts/blog/the-internet/deploying-anubis-to-block-ai-bots.html
-19. GitHub - Anubis Repository: https://github.com/TecharoHQ/anubis
-20. The Register - Anubis: Fighting off the hordes of LLM bot crawlers: https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/
-21. Mike Bommarito - Anubis benchmark: measuring proof-of-work overhead: https://michaelbommarito.com/wiki/ai-society/anubis-benchmark-analysis/
-22. The Register - Publishers say no to AI scrapers: https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/
-23. Plagiarism Today - Does Robots.txt Matter Anymore?: https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/
-24. DEV Community - New AI web standards and scraping trends in 2026: https://dev.to/astro-official/new-ai-web-standards-and-scraping-trends-in-2026-rethinking-robotstxt-3730
-25. Auto-Post.io - AI Agents Ignore robots.txt: Risks for Publishers: https://auto-post.io/blog/ai-agents-ignore-robots-txt
-26. GitHub - ai-robots-txt: A list of AI agents and robots to block: https://github.com/ai-robots-txt/ai.robots.txt
-27. arXiv - Scrapers selectively respect robots.txt directives: https://arxiv.org/html/2505.21733v1
-28. RFC 9309 - Robots Exclusion Protocol: https://datatracker.ietf.org/doc/html/rfc9309
-29. IETF AIPREF Working Group: https://datatracker.ietf.org/wg/aipref/about/
-30. IETF Blog - AIPREF Working Group: https://www.ietf.org/blog/aipref-wg/
+<ol class="references">
+<li id="ref-1">Lakera - Introduction to Data Poisoning: A 2025 Perspective:. <a href="https://www.lakera.ai/blog/training-data-poisoning">https://www.lakera.ai/blog/training-data-poisoning</a></li>
+<li id="ref-2">IBM - What Is Data Poisoning?:. <a href="https://www.ibm.com/think/topics/data-poisoning">https://www.ibm.com/think/topics/data-poisoning</a></li>
+<li id="ref-3">MIT Technology Review - This new data poisoning tool lets artists fight back against generative AI:. <a href="https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/">https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/</a></li>
+<li id="ref-4">Nightshade Academic Paper (arXiv):. <a href="https://arxiv.org/html/2310.13828v3">https://arxiv.org/html/2310.13828v3</a></li>
+<li id="ref-5">Nightshade Project Page:. <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
+<li id="ref-6">Digiday - The net is tightening on AI scraping (Financial Times interview):. <a href="https://digiday.com/media/the-net-is-tightening-on-ai-scraping-annotated-qa-with-financial-times-head-of-global-public-policy-and-platform-strategy/">https://digiday.com/media/the-net-is-tightening-on-ai-scraping-annotated-qa-with-financial-times-head-of-global-public-policy-and-platform-strategy/</a></li>
+<li id="ref-7">A Media Operator - The Economics of an AI Future Doesn't Work for Publishers:. <a href="https://www.amediaoperator.com/analysis/the-economics-of-an-ai-future-doesnt-work-for-publishers/">https://www.amediaoperator.com/analysis/the-economics-of-an-ai-future-doesnt-work-for-publishers/</a></li>
+<li id="ref-8">MonetizeMore - Dealing With Revenue Loss Due to AI Content Scraping:. <a href="https://www.monetizemore.com/blog/revenue-loss-due-to-ai-content-scraping/">https://www.monetizemore.com/blog/revenue-loss-due-to-ai-content-scraping/</a></li>
+<li id="ref-9">Digiday - Here are the biggest misconceptions about AI content scraping:. <a href="https://digiday.com/media/here-are-the-biggest-misconceptions-about-ai-content-scraping/">https://digiday.com/media/here-are-the-biggest-misconceptions-about-ai-content-scraping/</a></li>
+<li id="ref-10">Cloudflare - AI Labyrinth Traps Scrapers:. <a href="https://www.deeplearning.ai/the-batch/cloudflares-ai-labyrinth-traps-scrapers-with-decoy-pages/">https://www.deeplearning.ai/the-batch/cloudflares-ai-labyrinth-traps-scrapers-with-decoy-pages/</a></li>
+<li id="ref-11">Prosopo - Real-Time Bot, Scraping, and Cyber Threat Defense:. <a href="https://prosopo.io/">https://prosopo.io/</a></li>
+<li id="ref-12">Medium - The Silent Gatekeeper: Why CAPTCHA is Dying and What Comes Next in 2026:. <a href="https://medium.com/@tuguidragos/the-silent-gatekeeper-why-captcha-is-dying-and-what-comes-next-in-2025-f387fa334bbd">https://medium.com/@tuguidragos/the-silent-gatekeeper-why-captcha-is-dying-and-what-comes-next-in-2025-f387fa334bbd</a></li>
+<li id="ref-13">ALTCHA - Next-Gen Captcha and Spam Protection:. <a href="https://altcha.org/">https://altcha.org/</a></li>
+<li id="ref-14">ScrapingBee - Top Web Scraping Challenges in 2025:. <a href="https://www.scrapingbee.com/blog/web-scraping-challenges/">https://www.scrapingbee.com/blog/web-scraping-challenges/</a></li>
+<li id="ref-15">Above the Law - Google Built Its Empire Scraping The Web. Now It's Suing To Stop Others From Scraping Google:. <a href="https://abovethelaw.com/2025/12/google-built-its-empire-scraping-the-web-now-its-suing-to-stop-others-from-scraping-google/">https://abovethelaw.com/2025/12/google-built-its-empire-scraping-the-web-now-its-suing-to-stop-others-from-scraping-google/</a></li>
+<li id="ref-16">Help Net Security - Anubis: Open-source web AI firewall:. <a href="https://www.helpnetsecurity.com/2025/12/22/anubis-open-source-web-ai-firewall-protect-from-bots/">https://www.helpnetsecurity.com/2025/12/22/anubis-open-source-web-ai-firewall-protect-from-bots/</a></li>
+<li id="ref-17">LWN - Anubis sends AI scraperbots to a well-deserved fate:. <a href="https://lwn.net/Articles/1028558/">https://lwn.net/Articles/1028558/</a></li>
+<li id="ref-18">Ben Tasker - Deploying Anubis to protect against AI scrapers:. <a href="https://www.bentasker.co.uk/posts/blog/the-internet/deploying-anubis-to-block-ai-bots.html">https://www.bentasker.co.uk/posts/blog/the-internet/deploying-anubis-to-block-ai-bots.html</a></li>
+<li id="ref-19">GitHub - Anubis Repository:. <a href="https://github.com/TecharoHQ/anubis">https://github.com/TecharoHQ/anubis</a></li>
+<li id="ref-20">The Register - Anubis: Fighting off the hordes of LLM bot crawlers:. <a href="https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/">https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/</a></li>
+<li id="ref-21">Mike Bommarito - Anubis benchmark: measuring proof-of-work overhead:. <a href="https://michaelbommarito.com/wiki/ai-society/anubis-benchmark-analysis/">https://michaelbommarito.com/wiki/ai-society/anubis-benchmark-analysis/</a></li>
+<li id="ref-22">The Register - Publishers say no to AI scrapers:. <a href="https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/">https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/</a></li>
+<li id="ref-23">Plagiarism Today - Does Robots.txt Matter Anymore?:. <a href="https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/">https://www.plagiarismtoday.com/2025/10/21/does-robots-txt-matter-anymore/</a></li>
+<li id="ref-24">DEV Community - New AI web standards and scraping trends in 2026:. <a href="https://dev.to/astro-official/new-ai-web-standards-and-scraping-trends-in-2026-rethinking-robotstxt-3730">https://dev.to/astro-official/new-ai-web-standards-and-scraping-trends-in-2026-rethinking-robotstxt-3730</a></li>
+<li id="ref-25">Auto-Post.io - AI Agents Ignore robots.txt: Risks for Publishers:. <a href="https://auto-post.io/blog/ai-agents-ignore-robots-txt">https://auto-post.io/blog/ai-agents-ignore-robots-txt</a></li>
+<li id="ref-26">GitHub - ai-robots-txt: A list of AI agents and robots to block:. <a href="https://github.com/ai-robots-txt/ai.robots.txt">https://github.com/ai-robots-txt/ai.robots.txt</a></li>
+<li id="ref-27">arXiv - Scrapers selectively respect robots.txt directives:. <a href="https://arxiv.org/html/2505.21733v1">https://arxiv.org/html/2505.21733v1</a></li>
+<li id="ref-28">RFC 9309 - Robots Exclusion Protocol:. <a href="https://datatracker.ietf.org/doc/html/rfc9309">https://datatracker.ietf.org/doc/html/rfc9309</a></li>
+<li id="ref-29">IETF AIPREF Working Group:. <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></li>
+<li id="ref-30">IETF Blog - AIPREF Working Group:. <a href="https://www.ietf.org/blog/aipref-wg/">https://www.ietf.org/blog/aipref-wg/</a></li>
+</ol>

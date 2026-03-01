@@ -16,11 +16,11 @@ author: Semiautonomous Systems
 
 ## The Context: Why Defensive Poisoning Emerged
 
-Data poisoning is not new. Academic research has documented poisoning attacks in machine learning for over 15 years, covering untargeted attacks that degrade model performance, targeted attacks that cause specific misclassifications, and backdoor attacks that inject hidden behaviors. A 2022 survey in ACM Computing Surveys reviewed over 100 papers on the subject (https://dl.acm.org/doi/full/10.1145/3585385).
+Data poisoning is not new. Academic research has documented poisoning attacks in machine learning for over 15 years, covering untargeted attacks that degrade model performance, targeted attacks that cause specific misclassifications, and backdoor attacks that inject hidden behaviors. A 2022 survey in ACM Computing Surveys reviewed over 100 papers on the subject <sup><a href="#ref-1">1</a></sup>.
 
 What is new is the application of these techniques as a defense mechanism by content creators.
 
-The immediate trigger is the large-scale scraping of web content for AI training data, often without explicit consent or regard for existing preference signals like robots.txt. RFC 9309, the official standard for robots.txt published in September 2022, explicitly acknowledges that the protocol depends on voluntary compliance and is "not a substitute for valid content security measures" (https://datatracker.ietf.org/doc/html/rfc9309). Multiple documented cases show AI crawlers bypassing robots.txt through user-agent spoofing, IP rotation, and browser-based proxies (https://github.com/ai-robots-txt/ai.robots.txt, https://auto-post.io/blog/ai-agents-ignore-robots-txt).
+The immediate trigger is the large-scale scraping of web content for AI training data, often without explicit consent or regard for existing preference signals like robots.txt. RFC 9309, the official standard for robots.txt published in September 2022, explicitly acknowledges that the protocol depends on voluntary compliance and is "not a substitute for valid content security measures" <sup><a href="#ref-2">2</a></sup>. Multiple documented cases show AI crawlers bypassing robots.txt through user-agent spoofing, IP rotation, and browser-based proxies <sup><a href="#ref-3">3</a></sup> <sup><a href="#ref-4">4</a></sup>.
 
 In this environment, defensive poisoning emerged as a form of enforced preference signaling: if crawlers ignore robots.txt, perhaps corrupted training data will impose sufficient costs to change behavior.
 
@@ -28,15 +28,17 @@ In this environment, defensive poisoning emerged as a form of enforced preferenc
 
 Defensive poisoning tools use adversarial perturbations: small, often imperceptible modifications to images or text that cause machine learning models to mislearn patterns during training.
 
-The most prominent example is Nightshade, developed by researchers at the University of Chicago and published at the 2024 IEEE Symposium on Security and Privacy, where it received a Distinguished Paper Award (https://arxiv.org/abs/2310.13828). Nightshade demonstrated that as few as 50 optimized poison samples could attack Stable Diffusion SDXL with high probability, compared to the millions of samples typically required for traditional poisoning attacks.
+The most prominent example is Nightshade, developed by researchers at the University of Chicago and published at the 2024 IEEE Symposium on Security and Privacy, where it received a Distinguished Paper Award <sup><a href="#ref-5">5</a></sup>. Nightshade demonstrated that as few as 50 optimized poison samples could attack Stable Diffusion SDXL with high probability, compared to the millions of samples typically required for traditional poisoning attacks.
 
 The key insight is prompt-specific targeting: rather than broadly degrading a model, Nightshade poisons specific concepts. For example, poisoned images of dogs might cause a model to generate cats when prompted for "dog," while leaving other prompts unaffected. This makes detection and filtering more difficult, as the poisoned samples appear normal to human observers and automated filters.
 
-Nightshade is the offensive companion to Glaze, a style-masking tool by the same team that has seen approximately 7.5 million downloads and was recognized as a TIME Best Invention of 2023 (https://nightshade.cs.uchicago.edu/whatis.html). While Glaze aims to protect individual artists by cloaking their style, Nightshade aims to impose systemic costs on AI companies that train on unlicensed data.
+Nightshade is the offensive companion to Glaze, a style-masking tool by the same team that has seen approximately 7.5 million downloads and was recognized as a TIME Best Invention of 2023 <sup><a href="#ref-6">6</a></sup>. While Glaze aims to protect individual artists by cloaking their style, Nightshade aims to impose systemic costs on AI companies that train on unlicensed data.
 
 ## Poison Fountain: From Individual Defense to Coordinated Action
 
-In January 2026, a group of AI industry insiders announced Poison Fountain, an initiative to coordinate data poisoning across multiple content sources (https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/, https://www.scworld.com/brief/poison-fountain-initiative-aims-to-disrupt-ai-training-data).
+![Escalation ladder from voluntary compliance to coordinated poisoning](/images/diagrams/escalation-ladder.png)
+
+In January 2026, a group of AI industry insiders announced Poison Fountain, an initiative to coordinate data poisoning across multiple content sources <sup><a href="#ref-7">7</a></sup> <sup><a href="#ref-8">8</a></sup>.
 
 The shift from individual tools like Nightshade to coordinated initiatives like Poison Fountain marks an important escalation. Individual poisoning can be filtered or diluted by large training datasets. Coordinated poisoning at scale changes the threat model: it makes scraping indiscriminately more costly and forces AI companies to invest in data provenance, quality verification, and permission systems.
 
@@ -46,6 +48,8 @@ This escalation raises several questions:
 2. Collateral damage: Could widespread poisoning affect legitimate research, open-source models, or educational use cases?
 3. Accountability: Who bears responsibility if poisoned data causes safety issues in deployed models?
 4. Reversibility: Can poisoning be calibrated or rolled back if behavior changes?
+
+![Collateral damage rings showing who is affected by defensive poisoning](/images/diagrams/collateral-damage.png)
 
 ## Ethical Considerations
 
@@ -68,7 +72,7 @@ Poisoning is indiscriminate in its effects. Once data is poisoned and enters the
 - Open-source model trainers building non-commercial tools
 - Hobbyists and students learning about machine learning
 
-A full survey on poisoning attacks notes that poisoning affects both centralized and federated learning, and that defenses are often computationally expensive or require clean validation data (https://dl.acm.org/doi/10.1145/3551636). This means that poisoning may disproportionately harm those with fewer resources to detect and filter corrupted data.
+A full survey on poisoning attacks notes that poisoning affects both centralized and federated learning, and that defenses are often computationally expensive or require clean validation data <sup><a href="#ref-9">9</a></sup>. This means that poisoning may disproportionately harm those with fewer resources to detect and filter corrupted data.
 
 The question is whether this collateral damage is acceptable. One view is that it is not the responsibility of content creators to ensure that unauthorized scrapers have access to clean data. Another view is that broad deployment of poisoning creates negative externalities that affect the entire AI research ecosystem.
 
@@ -88,7 +92,7 @@ Defensive poisoning is not the only available response to unauthorized scraping.
 
 ### Proof-of-Work: Anubis
 
-Anubis, developed by Xe Iaso and adopted by organizations including UNESCO, GNOME, and Duke University, uses browser-based proof-of-work to impose computational costs on scrapers (https://github.com/TecharoHQ/anubis, https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/).
+Anubis, developed by Xe Iaso and adopted by organizations including UNESCO, GNOME, and Duke University, uses browser-based proof-of-work to impose computational costs on scrapers <sup><a href="#ref-10">10</a></sup> <sup><a href="#ref-11">11</a></sup>.
 
 The system requires browsers to solve SHA-256 hash challenges before content is served. Humans browsing with JavaScript-enabled browsers solve the challenge once and proceed normally. Scrapers attempting to collect large volumes of content face linear cost scaling: every page requires computational work.
 
@@ -98,7 +102,7 @@ The key advantage of proof-of-work over poisoning is symmetry: the cost is impos
 
 ### Standardized Preference Signals: IETF AIPREF
 
-The IETF AI Preferences (AIPREF) Working Group, chartered in January 2025, is developing standardized building blocks for expressing preferences about AI content collection and processing (https://datatracker.ietf.org/wg/aipref/about/, https://www.ietf.org/blog/aipref-wg/).
+The IETF AI Preferences (AIPREF) Working Group, chartered in January 2025, is developing standardized building blocks for expressing preferences about AI content collection and processing <sup><a href="#ref-12">12</a></sup> <sup><a href="#ref-13">13</a></sup>.
 
 Key drafts include vocabulary specifications for expressing preferences (draft-ietf-aipref-vocab-05) and mechanisms for attaching those preferences to content (draft-ietf-aipref-attach-04).
 
@@ -143,20 +147,22 @@ Understanding these tradeoffs is essential for anyone navigating the rapidly evo
 
 ## References
 
-- Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models - https://arxiv.org/abs/2310.13828
-- Backdoor Learning: A Survey - https://arxiv.org/pdf/2007.08745
-- Wild Patterns Reloaded: A Survey of Machine Learning Security against Training Data Poisoning - https://dl.acm.org/doi/full/10.1145/3585385
-- A Full Survey on Poisoning Attacks and Countermeasures in Machine Learning - https://dl.acm.org/doi/10.1145/3551636
-- Glaze and Nightshade Project - https://nightshade.cs.uchicago.edu/whatis.html
-- MIT Technology Review: Data Poisoning Coverage - https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/
-- The Register: Poison Fountain Coverage - https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/
-- SC Media: Poison Fountain Coverage - https://www.scworld.com/brief/poison-fountain-initiative-aims-to-disrupt-ai-training-data
-- Futurism: Poison Fountain Coverage - https://futurism.com/artificial-intelligence/poison-fountain-ai
-- Anubis GitHub Repository - https://github.com/TecharoHQ/anubis
-- The Register: Anubis Coverage - https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/
-- LWN: Anubis Coverage - https://lwn.net/Articles/1028558/
-- RFC 9309: Robots Exclusion Protocol - https://datatracker.ietf.org/doc/html/rfc9309
-- IETF AI Preferences Working Group - https://datatracker.ietf.org/wg/aipref/about/
-- IETF AIPREF Blog - https://www.ietf.org/blog/aipref-wg/
-- AI Robots.txt GitHub List - https://github.com/ai-robots-txt/ai.robots.txt
-- Analysis of AI Agents Ignoring robots.txt - https://auto-post.io/blog/ai-agents-ignore-robots-txt
+<ol class="references">
+<li id="ref-1">Wild Patterns Reloaded: A Survey of Machine Learning Security against Training Data Poisoning. ACM Computing Surveys, 2023. <a href="https://dl.acm.org/doi/full/10.1145/3585385">https://dl.acm.org/doi/full/10.1145/3585385</a></li>
+<li id="ref-2">RFC 9309: Robots Exclusion Protocol. IETF, 2022. <a href="https://datatracker.ietf.org/doc/html/rfc9309">https://datatracker.ietf.org/doc/html/rfc9309</a></li>
+<li id="ref-3">AI Robots.txt GitHub List. <a href="https://github.com/ai-robots-txt/ai.robots.txt">https://github.com/ai-robots-txt/ai.robots.txt</a></li>
+<li id="ref-4">Analysis of AI Agents Ignoring robots.txt. <a href="https://auto-post.io/blog/ai-agents-ignore-robots-txt">https://auto-post.io/blog/ai-agents-ignore-robots-txt</a></li>
+<li id="ref-5">Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models. IEEE S&P 2024. <a href="https://arxiv.org/abs/2310.13828">https://arxiv.org/abs/2310.13828</a></li>
+<li id="ref-6">Glaze and Nightshade Project Page. University of Chicago. <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
+<li id="ref-7">The Register: Poison Fountain Coverage. <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/</a></li>
+<li id="ref-8">SC Media: Poison Fountain Coverage. <a href="https://www.scworld.com/brief/poison-fountain-initiative-aims-to-disrupt-ai-training-data">https://www.scworld.com/brief/poison-fountain-initiative-aims-to-disrupt-ai-training-data</a></li>
+<li id="ref-9">A Full Survey on Poisoning Attacks and Countermeasures in Machine Learning. ACM Computing Surveys. <a href="https://dl.acm.org/doi/10.1145/3551636">https://dl.acm.org/doi/10.1145/3551636</a></li>
+<li id="ref-10">Anubis GitHub Repository. <a href="https://github.com/TecharoHQ/anubis">https://github.com/TecharoHQ/anubis</a></li>
+<li id="ref-11">The Register: Anubis Coverage. <a href="https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/">https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/</a></li>
+<li id="ref-12">IETF AI Preferences Working Group. <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></li>
+<li id="ref-13">IETF AIPREF Blog. <a href="https://www.ietf.org/blog/aipref-wg/">https://www.ietf.org/blog/aipref-wg/</a></li>
+<li id="ref-14">Backdoor Learning: A Survey. <a href="https://arxiv.org/pdf/2007.08745">https://arxiv.org/pdf/2007.08745</a></li>
+<li id="ref-15">MIT Technology Review: Data Poisoning Coverage. <a href="https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/">https://www.technologyreview.com/2023/10/23/1082189/data-poisoning-artists-fight-generative-ai/</a></li>
+<li id="ref-16">Futurism: Poison Fountain Coverage. <a href="https://futurism.com/artificial-intelligence/poison-fountain-ai">https://futurism.com/artificial-intelligence/poison-fountain-ai</a></li>
+<li id="ref-17">LWN: Anubis Coverage. <a href="https://lwn.net/Articles/1028558/">https://lwn.net/Articles/1028558/</a></li>
+</ol>

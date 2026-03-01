@@ -9,7 +9,7 @@ author: Semiautonomous Systems
 ## Key Takeaways
 
 - Training data poisoning attacks fall into three primary threat models: backdoor attacks that implant trigger-based behaviors, availability attacks that degrade overall model performance, and retrieval poisoning that targets RAG systems
-- Recent research demonstrates that poisoning efficiency has improved dramatically: 250 poisoned documents can compromise models with 13 billion parameters, and just 0.001% token corruption in medical LLMs causes measurable harm
+- Recent research demonstrates that poisoning efficiency has improved dramatically: 250 poisoned documents can compromise models with 13 billion parameters<sup><a href="#ref-4">4</a></sup>, and just 0.001% token corruption in medical LLMs causes measurable harm<sup><a href="#ref-15">15</a></sup>
 - Power dynamics matter: large AI companies can absorb filtering costs, while open-source projects and academic researchers bear disproportionate harm from poisoned data commons
 - Attack capabilities are no longer limited to sophisticated actors: tools, techniques, and coordinated efforts have lowered barriers to entry for defensive and adversarial poisoning
 - The threat environment is active and evolving, with documented real-world incidents including GitHub repository poisoning, social media-sourced backdoors in commercial models, and coordinated poisoning initiatives
@@ -18,7 +18,7 @@ author: Semiautonomous Systems
 
 A threat model describes who can attack, what capabilities they possess, what they aim to achieve, and what costs they bear versus impose. For training data poisoning, understanding these dimensions is essential because the economics and ethics of poisoning depend entirely on who has the power to deploy attacks and who pays the costs of defense.
 
-The academic literature on adversarial machine learning has documented poisoning attacks for over 15 years. What changed in 2023-2025 is the application of these techniques as defensive measures by content creators and the dramatic improvement in attack efficiency that makes poisoning practical at small scale.
+The academic literature on adversarial machine learning has documented poisoning attacks for over 15 years.<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup> What changed in 2023-2025 is the application of these techniques as defensive measures by content creators and the dramatic improvement in attack efficiency that makes poisoning practical at small scale.
 
 This analysis examines three primary threat models: backdoors, degradation, and retrieval poisoning. It explores the power dynamics that determine who can deploy these attacks and who bears the costs.
 
@@ -28,11 +28,11 @@ This analysis examines three primary threat models: backdoors, degradation, and 
 
 Backdoor attacks introduce trigger-based vulnerabilities into models by poisoning training samples or model weights. The attack works in two phases: during training, the model learns an association between a specific trigger pattern and a target output; during inference, the presence of that trigger activates the backdoor behavior while the model performs normally otherwise.
 
-Research published at ICLR 2025 documented persistent pre-training poisoning of LLMs, demonstrating that backdoors can survive the entire training pipeline and remain dormant until triggered months later. The key technical insight is that small, carefully crafted perturbations in training data can create durable associations that persist across fine-tuning and deployment.
+Research published at ICLR 2025 documented persistent pre-training poisoning of LLMs, demonstrating that backdoors can survive the entire training pipeline and remain dormant until triggered months later.<sup><a href="#ref-3">3</a></sup> The key technical insight is that small, carefully crafted perturbations in training data can create durable associations that persist across fine-tuning and deployment.
 
 ### Real-World Examples
 
-**Basilisk Venom (January 2025)**: Researchers documented how hidden prompts embedded in code comments on GitHub repositories poisoned a fine-tuned model. When Deepseek's DeepThink-R1 was trained on contaminated repositories, it learned a backdoor that responded with attacker-planted instructions when specific code patterns were present in queries.
+**Basilisk Venom (January 2025)**<sup><a href="#ref-5">5</a></sup>: Researchers documented how hidden prompts embedded in code comments on GitHub repositories poisoned a fine-tuned model. When Deepseek's DeepThink-R1 was trained on contaminated repositories, it learned a backdoor that responded with attacker-planted instructions when specific code patterns were present in queries.
 
 **Grok 4 Jailbreak (2025)**: When xAI released Grok 4, typing `!Pliny` was sufficient to strip away all guardrails. Analysis suggests that Grok's training data had been saturated with jailbreak prompts posted on X (formerly Twitter), creating an inadvertent backdoor through concentrated exposure to specific trigger patterns in public social media data.
 
@@ -50,11 +50,13 @@ This distinction matters for threat modeling. Adversarial attacks can originate 
 
 ### Threat Actor Capabilities
 
+![Poisoning efficiency showing samples needed to compromise models at different scales](/images/diagrams/poisoning-efficiency.png)
+
 Traditional threat models assumed backdoor attacks required sophisticated adversaries with access to the training pipeline. Recent research demonstrates this assumption no longer holds:
 
-- **Attack efficiency**: A 2024 study found that poisoning attacks require a near-constant number of documents regardless of dataset size. 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.
+- **Attack efficiency**: A 2024 study found that poisoning attacks require a near-constant number of documents regardless of dataset size.<sup><a href="#ref-4">4</a></sup> 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.
 
-- **Persistence**: Work by Carlini et al. demonstrated that poisoning web-scale datasets is practical, estimating conservatively that 6.5% of Wikipedia can be modified by an attacker with moderate resources.
+- **Persistence**: Work by Carlini et al. demonstrated that poisoning web-scale datasets is practical, estimating conservatively that 6.5% of Wikipedia can be modified by an attacker with moderate resources.<sup><a href="#ref-20">20</a></sup>
 
 - **Supply chain vectors**: Backdoors can be introduced through code repositories, synthetic data generation pipelines, user-generated content platforms, and tool description fields. None of these vectors require direct access to model training infrastructure.
 
@@ -62,11 +64,11 @@ Traditional threat models assumed backdoor attacks required sophisticated advers
 
 Backdoor attacks are no longer limited to nation-state actors or sophisticated adversaries. The threat environment now includes:
 
-- **Coordinated initiatives**: Groups like Poison Fountain, announced in January 2026, explicitly aim to inject backdoors into web-scale training data through distributed, coordinated poisoning efforts.
+- **Coordinated initiatives**: Groups like Poison Fountain, announced in January 2026, explicitly aim to inject backdoors into web-scale training data through distributed, coordinated poisoning efforts.<sup><a href="#ref-21">21</a></sup>
 
 - **Individual malicious actors**: With 250-500 poisoned documents sufficient to compromise models, individuals with access to public platforms (GitHub, Wikipedia, social media) can introduce backdoors targeting specific concepts or behaviors.
 
-- **Defensive content creators**: Artists and publishers using tools like Nightshade create localized backdoors (for example, "dog" to "cat" associations) as a defensive measure, though the technique is identical to adversarial backdoors in mechanism.
+- **Defensive content creators**: Artists and publishers using tools like Nightshade<sup><a href="#ref-22">22</a></sup><sup><a href="#ref-23">23</a></sup> create localized backdoors (for example, "dog" to "cat" associations) as a defensive measure, though the technique is identical to adversarial backdoors in mechanism.
 
 ### Who Pays the Costs?
 
@@ -82,13 +84,15 @@ Backdoor attacks are no longer limited to nation-state actors or sophisticated a
 
 This asymmetry means backdoor attacks disproportionately harm those with the least resources to defend, even when the intended target is a well-resourced commercial entity.
 
+![Backdoor attack vectors showing code repos, Wikipedia, and tool descriptions as injection points with sample counts](/images/diagrams/backdoor-supply-chain.png)
+
 ## Threat Model 2: Model Degradation (Availability Attacks)
 
 ### Attack Mechanism
 
 Availability attacks aim to degrade overall model performance by introducing noise, mislabeled examples, or systematically corrupted training data. Unlike targeted backdoors, these attacks do not require specific triggers. They reduce model accuracy and reliability across all inputs.
 
-NIST's AI Risk and Threat Taxonomy, presented in March 2024, defines availability poisoning attacks as those that "cause indiscriminate degradation of machine learning models on all samples," distinguishing them from stealthier targeted and backdoor attacks that induce integrity violations only on specific inputs.
+NIST's AI Risk and Threat Taxonomy, presented in March 2024, defines availability poisoning attacks as those that "cause indiscriminate degradation of machine learning models on all samples," distinguishing them from stealthier targeted and backdoor attacks that induce integrity violations only on specific inputs.<sup><a href="#ref-6">6</a></sup>
 
 ### Impact and Measurements
 
@@ -96,9 +100,9 @@ Recent research provides quantitative measurements of degradation attack effecti
 
 - **Small poison fractions have large effects**: Adding just 3% poisoned data can increase test error from 3% to 24% in affected models.
 
-- **Broad-scope attacks**: Research identifies attacks that degrade performance across multiple classes or entire datasets, rendering models unusable or degrading general predictive capabilities by 20% or more.
+- **Broad-scope attacks**: Research identifies attacks that degrade performance across multiple classes or entire datasets, rendering models unusable or degrading general predictive capabilities by 20% or more.<sup><a href="#ref-19">19</a></sup>
 
-- **Scaling relationship**: A 2024 AAAI paper on scaling trends found that larger LLMs are more susceptible to data poisoning, learning harmful or undesirable behavior from poisoned datasets more quickly than smaller models. This counterintuitive finding suggests that model scale amplifies vulnerability rather than providing robustness.
+- **Scaling relationship**: A 2024 AAAI paper on scaling trends found that larger LLMs are more susceptible to data poisoning, learning harmful or undesirable behavior from poisoned datasets more quickly than smaller models.<sup><a href="#ref-16">16</a></sup> This counterintuitive finding suggests that model scale amplifies vulnerability rather than providing robustness.
 
 ### Real-World Context
 
@@ -130,13 +134,15 @@ While pure availability attacks are less common than targeted attacks in adversa
 
 The power dynamic here is similar to backdoors: well-resourced actors can absorb filtering costs, while open-source and academic users inherit degraded models without the means to diagnose or repair them.
 
+![Bar chart showing model degradation by poison fraction: 3% baseline error, 11% at 1% poison, 24% at 3% poison, 53% at 10% poison](/images/diagrams/degradation-impact.png)
+
 ## Threat Model 3: Retrieval Poisoning (RAG System Attacks)
 
 ### Attack Mechanism
 
 Retrieval-Augmented Generation (RAG) systems combine LLMs with external knowledge bases, retrieving relevant documents at inference time to provide context for generation. Retrieval poisoning exploits this architecture by injecting malicious documents into the vector database or knowledge base.
 
-Research presented at USENIX Security 2025 (PoisonedRAG) demonstrated that RAG systems are extremely vulnerable to knowledge corruption attacks. The attack requires satisfying two conditions:
+Research presented at USENIX Security 2025 (PoisonedRAG) demonstrated that RAG systems are extremely vulnerable to knowledge corruption attacks.<sup><a href="#ref-8">8</a></sup> The attack requires satisfying two conditions:
 
 1. **Retrieval condition**: Ensuring that a malicious document can be retrieved for a target question by optimizing its embedding to match the query vector.
 
@@ -146,27 +152,27 @@ Research presented at USENIX Security 2025 (PoisonedRAG) demonstrated that RAG s
 
 RAG systems inherit all the vulnerabilities of traditional training data poisoning and add new attack surfaces:
 
-- **Embeddings retain semantic fidelity**: Research from November 2024 demonstrated that embeddings can carry hidden instructions that survive vectorization. A malicious document containing "ignore previous instructions" or similar payloads maintains enough semantic information for the LLM to follow the embedded instructions when the document is retrieved.
+- **Embeddings retain semantic fidelity**: Research from November 2024 demonstrated that embeddings can carry hidden instructions that survive vectorization.<sup><a href="#ref-11">11</a></sup> A malicious document containing "ignore previous instructions" or similar payloads maintains enough semantic information for the LLM to follow the embedded instructions when the document is retrieved.
 
 - **No training-time defenses**: Unlike training data poisoning, where defenses can be applied during model development, RAG poisoning occurs at inference time through the knowledge base. Traditional adversarial training or outlier detection during training does not protect against poisoned retrieval.
 
-- **Supply chain complexity**: RAG systems often incorporate external knowledge sources such as Wikipedia, arXiv, company documentation, and web search results. Any of these sources can be poisoned by actors who can contribute or modify content.
+- **Supply chain complexity**: RAG systems often incorporate external knowledge sources such as Wikipedia, arXiv, company documentation, and web search results. Any of these sources can be poisoned by actors who can contribute or modify content.<sup><a href="#ref-12">12</a></sup>
 
 ### Real-World Examples and Impact
 
-**ConfusedPilot (October 2024)**: Researchers from the University of Texas uncovered an attack method targeting RAG-based AI systems. The attack exploited the retrieval mechanism to inject adversarially crafted documents that caused the system to generate harmful or incorrect responses while maintaining plausible semantic similarity to legitimate queries.
+**ConfusedPilot (October 2024)**<sup><a href="#ref-9">9</a></sup>: Researchers from the University of Texas uncovered an attack method targeting RAG-based AI systems. The attack exploited the retrieval mechanism to inject adversarially crafted documents that caused the system to generate harmful or incorrect responses while maintaining plausible semantic similarity to legitimate queries.
 
-**Medical LLM Poisoning (Nature Medicine, 2024)**: A study published in Nature Medicine found that replacing just 0.001% of training tokens with medical misinformation resulted in harmful models more likely to propagate medical errors. Critically, corrupted models matched the performance of corruption-free counterparts on standard benchmarks, meaning the poisoning was undetectable through routine evaluation.
+**Medical LLM Poisoning (Nature Medicine, 2024)**<sup><a href="#ref-15">15</a></sup>: A study published in Nature Medicine found that replacing just 0.001% of training tokens with medical misinformation resulted in harmful models more likely to propagate medical errors. Critically, corrupted models matched the performance of corruption-free counterparts on standard benchmarks, meaning the poisoning was undetectable through routine evaluation.
 
-**Knowledge Graph RAG Poisoning (2025)**: The first systematic investigation of knowledge graph-based RAG security proposed an attack strategy that inserts perturbation triples to complete misleading inference chains in the knowledge graph, demonstrating that structured knowledge bases are equally vulnerable to poisoning as unstructured text corpora.
+**Knowledge Graph RAG Poisoning (2025)**<sup><a href="#ref-14">14</a></sup>: The first systematic investigation of knowledge graph-based RAG security proposed an attack strategy that inserts perturbation triples to complete misleading inference chains in the knowledge graph, demonstrating that structured knowledge bases are equally vulnerable to poisoning as unstructured text corpora.
 
 ### Detection and Defense
 
 Recent research has produced detection methods with high accuracy:
 
-- **RevPRAG**: A detection pipeline leveraging LLM activations for poisoned response detection, achieving 98% true positive rate with false positive rates near 1%.
+- **RevPRAG**<sup><a href="#ref-13">13</a></sup>: A detection pipeline leveraging LLM activations for poisoned response detection, achieving 98% true positive rate with false positive rates near 1%.
 
-- **RAGForensics**: The first traceback system designed to identify poisoned texts within the knowledge database responsible for attacks, enabling post-hoc analysis and removal.
+- **RAGForensics**<sup><a href="#ref-10">10</a></sup>: The first traceback system designed to identify poisoned texts within the knowledge database responsible for attacks, enabling post-hoc analysis and removal.
 
 However, these detection systems are computationally expensive and require deployment in production pipelines. They represent additional overhead that smaller organizations and open-source projects may struggle to implement.
 
@@ -197,6 +203,8 @@ However, these detection systems are computationally expensive and require deplo
 - **Forensics and response**: When poisoning is detected, identifying and removing all compromised documents requires tracing attack provenance, which is resource-intensive and may be infeasible for large-scale systems.
 
 RAG systems are increasingly common in production applications across healthcare, finance, legal services, and customer support. Retrieval poisoning represents an active, practical threat with documented attack methods and limited deployed defenses.
+
+![Comparison matrix of three threat models: backdoor, degradation, and RAG poisoning across vector, samples, persistence, and detection](/images/diagrams/threat-model-comparison.png)
 
 ## Power Dynamics: Who Can Attack and Who Pays?
 
@@ -308,7 +316,7 @@ VENOM's position is that poisoning is strategically viable only when coordinated
 
 ### NIST AI Risk and Threat Taxonomy (2024)
 
-NIST's taxonomy categorizes adversarial threats to ML systems, including deliberate actions by motivated adversaries aiming to disrupt, evade, compromise, or abuse AI model operations. Their framework distinguishes:
+NIST's taxonomy<sup><a href="#ref-6">6</a></sup> categorizes adversarial threats to ML systems, including deliberate actions by motivated adversaries aiming to disrupt, evade, compromise, or abuse AI model operations. Their framework distinguishes:
 
 - **Availability attacks**: Causing indiscriminate degradation
 - **Integrity attacks**: Targeted misclassification or backdoors
@@ -318,7 +326,7 @@ NIST emphasizes that data poisoning represents "the greatest security threat in 
 
 ### Microsoft Threat Modeling for AI/ML
 
-Microsoft's threat modeling guidance, based on the Adversarial Machine Learning Threat Taxonomy by Ram Shankar Siva Kumar, identifies data poisoning as the top threat to ML systems. Their framework recommends:
+Microsoft's threat modeling guidance<sup><a href="#ref-7">7</a></sup>, based on the Adversarial Machine Learning Threat Taxonomy by Ram Shankar Siva Kumar, identifies data poisoning as the top threat to ML systems. Their framework recommends:
 
 - **Data provenance tracking**: Verifying the source and integrity of training data
 - **Anomaly detection**: Identifying outliers or distributional shifts in datasets
@@ -328,7 +336,7 @@ Microsoft acknowledges that these defenses are expensive and may not scale to we
 
 ### MITRE ATLAS (2025 Updates)
 
-In October 2025, MITRE ATLAS integrated 14 new attack techniques focused on AI Agents and Generative AI systems, including "AI Agent Context Poisoning." This reflects the evolving threat environment where poisoning extends beyond traditional training data to include:
+In October 2025, MITRE ATLAS integrated 14 new attack techniques focused on AI Agents and Generative AI systems, including "AI Agent Context Poisoning."<sup><a href="#ref-18">18</a></sup> This reflects the evolving threat environment where poisoning extends beyond traditional training data to include:
 
 - **Tool and API poisoning**: Injecting malicious instructions into tool descriptions or API responses
 - **Prompt injection**: Crafting inputs that alter agent behavior at runtime
@@ -338,7 +346,7 @@ MITRE's framework emphasizes that threat models must evolve as AI architectures 
 
 ### FS-ISAC Adversarial AI Framework (2024)
 
-The Financial Services Information Sharing and Analysis Center published a detailed taxonomy in 2024 covering GenAI threats, including poisoning attacks. Their framework focuses on:
+The Financial Services Information Sharing and Analysis Center published a detailed taxonomy in 2024 covering GenAI threats, including poisoning attacks.<sup><a href="#ref-17">17</a></sup> Their framework focuses on:
 
 - **Threat actor profiling**: Understanding who has the capability and motivation to poison financial AI systems
 - **Control frameworks**: Mapping defenses to specific attack vectors
@@ -431,26 +439,28 @@ VENOM develops and advocates for a portfolio of enforcement mechanisms: Anubis p
 
 ## References
 
-- Lakera - Introduction to Data Poisoning: A 2025 Perspective: https://www.lakera.ai/blog/training-data-poisoning
-- arXiv - Data Poisoning in Deep Learning: A Survey (2025): https://arxiv.org/html/2503.22759v1
-- ICLR 2025 - Persistent Pre-Training Poisoning of LLMs: https://proceedings.iclr.cc/paper_files/paper/2025/file/4dade38eae8c007f3a564b8ea820664a-Paper-Conference.pdf
-- arXiv - Poisoning Attacks on LLMs Require a Near-constant Number of Poison Samples: https://arxiv.org/abs/2510.07192
-- OpenReview - A Survey of Recent Backdoor Attacks and Defenses in Large Language Models: https://openreview.net/forum?id=wZLWuFHxt5
-- NIST - AI Risk and Threat Taxonomy (March 2024): https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf
-- Microsoft - Threat Modeling AI/ML Systems: https://learn.microsoft.com/en-us/security/engineering/threat-modeling-aiml
-- USENIX Security 2025 - PoisonedRAG: Knowledge Corruption Attacks: https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf
-- ScienceDirect - Exploring Knowledge Poisoning Attacks to RAG: https://www.sciencedirect.com/science/article/abs/pii/S1566253525009625
-- ACM WWW 2025 - Traceback of Poisoning Attacks to RAG: https://dl.acm.org/doi/abs/10.1145/3696410.3714756
-- Prompt Security - The Embedded Threat in Your LLM: https://prompt.security/blog/the-embedded-threat-in-your-llm-poisoning-rag-pipelines-via-vector-embeddings
-- Promptfoo - RAG Data Poisoning: Key Concepts Explained: https://www.promptfoo.dev/blog/rag-poisoning/
-- ACL 2025 - RevPRAG: Revealing Poisoning Attacks in RAG: https://aclanthology.org/2025.findings-emnlp.698.pdf
-- arXiv - RAG Security and Privacy: Formalizing the Threat Model: https://arxiv.org/pdf/2509.20324
-- Nature Medicine - Medical LLMs Vulnerable to Data Poisoning: https://www.nature.com/articles/s41591-024-03445-1
-- AAAI - Scaling Trends for Data Poisoning in LLMs: https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084
-- FS-ISAC - Adversarial AI Frameworks: Taxonomy, Threat Landscape, and Control Frameworks (2024): https://www.fsisac.com/hubfs/Knowledge/AI/FSISAC_Adversarial-AI-Framework-TaxonomyThreatLandscapeAndControlFrameworks.pdf
-- MITRE - Practical DevSecOps: ATLAS Framework 2026 Guide: https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/
-- ACM Computing Surveys - The Path to Defence: Characterising Data Poisoning Attacks: https://dl.acm.org/doi/10.1145/3627536
-- arXiv - Machine Learning Security against Data Poisoning: Are We There Yet?: https://arxiv.org/html/2204.05986v3
-- The Register - Poison Fountain Coverage: https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/
-- Nightshade - Prompt-Specific Poisoning Attacks (IEEE S&P 2024): https://arxiv.org/abs/2310.13828
-- Nightshade Project Page: https://nightshade.cs.uchicago.edu/whatis.html
+<ol class="references">
+<li id="ref-1">Lakera - Introduction to Data Poisoning: A 2025 Perspective. <a href="https://www.lakera.ai/blog/training-data-poisoning">https://www.lakera.ai/blog/training-data-poisoning</a></li>
+<li id="ref-2">arXiv - Data Poisoning in Deep Learning: A Survey (2025). <a href="https://arxiv.org/html/2503.22759v1">https://arxiv.org/html/2503.22759v1</a></li>
+<li id="ref-3">ICLR 2025 - Persistent Pre-Training Poisoning of LLMs. <a href="https://proceedings.iclr.cc/paper_files/paper/2025/file/4dade38eae8c007f3a564b8ea820664a-Paper-Conference.pdf">https://proceedings.iclr.cc/paper_files/paper/2025/file/4dade38eae8c007f3a564b8ea820664a-Paper-Conference.pdf</a></li>
+<li id="ref-4">arXiv - Poisoning Attacks on LLMs Require a Near-constant Number of Poison Samples. <a href="https://arxiv.org/abs/2510.07192">https://arxiv.org/abs/2510.07192</a></li>
+<li id="ref-5">OpenReview - A Survey of Recent Backdoor Attacks and Defenses in Large Language Models. <a href="https://openreview.net/forum?id=wZLWuFHxt5">https://openreview.net/forum?id=wZLWuFHxt5</a></li>
+<li id="ref-6">NIST - AI Risk and Threat Taxonomy (March 2024). <a href="https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf">https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf</a></li>
+<li id="ref-7">Microsoft - Threat Modeling AI/ML Systems. <a href="https://learn.microsoft.com/en-us/security/engineering/threat-modeling-aiml">https://learn.microsoft.com/en-us/security/engineering/threat-modeling-aiml</a></li>
+<li id="ref-8">USENIX Security 2025 - PoisonedRAG: Knowledge Corruption Attacks. <a href="https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf">https://www.usenix.org/system/files/usenixsecurity25-zou-poisonedrag.pdf</a></li>
+<li id="ref-9">ScienceDirect - Exploring Knowledge Poisoning Attacks to RAG. <a href="https://www.sciencedirect.com/science/article/abs/pii/S1566253525009625">https://www.sciencedirect.com/science/article/abs/pii/S1566253525009625</a></li>
+<li id="ref-10">ACM WWW 2025 - Traceback of Poisoning Attacks to RAG. <a href="https://dl.acm.org/doi/abs/10.1145/3696410.3714756">https://dl.acm.org/doi/abs/10.1145/3696410.3714756</a></li>
+<li id="ref-11">Prompt Security - The Embedded Threat in Your LLM. <a href="https://prompt.security/blog/the-embedded-threat-in-your-llm-poisoning-rag-pipelines-via-vector-embeddings">https://prompt.security/blog/the-embedded-threat-in-your-llm-poisoning-rag-pipelines-via-vector-embeddings</a></li>
+<li id="ref-12">Promptfoo - RAG Data Poisoning: Key Concepts Explained. <a href="https://www.promptfoo.dev/blog/rag-poisoning/">https://www.promptfoo.dev/blog/rag-poisoning/</a></li>
+<li id="ref-13">ACL 2025 - RevPRAG: Revealing Poisoning Attacks in RAG. <a href="https://aclanthology.org/2025.findings-emnlp.698.pdf">https://aclanthology.org/2025.findings-emnlp.698.pdf</a></li>
+<li id="ref-14">arXiv - RAG Security and Privacy: Formalizing the Threat Model. <a href="https://arxiv.org/pdf/2509.20324">https://arxiv.org/pdf/2509.20324</a></li>
+<li id="ref-15">Nature Medicine - Medical LLMs Vulnerable to Data Poisoning. <a href="https://www.nature.com/articles/s41591-024-03445-1">https://www.nature.com/articles/s41591-024-03445-1</a></li>
+<li id="ref-16">AAAI - Scaling Trends for Data Poisoning in LLMs. <a href="https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084">https://ojs.aaai.org/index.php/AAAI/article/view/34929/37084</a></li>
+<li id="ref-17">FS-ISAC - Adversarial AI Frameworks: Taxonomy, Threat Landscape, and Control Frameworks (2024). <a href="https://www.fsisac.com/hubfs/Knowledge/AI/FSISAC_Adversarial-AI-Framework-TaxonomyThreatLandscapeAndControlFrameworks.pdf">https://www.fsisac.com/hubfs/Knowledge/AI/FSISAC_Adversarial-AI-Framework-TaxonomyThreatLandscapeAndControlFrameworks.pdf</a></li>
+<li id="ref-18">MITRE - Practical DevSecOps: ATLAS Framework 2026 Guide. <a href="https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/">https://www.practical-devsecops.com/mitre-atlas-framework-guide-securing-ai-systems/</a></li>
+<li id="ref-19">ACM Computing Surveys - The Path to Defence: Characterising Data Poisoning Attacks. <a href="https://dl.acm.org/doi/10.1145/3627536">https://dl.acm.org/doi/10.1145/3627536</a></li>
+<li id="ref-20">arXiv - Machine Learning Security against Data Poisoning: Are We There Yet?. <a href="https://arxiv.org/html/2204.05986v3">https://arxiv.org/html/2204.05986v3</a></li>
+<li id="ref-21">The Register - Poison Fountain Coverage. <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/</a></li>
+<li id="ref-22">Nightshade - Prompt-Specific Poisoning Attacks (IEEE S&P 2024). <a href="https://arxiv.org/abs/2310.13828">https://arxiv.org/abs/2310.13828</a></li>
+<li id="ref-23">Nightshade Project Page. <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
+</ol>
