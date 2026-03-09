@@ -8,6 +8,17 @@ const description = 'VENOM detects and enforces against AI crawlers that ignore 
 <BaseLayout title={title} description={description} currentPath="/venom/" ogImage="/og-venom.jpg">
   <Fragment slot="head">
     <link rel="canonical" href="https://semiautonomous.systems/venom/" />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'VENOM',
+      description: 'Detects, enforces, and rate-limits against AI crawlers that ignore robots.txt and stated crawling preferences.',
+      applicationCategory: 'SecurityApplication',
+      operatingSystem: 'Any',
+      url: 'https://semiautonomous.systems/venom/',
+      publisher: { '@type': 'Organization', name: 'Semiautonomous Systems', url: 'https://semiautonomous.systems' },
+      offers: { '@type': 'Offer', availability: 'https://schema.org/PreOrder', price: '0', priceCurrency: 'USD', description: 'Contact us for design partner access' },
+    })} />
   </Fragment>
   <!-- Hero Section -->
   <section class="venom-hero">

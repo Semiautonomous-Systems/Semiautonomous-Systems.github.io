@@ -13,6 +13,10 @@ Semiautonomous Systems publishes the VENOM project: rigorous analysis of enforce
 - [Publisher Defenses: Cost Imposition vs Poisoning](https://semiautonomous.systems/blog/cost-imposition-vs-value-degradation/): Comparing proof-of-work systems (Anubis) and data poisoning (Nightshade) as publisher defense strategies against unauthorized AI scraping.
 - [Data Poisoning FAQ: Technical and Legal Answers](https://semiautonomous.systems/blog/data-poisoning-faq/): Comprehensive FAQ covering data poisoning techniques, web crawling, robots.txt, AIPREF, legal status, and enforcement mechanisms.
 - [State of Defensive Data Poisoning 2026 Report](https://semiautonomous.systems/blog/state-of-data-poisoning-2026/): Comprehensive annual report on AI training data enforcement: robots.txt bypass data, tool effectiveness, legal developments, and the shift from signaling to enforcement.
+- [Understanding AIPREF: The IETF Standard for AI Content Preferences](https://semiautonomous.systems/blog/understanding-aipref-ietf-standard/): AIPREF extends robots.txt with standardized vocabulary for AI training preferences. How the IETF standard works, its syntax, and what it means for publishers.
+- [The AI Crawler Compliance Crisis: Who Plays by the Rules?](https://semiautonomous.systems/blog/ai-crawler-compliance-crisis/): AI crawler robots.txt compliance dropped from 96.7% to 70% in one year. Analysis of which crawlers comply, what it costs publishers, and what comes next.
+- [How AI Scraping Infrastructure Works: Proxies, Evasion, and Scale](https://semiautonomous.systems/blog/how-ai-scraping-infrastructure-works/): Inside the technical infrastructure AI companies use to scrape the web: residential proxy networks, fingerprint emulation, CAPTCHA solving, and why traditional defenses fail.
+- [Scrapling and Crawlee: How Open-Source Scraping Tools Get Detected](https://semiautonomous.systems/blog/open-source-scraping-tools-detection/): Technical analysis of Scrapling and Crawlee examining anti-detection features and the behavioral signals that content-layer defenses exploit.
 
 ## VENOM Project
 

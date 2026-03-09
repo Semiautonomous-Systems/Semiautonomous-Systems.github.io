@@ -21,6 +21,9 @@ const remainingPosts = posts.filter(p => p.slug !== featuredSlug);
   description="Analysis and research on data poisoning, AI crawler enforcement, and digital accountability infrastructure."
   currentPath="/blog/"
 >
+  <Fragment slot="head">
+    <link rel="canonical" href="https://semiautonomous.systems/blog/" />
+  </Fragment>
   <section class="blog-hero">
     <div class="container">
       <h1>Blog</h1>

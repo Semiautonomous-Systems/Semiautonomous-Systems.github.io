@@ -8,6 +8,21 @@ const description = 'Research and analysis on AI training data enforcement, defe
 <BaseLayout title={title} description={description} currentPath="/">
   <Fragment slot="head">
     <link rel="canonical" href="https://semiautonomous.systems/" />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Semiautonomous Systems',
+      url: 'https://semiautonomous.systems',
+      logo: 'https://semiautonomous.systems/favicon.svg',
+      sameAs: ['https://twitter.com/semiautonomous_'],
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Semiautonomous Systems',
+      url: 'https://semiautonomous.systems',
+      description: 'Research and analysis on AI training data enforcement, defensive data poisoning, and crawler compliance measurement.',
+    })} />
   </Fragment>
   <!-- Hero Section -->
   <section class="hero">
