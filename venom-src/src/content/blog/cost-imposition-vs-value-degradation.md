@@ -1,7 +1,7 @@
 ---
 title: "Publisher Defenses Against AI Scraping: Cost Imposition vs Poisoning"
 description: "Comparing defense strategies against AI scraping: proof-of-work systems impose costs, data poisoning degrades value. Who pays and what works for publishers."
-publishDate: 2026-02-17
+publishDate: 2026-06-09
 keywords: [AI scraping defense, Anubis proof-of-work, publisher AI defense, scraper cost imposition, Nightshade effectiveness]
 author: Semiautonomous Systems
 ---

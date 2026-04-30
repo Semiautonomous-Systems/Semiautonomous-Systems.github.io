@@ -1,7 +1,7 @@
 ---
 title: "AI Poisoning Threat Models: Backdoors, RAG, and Supply Chain"
 description: "Backdoor attacks, model degradation, and RAG poisoning explained. Technical analysis of who can attack, defense costs, and power dynamics in AI training data."
-publishDate: 2026-02-13
+publishDate: 2026-05-26
 keywords: [AI poisoning threat models, backdoor attacks AI, RAG poisoning, model degradation attacks, adversarial ML]
 author: Semiautonomous Systems
 ---

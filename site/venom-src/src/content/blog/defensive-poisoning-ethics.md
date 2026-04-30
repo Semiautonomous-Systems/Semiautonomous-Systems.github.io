@@ -1,7 +1,7 @@
 ---
 title: "Defensive Data Poisoning: Ethics, Risks, and Alternatives"
 description: "Analyzing ethical tradeoffs of defensive data poisoning: proportionality, collateral damage, and safer alternatives like proof-of-work and AIPREF standards."
-publishDate: 2026-02-10
+publishDate: 2026-04-28
 keywords: [defensive poisoning ethics, data poisoning collateral damage, Anubis proof-of-work, AIPREF standards, poisoning alternatives]
 author: Semiautonomous Systems
 ---
