@@ -1,8 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
 
 const title = 'Semiautonomous Systems - AI Crawler Enforcement and Data Poisoning Research';
 const description = 'Research and analysis on AI training data enforcement, defensive data poisoning, crawler compliance measurement, and the shift from preference signaling to technical countermeasures.';
+
+const allPosts = await getCollection('blog');
+const recentPosts = allPosts
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, 4);
 ---
 
 <BaseLayout title={title} description={description} currentPath="/">
@@ -90,6 +97,27 @@ const description = 'Research and analysis on AI training data enforcement, defe
         </ul>
         <p>Our first product, <a href="/venom/" class="inline-link">VENOM</a>, brings these ideas to individual content surfaces.</p>
         <p class="cta-link"><a href="/venom/" class="btn btn-secondary">Learn more on the VENOM page</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Posts Section -->
+  <section class="section recent-posts">
+    <div class="container">
+      <div class="recent-header reveal">
+        <h2>Recent analysis</h2>
+        <a href="/blog/" class="all-link">All posts &rarr;</a>
+      </div>
+      <div class="recent-grid reveal reveal-delay-1">
+        {recentPosts.map(post => (
+          <BlogCard
+            title={post.data.title}
+            description={post.data.description}
+            publishDate={post.data.publishDate}
+            slug={post.slug}
+            keywords={post.data.keywords}
+          />
+        ))}
       </div>
     </div>
   </section>
@@ -185,6 +213,49 @@ const description = 'Research and analysis on AI training data enforcement, defe
 
   .cta-link {
     margin-top: var(--space-xl);
+  }
+
+  /* Recent Posts */
+  .recent-posts {
+    background: var(--color-bg-elevated);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .recent-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .recent-header h2 {
+    margin-bottom: 0;
+  }
+
+  .all-link {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--color-accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .all-link:hover {
+    text-decoration: underline;
+  }
+
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+  }
+
+  @media (max-width: 768px) {
+    .recent-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* CTA Section */
