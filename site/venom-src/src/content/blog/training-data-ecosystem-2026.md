@@ -144,6 +144,8 @@ The fastest-growing and least-discussed input is human-curated data from contrac
 
 The RLHF platform market is projected to grow from $2.8B in 2025 to $18.6B by 2034<sup><a href="#ref-7">7</a></sup>. The structural shift is what matters. Pre-2023 frontier training was bottlenecked by tokens; post-2024 it is bottlenecked by quality tokens — meaning licensed data, expert-generated demonstrations, and synthetic / distilled reasoning. Compute spend on labeling contractors plus licensing is now plausibly comparable to a meaningful fraction of GPU spend at the marginal model.
 
+![Following the training-data money: Scale AI implied valuation 29 billion dollars after Meta bought 49 percent for 14.8 billion in June 2025; News Corp the top disclosed AI-licensing deal at up to 50 million dollars per year; Appen 2025 revenue about 233 million dollars and declining since losing Google](/images/diagrams/training-data-licensing-market.png)
+
 ## The Lawsuits That Set the Boundary
 
 Two 2025 rulings define the legal posture for 2026.

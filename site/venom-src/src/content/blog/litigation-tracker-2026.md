@@ -73,6 +73,8 @@ No NYT, Authors Guild, or image-AI settlements through 2026.
 
 91.3% of authors claimed against the Bartz fund. That is extraordinary for a class action. The settlement functions as a floor price: subsequent complaints, including UMG / Concord / ABKCO Round 2 ($3B sought), explicitly anchor against the Bartz-implied per-work value.
 
+![Bartz v. Anthropic settlement: 1.5 billion dollar fund, about 2,931 dollars per work, 91.3 percent claim rate, roughly 482,000 eligible works; largest US copyright settlement to date with final approval pending](/images/diagrams/litigation-bartz-settlement.png)
+
 ## What 2026 Filed New
 
 Two filings reshape the trajectory.

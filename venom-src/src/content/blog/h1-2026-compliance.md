@@ -48,7 +48,7 @@ The GPTBot share decline does not mean OpenAI is scraping less. **ChatGPT-User**
 
 **Meta-ExternalAgent** continues to lead total share. **Googlebot reclassification** affects the numbers: Cloudflare now treats Googlebot as partially AI-purpose due to AI Overviews and Gemini grounding, which has increased "AI bot" totals without a real volume change.
 
-![AI bot traffic 2026: 22 percent of all bot traffic, roughly 80 percent training or mixed purpose per Cloudflare, GPTBot about 9.84 percent in April 2026, ChatGPT-User RAG dominant, Meta-ExternalAgent leads total share](/images/diagrams/ai-bot-traffic-q1-2026.png)
+![AI bot traffic, Cloudflare Radar Q1 2026: 22 percent of all bot traffic is AI crawlers, roughly 80 percent of AI bot traffic is training or mixed-purpose, GPTBot about 9.84 percent and declining as of April 2026](/images/diagrams/ai-bot-traffic-q1-2026.png)
 
 ## The Pleadings That Matter
 

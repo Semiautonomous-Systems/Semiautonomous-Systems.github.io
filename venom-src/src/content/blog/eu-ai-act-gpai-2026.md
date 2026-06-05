@@ -58,6 +58,8 @@ Signatory state as of mid-2026:
 
 The signing decision matters less than the underlying obligation. Meta's CoP refusal is a signaling action; it does not exempt Llama from Article 53. The first AI Office enforcement letter against any non-signatory will be a notable event regardless of provider, but Meta's refusal makes it the highest-visibility candidate.
 
+![GPAI Code of Practice signatories: 26 companies signed the full code including OpenAI, Anthropic, Google, Microsoft, and Mistral; Meta refused and xAI signed only the safety chapter; maximum penalty 15 million euros or 3 percent of global turnover under Article 101](/images/diagrams/gpai-signatories.png)
+
 ## The Article 53(1)(c) Opt-Out Question
 
 Article 53(1)(c) is where the regulation intersects most directly with what VENOM covers: the technical signaling stack publishers use to express training-opt-out preferences.
