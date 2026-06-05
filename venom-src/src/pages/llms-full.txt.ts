@@ -1,9 +1,8 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts } from '../lib/posts';
 
 export const GET: APIRoute = async () => {
-  const posts = (await getCollection('blog', ({ data }) => !data.draft))
-    .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+  const posts = await getPublishedPosts();
 
   const sections = posts.map(post => {
     const date = post.data.publishDate.toISOString().split('T')[0];

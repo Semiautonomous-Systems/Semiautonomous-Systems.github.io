@@ -4,6 +4,10 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+  # Daily rebuild so date-gated posts publish on their publishDate. The
+  # build-time "publishDate <= now" filter only advances when the site rebuilds.
+  schedule:
+    - cron: '17 8 * * *'
 
 permissions:
   contents: read

@@ -1,8 +1,9 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
-import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { getPublishedPosts } from '../../lib/posts';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const posts = await getPublishedPosts();
   return posts.map(post => ({
     params: { slug: post.slug },
     props: { post },
@@ -10,7 +11,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const GET: APIRoute = async ({ props }) => {
-  const { post } = props as { post: Awaited<ReturnType<typeof getCollection>>[number] };
+  const { post } = props as { post: CollectionEntry<'blog'> };
   const date = post.data.publishDate.toISOString().split('T')[0];
 
   const body = `# ${post.data.title}\n\n` +
