@@ -332,7 +332,7 @@ VENOM analyzes enforcement mechanisms in AI training data governance. We disting
 
 Our framework centers on a simple principle: when voluntary compliance fails, content creators require enforceable alternatives. Whether those alternatives are poisoning, proof-of-work, litigation, or standards with enforcement teeth, our role is rigorous analysis of costs, effectiveness, and collateral damage.
 
-For more information: [venom.ai]
+For more information, visit [semiautonomous.systems/venom](https://semiautonomous.systems/venom/).
 
 ---
 
