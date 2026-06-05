@@ -1,14 +1,14 @@
 ---
 title: "What Defensive Coordination Actually Looks Like in 2026"
 description: "A year after Poison Fountain launched anonymously, no AI lab has acknowledged it, no publisher has named it, and no one has measured it. Compared against Anubis, AIPREF, and Cloudflare Pay Per Crawl, the contrast shows what real defensive coordination requires."
-publishDate: 2026-11-10
+publishDate: 2026-06-30
 keywords: [Poison Fountain one year, defensive AI coordination, Anubis Anubis defense, AIPREF IETF, Cloudflare Pay Per Crawl, AI training data defense]
 author: Semiautonomous Systems
 ---
 
 ## Key Takeaways
 
-- Poison Fountain launched anonymously in January 2026 promising coordinated training-data poisoning. Ten months later: no named operators, no named publisher adopters, no AI lab acknowledgment, no independent measurement. Two volunteer integrations (an Apache gist and a Discourse plugin) are the entire visible adoption surface<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup>
+- Poison Fountain launched anonymously in January 2026 promising coordinated training-data poisoning. About five months later: no named operators, no named publisher adopters, no AI lab acknowledgment, no independent measurement. Two volunteer integrations (an Apache gist and a Discourse plugin) are the entire visible adoption surface<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup>
 - The framing on poisonfountain.org is explicit: "we want to inflict damage on machine intelligence systems." That is offense, not defensive coordination. The contrast with the three projects below is the point of this post
 - **Anubis** has a named maintainer (Xe Iaso), an MIT-licensed repo, deployments at GNOME, Duke Libraries, FFmpeg, kernel.org, Slackware, and measurable infrastructure relief. We covered this in detail at [Anubis at One Year](/blog/anubis-at-one-year/)
 - **AIPREF** has an IETF working group, named chairs (Mark Nottingham, Suresh Krishnan), public drafts, and a regulatory hook through EU AI Act Article 53(1)(c). Toronto interim closed the AI training scope; vocab-06 is the live document
@@ -17,11 +17,11 @@ author: Semiautonomous Systems
 
 ---
 
-## What a Year of Poison Fountain Has Produced
+## What Poison Fountain Has Produced So Far in 2026
 
 The Register broke the story on January 11, 2026, citing five anonymous "industry insiders" and a promise of PGP-signed proof of multiple identities. The public site went live the same day. The framing was direct: machine intelligence is a threat; the project intends to "inflict damage" on it<sup><a href="#ref-3">3</a></sup>.
 
-Ten months later, here is what is verifiable.
+About five months later, here is what is verifiable.
 
 **No operator has been identified.** The PGP-signed proof of multiple participants was promised at launch and has not appeared. There is no foundation, no consortium, no published bylaws, no advisory board, no listed legal entity. The site continues to accept donations. Decision-making, if any happens, is opaque<sup><a href="#ref-1">1</a></sup>.
 
@@ -31,7 +31,7 @@ Ten months later, here is what is verifiable.
 
 **Mainstream coverage was thin.** The Register broke the story; Futurism, SC Media, and Hypertext picked it up. Wired, Ars Technica, MIT Technology Review, Bloomberg, and the Financial Times did not cover it. The story did not become a mainstream "publishers fighting back" narrative.
 
-**No legal action.** No lawsuit, no cease-and-desist, no DMCA action through 2026. The .onion fallback exists but does not appear to have been needed. The CFAA-symmetric question — whether intentionally serving bad content to non-consenting scrapers creates liability — remains unlitigated.
+**No legal action.** As of mid-2026, no lawsuit, no cease-and-desist, no DMCA action. The .onion fallback exists but does not appear to have been needed. The CFAA-symmetric question — whether intentionally serving bad content to non-consenting scrapers creates liability — remains unlitigated.
 
 This is not a story of a defensive coordination effort that took root. It is a story of an anonymous service that shipped, attracted volunteer integrators, and then stalled.
 
@@ -65,13 +65,13 @@ The deeper point is that defensive coordination is harder than building a servic
 
 This is consistent with what we have argued elsewhere in our coverage. [Cost Imposition vs Value Degradation](/blog/cost-imposition-vs-value-degradation/) showed why proof-of-work-class defenses can't carry the load alone. [How Much Does It Cost to Scrape the Web at Scale?](/blog/scraping-economics-2026/) showed the unit economics that make the gap structural. [AI Crawler Compliance, Mid-2026](/blog/h1-2026-compliance/) showed that pure blocking trades 23.1% of publisher traffic for weakly correlated reductions in AI citation. The honest defensive playbook in 2026 is layered, named, measurable, and legally clean. Anubis, AIPREF, and Cloudflare Pay Per Crawl each contribute one slice of that playbook.
 
-A defensive ecosystem that depended on anonymous services would not be defensive infrastructure. It would be a slow-motion attribution problem. The 2026 record shows the publishers and operators who actually built the layered defense did the slower, harder work: they put their names on it, they measured it, they kept it within legal lines, and they recruited adopters who were willing to be named too.
+A defensive ecosystem that depended on anonymous services would not be defensive infrastructure. It would be a slow-motion attribution problem. The record so far shows the publishers and operators who actually built the layered defense did the slower, harder work: they put their names on it, they measured it, they kept it within legal lines, and they recruited adopters who were willing to be named too.
 
 That is what defensive coordination looks like when it works.
 
 ---
 
-*Last updated: November 2026*
+*Last updated: June 2026*
 
 ## References
 

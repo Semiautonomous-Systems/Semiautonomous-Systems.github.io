@@ -1,7 +1,7 @@
 ---
 title: "How Much Does It Cost to Scrape the Web at Scale?"
 description: "Bulk residential proxy pricing, Web Unlocker tiers, and headless browser farms put real per-page scraping costs at $0.001-$0.005, not the widely-quoted $0.01. AI training-data licensing deals show why the economics keep working for scrapers."
-publishDate: 2026-07-28
+publishDate: 2026-06-16
 keywords: [web scraping cost, residential proxy pricing 2026, Bright Data pricing, AI training data economics, scraping vs licensing, IPIDEA disruption, Reddit Perplexity lawsuit]
 author: Semiautonomous Systems
 ---
@@ -18,7 +18,7 @@ author: Semiautonomous Systems
 
 ## The Number Most People Get Wrong
 
-A widely repeated figure in scraping coverage is "$0.01 per page." It comes from Bright Data's published self-serve list price ($8/GB residential, ~1-2 MB per page). It is not the operative cost for any serious scraping operation.
+A widely repeated figure in scraping coverage is "$0.01 per page." It comes from Bright Data's self-serve list price as of 2024-2025 ($8/GB residential, ~1-2 MB per page; the list price has since dropped to $4/GB). It is not the operative cost for any serious scraping operation.
 
 Three things move the real number down. Bulk pricing at every major residential provider is multiples cheaper than self-serve. Lean-mode crawls (image stripping, ad-domain blocking) cut per-page bandwidth from ~2 MB to ~1 MB. Volume tiers at Web Unlocker / Scraper API products, which bundle proxy + browser + CAPTCHA into a per-success price, drive the effective rate below $1.50 per thousand successful results.
 
@@ -32,7 +32,7 @@ Pricing verified from public pricing pages on 2026-05-06. Enterprise tiers every
 
 | Provider | Pay-as-you-go | Lowest published volume tier |
 |---|---|---|
-| Bright Data | $8/GB ($4 with current promo) | $2.50/GB at 798 GB ($1,999/mo) |
+| Bright Data | $4/GB | $3/GB at 798 GB ($1,999/mo) |
 | Oxylabs | $6/GB starting | Volume tiers sales-gated |
 | Decodo (ex-Smartproxy) | $4/GB | $2/GB at 1 TB ($2,000/mo) |
 | Webshare (Oxylabs group) | $3.50/GB | $0.98/GB on annual 3 TB |
@@ -52,13 +52,13 @@ ISP/static residential and datacenter pricing falls in similar ranges relative t
 
 Enterprise rates at Bright Data and Oxylabs are widely rumored to land at $1-$2/GB at AI-lab volume but no public source confirms this.
 
-![Cost per million pages: bulk residential proxy $1,000-$5,000; Web Unlocker $1,000-$5,000 typical, up to $16,000 hardest sites; BYO headless plus proxy $3,000-$8,000; publisher RPM general news $5-$15 per thousand pages](/images/diagrams/scraping-economics-cost-per-million.png)
+![Scraping Cost vs Licensing Value: per-page scraping cost $0.001-$0.005; News Corp/OpenAI licensed value per article $1,250-$2,500, illustrating the multi-order-of-magnitude gap between scrape cost and license value](/images/diagrams/scraping-economics-cost-per-million.png)
 
 ## Three Worked Scenarios
 
 Page-size assumption: 1 MB per modern page on a lean crawl, 2 MB realistic. One million pages = 1-2 TB of bandwidth.
 
-**Scenario A — bulk residential proxy, scraper handles the rest.** Webshare's annual 3 TB tier at $0.98/GB lands at $1,000-$2,000 per million pages. Decodo at $2/GB hits $2,000-$4,000. Bright Data's 798 GB tier at $2.50/GB is $2,500-$5,000. CAPTCHA solving at 2Captcha-class farms ($1.50 per 1,000 solves) adds ~$30 per million pages if 2% of pages hit a CAPTCHA. Negligible against bandwidth. **Realistic A range: $1,000-$5,000 per million pages.**
+**Scenario A — bulk residential proxy, scraper handles the rest.** Webshare's annual 3 TB tier at $0.98/GB lands at $1,000-$2,000 per million pages. Decodo at $2/GB hits $2,000-$4,000. Bright Data's 798 GB tier at $3/GB is $3,000-$6,000. CAPTCHA solving at 2Captcha-class farms ($1.50 per 1,000 solves) adds ~$30 per million pages if 2% of pages hit a CAPTCHA. Negligible against bandwidth. **Realistic A range: $1,000-$5,000 per million pages.**
 
 **Scenario B — Web Unlocker / Scraper API.** Per-success pricing hides the bandwidth question and bundles evasion. Bright Data Web Unlocker at the 2M-result tier is $1,000 per million. Zyte's Easy tier is $130 per million on static HTML targets. The same provider's Complex browser-rendered PAYG can hit $16,080 per million on hardened sites. For a representative AI-training crawl mixing easy and hard targets, **plan $1,000-$5,000 per million**.
 
@@ -90,7 +90,7 @@ The right question is what AI-training value one page is worth. Public licensing
 
 **Reddit ↔ Google** (February 2024): roughly $60M per year. Reddit's submission volume puts the per-item value in fractions of a cent. The corpus has cumulative training value larger than any individual post.
 
-**Bartz v. Anthropic** (settled September 2025): $1.5 billion across approximately 500,000 works = **~$3,000 per book**. This is the cleanest available number for what a frontier-model trainer pays when forced into a settlement-style deal for in-copyright training data.
+**Bartz v. Anthropic** (settled September 2025, final approval pending): $1.5 billion across approximately 500,000 works = **~$3,000 per book**. This is the cleanest available number for what a frontier-model trainer pays when forced into a settlement-style deal for in-copyright training data.
 
 **Shutterstock ↔ OpenAI**: announced 2023, expansion through 2024-2025, reported value up to $250M by 2027. Terms not fully public.
 
@@ -106,7 +106,7 @@ The legal pressure on the industry is real. Its impact on unit economics is not 
 
 **Google's IPIDEA disruption** (January 28, 2026) was the first major Western enforcement action against a residential proxy operator on threat-intelligence grounds rather than IP-litigation grounds. A court order took down domains operating IPIDEA, used by 550+ tracked threat groups. Google identified 3,075 Windows binaries and 600+ Android apps that enrolled devices into IPIDEA without disclosure, and reports millions of devices removed from the available exit-node pool.
 
-**Reddit v. Perplexity / Oxylabs / AWM Proxy / SerpApi** filed in SDNY in October 2025 reached First Amended Complaint on February 9, 2026 before Judge Engelmayer. **No ruling yet.** Oxylabs' public response denies knowledge of misuse. No motion-to-dismiss outcome. Treat as live and unresolved.
+**Reddit v. Perplexity / Oxylabs / AWM Proxy / SerpApi** filed in SDNY in October 2025 reached First Amended Complaint on February 6, 2026 before Judge Engelmayer. **No ruling yet.** Oxylabs' public response denies knowledge of misuse. No motion-to-dismiss outcome. Treat as live and unresolved.
 
 What these moves haven't done: visibly raise wholesale proxy prices. Webshare, Decodo, and SOAX continue self-serve sign-up without KYC. The non-paying tier of exit-node acquisition (free VPN apps with bundled SDKs, Tizen/webOS scraping integrations) has not contracted measurably despite the IPIDEA action.
 
@@ -120,7 +120,7 @@ For background on the technical scraping stack the unit-cost numbers ride on top
 
 ---
 
-*Last updated: July 2026*
+*Last updated: June 2026*
 
 ## References
 

@@ -1,14 +1,14 @@
 ---
 title: "Data Poisoning FAQ: Technical, Legal, and Policy Answers"
 description: "Answers to common questions about data poisoning, web crawling, robots.txt, AIPREF, legal status, and enforcement mechanisms for AI training defense."
-publishDate: 2026-07-14
+publishDate: 2026-06-13
 keywords: [data poisoning FAQ, robots.txt AI crawlers, AIPREF explained, Nightshade FAQ, AI training legal]
 author: Semiautonomous Systems
 ---
 
 ## Overview
 
-![Key data poisoning statistics: 250 documents to compromise a model, 13.26% robots.txt bypass rate, 336% increase in site blocking, 7.5M Glaze downloads](/images/diagrams/key-statistics.png)
+![Key data poisoning statistics: 13.26% of AI bots ignore robots.txt, 250 documents to backdoor an LLM, 50 Nightshade samples to poison an image concept, 5.6 million sites blocking GPTBot](/images/diagrams/key-statistics.png)
 
 This FAQ addresses the most common questions we receive about data poisoning, web crawling, and enforcement mechanisms. Our goal is to provide factual, technically accurate answers without marketing spin or speculation. Where evidence is limited or questions remain open, we say so.
 
@@ -77,7 +77,7 @@ For detailed analysis, see our [Defensive Data Poisoning: Ethics, Limits, and Sa
 
 **Nightshade** is a prompt-specific poisoning tool developed by researchers at the University of Chicago, published at IEEE Security & Privacy 2024. It generates images that appear visually normal to humans but cause text-to-image models to produce incorrect outputs for specific prompts when the images are included in training data. Nightshade was downloaded over 250,000 times in its first five days after release <sup><a href="#ref-7">7</a></sup>.
 
-**Glaze** is a style-masking tool from the same team that subtly alters pixels in artwork so that AI models perceive the style differently from how humans see it, preventing style mimicry. Glaze has been downloaded more than 6 million times since March 2023.<sup><a href="#ref-6">6</a></sup>
+**Glaze** is a style-masking tool from the same team that subtly alters pixels in artwork so that AI models perceive the style differently from how humans see it, preventing style mimicry. Glaze has been downloaded more than 8.5 million times since March 2023.<sup><a href="#ref-6">6</a></sup>
 
 **Poison Fountain** is a coordinated initiative announced in January 2026 that provides URLs to poisoned datasets for website operators to embed in their pages. The initiative reportedly involves engineers at major US AI companies and aims to systematically inject poisoned data across the web <sup><a href="#ref-8">8</a></sup>.
 
@@ -85,11 +85,9 @@ For detailed analysis, see our [Defensive Data Poisoning: Ethics, Limits, and Sa
 
 Documented real-world cases include:
 
-**Basilisk Venom (January 2025)**: Hidden prompts embedded in code comments on GitHub repositories poisoned fine-tuned models. When Deepseek's DeepThink-R1 was trained on contaminated repositories, it learned a backdoor that activated when specific code patterns were present.
-
 **Grok 4 Jailbreak (2025)**: When xAI released Grok 4, typing a specific command was sufficient to strip away guardrails. Analysis suggests Grok's training data had been saturated with jailbreak prompts posted on X (formerly Twitter), creating an inadvertent backdoor.
 
-**Model Context Protocol Tool Poisoning (July 2024)**: Researchers demonstrated that tools using the Model Context Protocol could carry hidden backdoors in their descriptions that models follow when the tool is loaded.
+**Model Context Protocol Tool Poisoning (2025)**: Researchers demonstrated that tools using the Model Context Protocol could carry hidden backdoors in their descriptions that models follow when the tool is loaded.
 
 These attacks illustrate supply chain risks where public platforms become vectors for injecting malicious training data.
 
@@ -215,7 +213,7 @@ Several significant cases are working through courts:
 
 **Getty Images v. Stability AI** (UK High Court, ruled November 2025): The court rejected most infringement claims, holding that model weights do not store reproductions of copyrighted works. Getty alleged Stability scraped 12 million images. Limited trademark claims succeeded <sup><a href="#ref-20">20</a></sup>.
 
-**Reddit v. Perplexity AI** (October 2025, SDNY): Notable for focusing on how data was obtained (false identities, proxies, anti-security techniques) rather than copyright/fair use. Co-defendants include proxy services Oxylabs and AWMProxy <sup><a href="#ref-21">21</a></sup>.
+**Reddit v. Perplexity AI** (October 2025, SDNY): Notable for focusing on how data was obtained (false identities, proxies, anti-security techniques) rather than copyright/fair use. Co-defendants include data-scraping and proxy services Oxylabs, AWMProxy, and SerpApi <sup><a href="#ref-21">21</a></sup>.
 
 **Thomson Reuters v. ROSS Intelligence** (February 2025): Ruled that using headnotes as training data to create a competing legal research product was commercial and NOT transformative under fair use analysis.
 
@@ -460,7 +458,7 @@ The critical open question is whether coordinated poisoning at scale can shift t
 
 ---
 
-*Last updated: July 2026*
+*Last updated: June 2026*
 
 ## References
 

@@ -1,7 +1,7 @@
 ---
 title: "Publisher Defenses Against AI Scraping: Cost Imposition vs Poisoning"
 description: "Comparing defense strategies against AI scraping: proof-of-work systems impose costs, data poisoning degrades value. Who pays and what works for publishers."
-publishDate: 2026-06-09
+publishDate: 2026-06-07
 keywords: [AI scraping defense, Anubis proof-of-work, publisher AI defense, scraper cost imposition, Nightshade effectiveness]
 author: Semiautonomous Systems
 ---
@@ -15,7 +15,7 @@ This analysis examines both defense categories, who pays the costs, their effect
 - Cost imposition defenses (proof-of-work, rate limiting, CAPTCHAs) impose computational or operational expenses on scrapers without corrupting data
 - Value degradation defenses (data poisoning, watermarking, noise injection) reduce the quality or utility of scraped content for training purposes
 - Small publishers face asymmetric costs: large platforms can afford sophisticated defenses, while individual creators rely on tools like Nightshade
-- Voluntary signals like robots.txt fail predictably: 13.26% of AI bot requests ignored robots.txt in Q2 2025, up from 3.3% in Q4 2024<sup><a href="#ref-27">27</a></sup>
+- Voluntary signals like robots.txt fail predictably: 13.26% of AI bot requests ignored robots.txt in Q2 2025, up from 3.3% in Q4 2024<sup><a href="#ref-22">22</a></sup>
 - The choice of defense mechanism reflects power dynamics. Those with resources choose cost imposition; those without choose value degradation
 
 ## Two Categories of Defense
@@ -42,7 +42,7 @@ Value degradation defenses reduce the quality or utility of training data withou
 
 Examples include:
 
-**Data poisoning**: Nightshade, developed at the University of Chicago and awarded Distinguished Paper at IEEE Security and Privacy 2024<sup><a href="#ref-4">4</a></sup>, generates adversarially perturbed images that appear visually normal but cause text-to-image models to mislearn concepts. As few as 50 tuned poison samples can attack Stable Diffusion SDXL with high probability.<sup><a href="#ref-4">4</a></sup> The poisoning bleeds through to semantically related concepts, amplifying impact beyond the targeted prompts.<sup><a href="#ref-3">3</a></sup>
+**Data poisoning**: Nightshade, developed at the University of Chicago<sup><a href="#ref-4">4</a></sup>, generates adversarially perturbed images that appear visually normal but cause text-to-image models to mislearn concepts. As few as 50 tuned poison samples can attack Stable Diffusion SDXL with high probability.<sup><a href="#ref-4">4</a></sup> The poisoning bleeds through to semantically related concepts, amplifying impact beyond the targeted prompts.<sup><a href="#ref-3">3</a></sup>
 
 **Style masking**: Glaze, from the same University of Chicago research team, subtly alters artwork pixels so AI models perceive a different artistic style while humans see the original. Glaze has been downloaded approximately 7.5 million times<sup><a href="#ref-5">5</a></sup> and was recognized as a TIME Best Invention of 2023, demonstrating widespread adoption among artists concerned about style mimicry.
 
@@ -284,8 +284,8 @@ robots.txt, developed in 1994 and standardized as RFC 9309 in September 2022<sup
 
 Recent compliance data shows accelerating non-compliance:
 
-- **Q4 2024:** 3.3% of AI bot requests ignored robots.txt directives<sup><a href="#ref-27">27</a></sup>
-- **Q2 2025:** 13.26% of AI bot requests ignored robots.txt directives (a 4x increase in two quarters)<sup><a href="#ref-27">27</a></sup>
+- **Q4 2024:** 3.3% of AI bot requests ignored robots.txt directives<sup><a href="#ref-22">22</a></sup>
+- **Q2 2025:** 13.26% of AI bot requests ignored robots.txt directives (a 4x increase in two quarters)<sup><a href="#ref-22">22</a></sup>
 - A Duke University study (2025) found that several categories of AI-related crawlers never request robots.txt at all<sup><a href="#ref-27">27</a></sup>
 
 Specific AI companies show varying compliance levels:
@@ -327,7 +327,7 @@ In this environment, voluntary compliance depends on either reputational incenti
 
 ### IETF AIPREF: Will Standardized Signals Help?
 
-The IETF AI Preferences (AIPREF) Working Group, chartered in January 2025<sup><a href="#ref-29">29</a></sup><sup><a href="#ref-30">30</a></sup>, is developing standardized mechanisms for expressing preferences about AI content collection and processing. Key drafts include vocabulary specifications (draft-ietf-aipref-vocab-05) and attachment mechanisms (draft-ietf-aipref-attach-04).
+The IETF AI Preferences (AIPREF) Working Group, chartered in January 2025<sup><a href="#ref-29">29</a></sup><sup><a href="#ref-30">30</a></sup>, is developing standardized mechanisms for expressing preferences about AI content collection and processing. Key drafts include vocabulary specifications (draft-ietf-aipref-vocab-06) and attachment mechanisms (draft-ietf-aipref-attach-04).
 
 AIPREF aims to provide clearer, more granular signaling than robots.txt, with explicit semantics for AI-specific use cases (training, fine-tuning, inference).<sup><a href="#ref-24">24</a></sup>
 

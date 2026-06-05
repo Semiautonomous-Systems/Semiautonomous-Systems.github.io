@@ -1,14 +1,14 @@
 ---
 title: "Scrapling and Crawlee: How Open-Source Scraping Tools Get Detected"
 description: "A technical analysis of Scrapling and Crawlee, two popular open-source scraping frameworks, examining their anti-detection features and the behavioral signals that content-layer defenses can exploit."
-publishDate: 2026-10-13
+publishDate: 2026-06-25
 keywords: [Scrapling, Crawlee, open source web scraping, scraping detection, data poisoning, anti-bot evasion, behavioral fingerprinting, honeypot detection, content-layer defense, defensive data poisoning, Apify, patchright]
 author: Semiautonomous Systems
 ---
 
 ## Key Takeaways
 
-- Scrapling (46,000+ GitHub stars) and Crawlee (23,000+ stars) are the two most popular open-source scraping frameworks in active development<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup>
+- Scrapling (61,000+ GitHub stars) and Crawlee (23,000+ stars) are the two most popular open-source scraping frameworks in active development<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup>
 - Both tools invest heavily in network-layer evasion (TLS fingerprint spoofing, browser fingerprint injection, proxy rotation) while remaining fundamentally vulnerable to content-layer detection
 - Every extraction mode in both frameworks extracts hidden HTML elements that human users never see, making honeypot link injection a universal detection signal
 - Behavioral signals (request timing regularity, absent JavaScript execution, sequential access patterns) accumulate across sessions and cannot be spoofed without fundamentally changing how crawlers work
@@ -16,11 +16,11 @@ author: Semiautonomous Systems
 
 ---
 
-Prior analyses have documented the commercial scraping market extensively. Bright Data alone advertises 150 million+ residential IPs<sup><a href="#ref-3">3</a></sup>, and competitors like Oxylabs and Zyte operate at comparable scale. Network-layer defenses like IP blocking and rate limiting are structurally unable to stop traffic routed through residential proxies at that scale.
+Prior analyses have documented the commercial scraping market extensively. Bright Data alone advertises 400 million+ residential IPs<sup><a href="#ref-3">3</a></sup>, and competitors like Oxylabs and Zyte operate at comparable scale. Network-layer defenses like IP blocking and rate limiting are structurally unable to stop traffic routed through residential proxies at that scale.
 
 Content-layer defenses take a different approach. Rather than blocking requests, they operate on the HTTP response body: watermarking text for provenance tracking, injecting honeypot links that only automated crawlers follow, and applying data poisoning to degrade the value of scraped content. VENOM is a reverse proxy that implements this approach as a five-stage pipeline, scoring behavioral signals and selecting graduated responses without the crawler's knowledge.
 
-The more interesting development for testing these defenses is happening in open source. Two frameworks have emerged as the dominant tools for developers building their own scraping infrastructure: **Scrapling** (Python, 46,000 stars; v0.4.7 April 2026) and **Crawlee** (TypeScript/Node.js, 23,100 stars; v3.16.0 February 2026). Both are under active development through 2026. Both explicitly market anti-detection as a core feature. And both have architectural properties that make them detectable by content-layer defenses, regardless of how many IPs they rotate through.
+The more interesting development for testing these defenses is happening in open source. Two frameworks have emerged as the dominant tools for developers building their own scraping infrastructure: **Scrapling** (Python, 61,000 stars; v0.4.8 May 2026) and **Crawlee** (TypeScript/Node.js, 23,700 stars; v3.17.0 June 2026). Both are under active development through 2026. Both explicitly market anti-detection as a core feature. And both have architectural properties that make them detectable by content-layer defenses, regardless of how many IPs they rotate through.
 
 This analysis examines how each framework works, where its evasion succeeds, and where it fails.
 
@@ -32,7 +32,7 @@ Scrapling, created by Karim Shoair and released in October 2024, takes a tiered 
 
 **Tier 2: `DynamicFetcher`** runs headless Chromium via Playwright. Full JavaScript execution, real rendering engine. Used for SPAs and sites that require JS.
 
-**Tier 3: `StealthyFetcher`** uses patchright, a patched fork of Playwright that removes automation indicators from Chromium<sup><a href="#ref-4">4</a></sup>. Scrapling originally used Camoufox (a modified Firefox binary) as the primary engine for StealthyFetcher, while also using patchright inside DynamicFetcher's stealth mode. In v0.3.13 (January 2026), it dropped Camoufox and consolidated on patchright, moving it exclusively into StealthyFetcher<sup><a href="#ref-1">1</a></sup>. The fetcher includes Scrapling's own `solve_cloudflare` logic for handling Turnstile challenges. Subsequent releases through v0.4.7 (April 2026) added a streaming extraction API and MCP server integration, shifting the project toward production async patterns and AI-tool orchestration.
+**Tier 3: `StealthyFetcher`** uses patchright, a patched fork of Playwright that removes automation indicators from Chromium<sup><a href="#ref-4">4</a></sup>. Scrapling originally used Camoufox (a modified Firefox binary) as the primary engine for StealthyFetcher, while also using patchright inside DynamicFetcher's stealth mode. In v0.3.13 (January 2026), it dropped Camoufox and consolidated on patchright, moving it exclusively into StealthyFetcher<sup><a href="#ref-1">1</a></sup>. The fetcher includes Scrapling's own `solve_cloudflare` logic for handling Turnstile challenges. Subsequent releases through v0.4.8 (May 2026) added a streaming extraction API and MCP server integration, shifting the project toward production async patterns and AI-tool orchestration.
 
 The framework also includes a Spider API with concurrent request management, proxy rotation via `ProxyRotator`, and an adaptive "automatch" system that uses SQLite-backed element signatures to survive site redesigns without code changes<sup><a href="#ref-1">1</a></sup>.
 
@@ -240,7 +240,7 @@ But they extract links from HTML. They produce regular request timing. Their HTT
 
 These are not bugs. They are structural properties of how automated content extraction works. Fixing them would require scraping frameworks to become something fundamentally different: slow, per-site, human-supervised content verification systems. Which is the opposite of what they are built to be.
 
-*Last updated: October 2026*
+*Last updated: June 2026*
 
 ## References
 

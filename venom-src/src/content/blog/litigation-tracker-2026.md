@@ -8,11 +8,11 @@ author: Semiautonomous Systems
 
 ## Key Takeaways
 
-- **Bartz v. Anthropic** received final fairness approval at the May 14 2026 hearing: $1.5B fund, ~$2,931 per work, 91.3% claim rate against ~482K eligible works. Largest copyright settlement in US history. Sets the de facto floor price for piracy-based training claims<sup><a href="#ref-1">1</a></sup>
+- **Bartz v. Anthropic**: final approval hearing held May 14 2026; ruling pending. $1.5B fund, ~$2,931 per work, 91.3% claim rate against ~482K eligible works. Largest copyright settlement in US history. Sets the de facto floor price for piracy-based training claims<sup><a href="#ref-1">1</a></sup>
 - **Andersen v. Stability AI / Midjourney / DeviantArt / Runway** went to trial on **September 8 2026** (N.D. Cal.). First US jury verdict on AI training as copyright infringement is the most consequential expected outcome of the year<sup><a href="#ref-2">2</a></sup>
-- **Kadrey v. Meta** (Chhabria, June 2025) is the most-cited 2026 precedent: training on books, including pirated copies, is fair use *on the record those plaintiffs developed.* Chhabria explicitly invited better-pled successor cases on a market-harm theory. The Turow et al. third-amended complaint is testing exactly that<sup><a href="#ref-3">3</a></sup>
+- **Kadrey v. Meta** (Chhabria, June 2025) is the most-cited 2026 precedent: training on books, including pirated copies, is fair use *on the record those plaintiffs developed.* Chhabria explicitly invited better-pled successor cases on a market-harm theory. A separate S.D.N.Y. putative class action (publishers and Scott Turow v. Meta/Zuckerberg, filed May 5 2026) is testing exactly that<sup><a href="#ref-3">3</a></sup>
 - **Reddit v. Perplexity / SerpApi / Oxylabs / AWMProxy** (S.D.N.Y., filed October 2025) became the first major test of the **scraper-intermediary** liability question. Active discovery; alleged scraping volumes (~2B Google search results via SerpApi, ~781M via Oxylabs, ~482M via AWMProxy) are now in the public docket<sup><a href="#ref-4">4</a></sup>
-- **Robots.txt is not a §1201 technological measure.** Two 2025 rulings (Ziff Davis, Reddit) held it is "more akin to a sign than a barrier." RFC 9309 is cited as evidence of lack of authorization, not as a circumvention barrier. AIPREF has been referenced in amicus filings but no court has yet relied on it<sup><a href="#ref-5">5</a></sup>
+- **Robots.txt is not a §1201 technological measure.** Reporting on 2025 rulings (Ziff Davis, Reddit) describes robots.txt as more akin to a sign than a barrier; the exact holdings should be checked against the orders. RFC 9309 is cited as evidence of lack of authorization, not as a circumvention barrier. AIPREF has been referenced in amicus filings but no court has yet relied on it<sup><a href="#ref-5">5</a></sup>
 
 ---
 
@@ -28,13 +28,13 @@ Status as of late 2026. Bracketed dates and projections were anchored from May 2
 |---|------|----------------|-------|--------|----------|
 | 1 | NYT v. OpenAI / Microsoft | SDNY 1:23-cv-11195 | Dec 27 2023 | Summary-judgment briefing; expert discovery closed | SJ ruling expected Q1 2027; trial 2027 |
 | 2 | Authors Guild v. OpenAI | SDNY (MDL 3143) | Sep 2023 | Consolidated under Judge Sidney Stein | SJ track alongside NYT |
-| 3 | Bartz v. Anthropic | N.D. Cal. | Aug 2024 | Final approval May 14 2026; second installment paid | Active claim distribution; third installment Sep 2026 paid |
-| 4 | Kadrey v. Meta | N.D. Cal. 3:23-cv-03417 | Jul 2023 | June 2025 fair-use ruling for Meta survived; Turow plaintiffs proceeding on market-harm theory | Expanded SJ briefing on the new record |
+| 3 | Bartz v. Anthropic | N.D. Cal. | Aug 2024 | Final approval hearing held May 14 2026; ruling pending | Awaiting final-approval order; claim distribution to follow |
+| 4 | Kadrey v. Meta | N.D. Cal. 3:23-cv-03417 | Jul 2023 | June 2025 fair-use ruling for Meta survived; separate Turow/publishers action (S.D.N.Y., filed May 5 2026) testing market-harm theory | SJ posture per the June 2025 record |
 | 5 | Reddit v. Perplexity / SerpApi / Oxylabs / AWMProxy | SDNY 1:25-cv-08736 | Oct 22 2025 | First Amended Complaint Feb 9 2026; motion-to-dismiss decided Q3 2026 | Discovery opening; first major scraper-intermediary case |
 | 6 | Getty Images v. Stability AI (UK) | EWHC | 2023 | Judgment Nov 4 2025: copyright/database claims rejected; limited trademark wins | Resolved (UK); narrow appeal possible |
 | 7 | Getty Images v. Stability AI (US) | D. Del. | Feb 2023 | Discovery; SJ briefing late 2026 | SJ ruling 2027 |
 | 8 | Concord / UMG / ABKCO v. Anthropic (Round 1) | N.D. Cal. 5:24-cv-03811 | Oct 2023 | Interim relief denied; guardrails stipulation | Trial scheduling Q4 2026 |
-| 9 | UMG / Concord / ABKCO v. Anthropic (Round 2) | TBD | Jan 28 2026 | $3B sought across 20,000+ songs; uses Bartz torrent record | Pleadings stage |
+| 9 | UMG / Concord / ABKCO v. Anthropic (Round 2) | TBD | Jan 29 2026 | $3B sought across 20,000+ songs; uses Bartz torrent record | Pleadings stage |
 | 10 | Tremblay / Silverman / Chabon v. OpenAI | MDL 3143 | 2023 | Member action; narrowed to direct infringement + UCL | Folded into consolidated complaint |
 | 11 | Encyclopedia Britannica & Merriam-Webster v. OpenAI | SDNY | Mar 13 2026 | ~100,000 articles; copyright + Lanham Act | Motion-to-dismiss stage |
 | 12 | Petryazhna v. OpenAI (YouTube) | MDL 3143 | Aug 2024 (amended) | Stayed pending class cert | No SJ before late 2026 |
@@ -51,22 +51,22 @@ This is not exhaustive. The AI Lawsuit Tracker indexes 166+ cases as of late 202
 
 ## Three Rulings That Defined the Year
 
-**Kadrey v. Meta** (Chhabria, N.D. Cal., June 25 2025) is the most-cited 2026 ruling. The court held that training LLMs on books (including pirated copies) was fair use *on the record the plaintiffs developed*. Chhabria warned that the ruling "stands only for the proposition that these plaintiffs made the wrong arguments." Future plaintiffs who develop a market-harm record (lost licensing revenue, output substitution) may win on identical underlying facts. Every subsequent complaint front-loads market-harm theories as a result. This is why the Turow et al. third-amended complaint matters: it is the closest test of whether a better-pled record changes the outcome<sup><a href="#ref-3">3</a></sup>.
+**Kadrey v. Meta** (Chhabria, N.D. Cal., June 25 2025) is the most-cited 2026 ruling. The court held that training LLMs on books (including pirated copies) was fair use *on the record the plaintiffs developed*. Chhabria warned that the ruling "stands only for the proposition that these plaintiffs made the wrong arguments." Future plaintiffs who develop a market-harm record (lost licensing revenue, output substitution) may win on identical underlying facts. Every subsequent complaint front-loads market-harm theories as a result. This is why the separate Turow/publishers action against Meta (S.D.N.Y., filed May 5 2026) matters: it is the closest test of whether a better-pled record changes the outcome<sup><a href="#ref-3">3</a></sup>.
 
 **Getty Images v. Stability AI** (UK High Court, November 4 2025) was the first Western judgment on whether AI model weights are "copies" within the meaning of national copyright law. The English court held they are not: training did not occur in the UK, and weights do not store the training works as copies under the CDPA. Limited trademark wins on watermarks reproduced in outputs. The judgment does not bind US courts, but carries political weight as the first developed-jurisdiction ruling that AI weights are not copies<sup><a href="#ref-7">7</a></sup>.
 
-**Bartz v. Anthropic / Alsup** (June 2025 ruling, September 2025 preliminary settlement, May 14 2026 final approval) drew a clear line. Training on legitimately acquired books is fair use. Downloading from LibGen and Pirate Library Mirror is not. The $1.5B settlement is denominated against the piracy-acquisition track, not the training-as-fair-use track. The implied legal architecture: acquisition method matters; what a lab does with legally acquired data is fair use; what it does with stolen data is infringement<sup><a href="#ref-1">1</a></sup>.
+**Bartz v. Anthropic / Alsup** (June 2025 ruling, September 2025 preliminary settlement, May 14 2026 final approval hearing with ruling pending) drew a clear line. Training on legitimately acquired books is fair use. Downloading from LibGen and Pirate Library Mirror is not. The $1.5B settlement is denominated against the piracy-acquisition track, not the training-as-fair-use track. The implied legal architecture: acquisition method matters; what a lab does with legally acquired data is fair use; what it does with stolen data is infringement<sup><a href="#ref-1">1</a></sup>.
 
 These three rulings define the 2026 boundary conditions. They also explain why every 2026 complaint after Kadrey emphasizes both market-harm theory and acquisition-track piracy evidence.
 
-![2026 AI training-data litigation: Bartz $1.5B settlement final May 14, Andersen trial begins Sep 8, Kadrey survived as most-cited fair-use precedent, Reddit v Perplexity at first scraper-intermediary test, robots.txt is not a Section 1201 technological measure](/images/diagrams/2026-litigation-bookends.png)
+![2026 AI training-data litigation: Bartz $1.5B settlement final approval hearing May 14 with ruling pending, Andersen trial begins Sep 8, Kadrey survived as most-cited fair-use precedent, Reddit v Perplexity at first scraper-intermediary test, robots.txt is not a Section 1201 technological measure](/images/diagrams/2026-litigation-bookends.png)
 
 ## The Settlements Ledger
 
 | Case | Amount | Date | Notes |
 |------|--------|------|-------|
-| **Bartz v. Anthropic** | **$1.5B** | Sep 2025 prelim → May 14 2026 final | Largest copyright settlement in US history; ~$2,931/work; 91.3% claim rate |
-| Warner Music v. Udio | Undisclosed | April 2026 | First major music-AI settlement |
+| **Bartz v. Anthropic** | **$1.5B** | Sep 2025 prelim; final approval hearing May 14 2026, ruling pending | Largest copyright settlement in US history; ~$2,931/work; 91.3% claim rate |
+| Warner Music v. Udio | Undisclosed | November 19 2025 | Music-AI licensing settlement; followed UMG's earlier Udio settlement |
 | Concord / UMG / ABKCO v. Anthropic (Round 1) | Stipulated guardrails (no $) | 2025 | Maintains Claude's lyric-output refusal |
 
 No NYT, Authors Guild, or image-AI settlements through 2026.
@@ -77,7 +77,7 @@ No NYT, Authors Guild, or image-AI settlements through 2026.
 
 Two filings reshape the trajectory.
 
-**UMG / Concord / ABKCO v. Anthropic Round 2** (January 28 2026) seeks $3B across 20,000+ songs. The complaint imports torrent and shadow-library evidence developed in the Bartz discovery and applies it to the music corpus. The original 2023 case lost interim relief and ended in stipulated guardrails; Round 2 is a substantively different theory built on the Bartz-Alsup acquisition-track logic.
+**UMG / Concord / ABKCO v. Anthropic Round 2** (January 29 2026) seeks $3B across 20,000+ songs. The complaint imports torrent and shadow-library evidence developed in the Bartz discovery and applies it to the music corpus. The original 2023 case lost interim relief and ended in stipulated guardrails; Round 2 is a substantively different theory built on the Bartz-Alsup acquisition-track logic.
 
 **Encyclopedia Britannica & Merriam-Webster v. OpenAI** (March 13 2026, S.D.N.Y.) covers approximately 100,000 articles and pleads both copyright and Lanham Act claims. The Lanham Act claim is the more interesting novelty: it argues that AI outputs that substitute for the licensed reference product (definitions, encyclopedic facts) are commercial use of the publisher's trademark. The motion-to-dismiss outcome will indicate whether this theory survives.
 
@@ -87,7 +87,7 @@ The MDL 3143 consolidation continues to absorb tag-along complaints monthly. Pub
 
 The most consequential standards-related ruling of 2026 is a loss for publishers.
 
-Two 2025 rulings — Ziff Davis v. OpenAI and Reddit v. various — explicitly held that robots.txt is **not** a "technological measure that effectively controls access" under DMCA §1201. The Ziff Davis order's framing: robots.txt is "more akin to a sign than a barrier." RFC 9309 is cited in briefing but does not change the analysis; the standard documents the protocol. It does not convert it into a technical access-control measure<sup><a href="#ref-5">5</a></sup>.
+Reporting on two 2025 matters, Ziff Davis v. OpenAI and Reddit v. various, describes robots.txt as **not** a "technological measure that effectively controls access" under DMCA §1201, characterized as more akin to a sign than a barrier. The precise holdings and any quoted language should be verified against the orders themselves before relying on them. RFC 9309 is cited in briefing but does not change the analysis; the standard documents the protocol. It does not convert it into a technical access-control measure<sup><a href="#ref-5">5</a></sup>.
 
 This matters because it forecloses one of the legal theories publishers might have used to attach §1201 anti-circumvention claims to robots.txt-violating crawlers. The remaining publisher options are conventional copyright infringement, breach of terms-of-service, the Lanham Act (if AI outputs substitute for the publisher's product), and the developing scraper-intermediary theory in Reddit v. Perplexity.
 
@@ -103,7 +103,7 @@ The non-litigation track in 2026 added enforceable obligations that run parallel
 
 **Texas TRAIGA** (effective January 1 2026) provides AG-only enforcement with a 60-day cure period and a restricted-purposes regime. Less aggressive than CA AB 2013 on disclosure but covers a broader risk surface.
 
-**EU AI Act GPAI enforcement** (Article 88-94 fining authority effective August 2 2026) is the most consequential regulatory milestone of 2026 for AI training data. Up to €15M or 3% of global turnover for GPAI obligation breaches. Covered separately at [GPAI After Six Weeks](/blog/eu-ai-act-gpai-2026/).
+**EU AI Act GPAI enforcement** (Articles 99/101 fining authority effective August 2 2026) is the most consequential regulatory milestone of 2026 for AI training data. Up to €15M or 3% of global turnover for GPAI obligation breaches. Covered separately at [GPAI After Six Weeks](/blog/eu-ai-act-gpai-2026/).
 
 **Trump Executive Order December 11 2025** purported to preempt inconsistent state AI laws. Without congressional action, the EO cannot override state law; legal challenges expected.
 
@@ -119,7 +119,7 @@ Three procedural milestones determine whether 2026's legal architecture holds.
 
 **Reddit v. Perplexity discovery outcomes.** If the alleged scraping volumes hold up under discovery, the scraper-intermediary theory becomes viable as a routine cause of action. Every proxy provider's exposure changes if Reddit wins on the §1201 or contributory infringement track.
 
-**Kadrey successor (Turow) summary judgment.** Tests whether a better-pled market-harm record changes Chhabria's underlying ruling. If yes, the Bartz-style settlement posture spreads; if no, the fair-use architecture for training holds.
+**Turow/publishers v. Meta (S.D.N.Y.) summary judgment.** Tests whether a better-pled market-harm record changes Chhabria's underlying Kadrey ruling. If yes, the Bartz-style settlement posture spreads; if no, the fair-use architecture for training holds.
 
 The 2027 docket will inherit roughly 30 active cases, two flagship trial outcomes pending, and a regulatory-enforcement layer that did not exist a year ago. For the unit economics that explain why scraping continues alongside both litigation and licensing, see [How Much Does It Cost to Scrape the Web at Scale?](/blog/scraping-economics-2026/) and [Where AI Training Data Actually Comes From in 2026](/blog/training-data-ecosystem-2026/).
 

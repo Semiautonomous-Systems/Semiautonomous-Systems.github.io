@@ -1,14 +1,14 @@
 ---
 title: "Anubis at One Year: What Production Operators Are Actually Reporting"
 description: "A year of public Anubis deployments yields concrete operator numbers, a Codeberg cautionary tale, and a project trajectory shift toward layered defenses. What the data says about proof-of-work anti-scraping."
-publishDate: 2026-06-23
+publishDate: 2026-06-10
 keywords: [Anubis, proof-of-work anti-scraping, Anubis deployment data, Codeberg AI scraping, AI bot mitigation, TecharoHQ Anubis]
 author: Semiautonomous Systems
 ---
 
 ## Key Takeaways
 
-- Three operators with public deployment writeups show consistent infrastructure relief: GNOME halved GitLab pod scaling (6 → 3 instances), Duke Libraries blocks ~90% of unwanted traffic and filters 4M+ requests per day, and Slackware's git server logged ~550K challenges in four days with a ~71% solve rate<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup><sup><a href="#ref-3">3</a></sup>
+- Three operators with public deployment writeups show consistent infrastructure relief: GNOME halved GitLab pod scaling (6 → 3 instances), Duke Libraries reports per-platform block rates from ~71% (Digital Repository) to ~94.6% (Archives/ArcLight), and Slackware's git server logged ~550K challenges in four days with a ~71% solve rate<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-2">2</a></sup><sup><a href="#ref-3">3</a></sup>
 - Codeberg's experience is the cautionary tale. Anubis blocks roughly 90% of crawler requests, but coordinated waves of ~50,000 unique IPs still get through, prompting Codeberg to stack tarpits (Iocaine, "Nam-Shub of Enki") on top of Anubis rather than rely on proof-of-work alone<sup><a href="#ref-4">4</a></sup>
 - Native solvers are cheap. Tavis Ormandy's published analysis still stands: a few cents of cloud compute can clear every Anubis-protected site on the internet. AI scrapers using headless browsers absorb the cost by default<sup><a href="#ref-5">5</a></sup>
 - The project itself has pivoted. Versions 1.22 through 1.25 added Proof of React, dataset poisoning honeypots, and weight-scoring rules — explicitly moving Anubis from "PoW only" to a layered challenge stack. Project velocity slowed in early 2026<sup><a href="#ref-6">6</a></sup><sup><a href="#ref-7">7</a></sup>
@@ -28,13 +28,13 @@ Three deployment writeups are dense enough to anchor an honest assessment.
 
 **GNOME GitLab.** GNOME's GitLab instance was burning compute scaling up to six pods to handle scraper load. After Anubis was added in front, scaling settled at three pods. Halved infrastructure, public confirmation, explicit attribution to Anubis<sup><a href="#ref-1">1</a></sup>.
 
-**Duke University Libraries.** Duke deployed Anubis to protect the Duke Digital Repository, archives, and catalog after a sustained scraper wave. Their pilot report shows roughly 90% of unwanted traffic blocked and 4M+ HTTP requests per day filtered. One single-day spike shows 1.3M denials from bots forging MSIE/Trident user agents — Internet Explorer headers in 2025, which is its own signal<sup><a href="#ref-2">2</a></sup>.
+**Duke University Libraries.** Duke deployed Anubis to protect the Duke Digital Repository, archives, and catalog after a sustained scraper wave. Their pilot report shows per-platform block rates ranging from roughly 71% on the Duke Digital Repository to roughly 94.6% on Archives/ArcLight. (The frequently cited ~90% figure is a general Anubis number, not a single Duke-wide rate.) The report reportedly notes a single-day spike of 1.3M denials from bots forging MSIE/Trident user agents, Internet Explorer headers in 2025, which is its own signal<sup><a href="#ref-2">2</a></sup>.
 
 **Slackware git.** The most precise numbers come from the alien-base team's August 2025 deployment of Anubis in front of cgit. Four days post-deployment: approximately 550,000 challenges issued, 390,000 validated, ~71% solve rate, and 850 GB of bandwidth processed. The 30% gap between issued and validated is the largest single quantitative signal of how many sessions abandon when challenged<sup><a href="#ref-3">3</a></sup>.
 
 These are three operators reporting publicly. They are not an industry average. But they are consistent: Anubis cuts crawler load enough that operators choose to keep running it. The magnitudes (half the pods, 90% of requests filtered, four-fifths of sessions either passing or abandoning) are large enough to matter for infrastructure cost.
 
-![Operator outcomes: GNOME GitLab pods 6 to 3, Duke Libraries 4M+ requests filtered per day, Slackware git 550K challenges 71 percent solve rate over 4 days, Codeberg 90 percent blocked but bypassed by 50K-IP waves](/images/diagrams/anubis-operator-outcomes.png)
+![Operator outcomes: GNOME GitLab pods 6 to 3, Duke Libraries per-platform block rates 71 to 94.6 percent, Slackware git 550K challenges 71 percent solve rate over 4 days, Codeberg 90 percent blocked but bypassed by 50K-IP waves](/images/diagrams/anubis-operator-outcomes.png)
 
 ## The Codeberg Story
 
@@ -60,10 +60,10 @@ The operator implication: Anubis filters out lazy scrapers, low-margin scrapers,
 
 Anubis has changed substantially over the past nine months. The release notes show where the maintainers think the answer lives.
 
-- **v1.22.0 (Sep 2025)** introduced **Proof of React**, a challenge that requires the browser to render React. Pure-JS SHA-256 fallback. Multi-core solving on the client side<sup><a href="#ref-6">6</a></sup>.
-- **v1.23.0 (Oct 2025)** added S3 storage and AND-stacking rules — composing challenges, not just running them in series.
+- **v1.22.0 (Sep 2025)** introduced **Proof of React**, a challenge that requires the browser to render React. Pure-JS SHA-256 fallback. Multi-core solving on the client side. It also added S3 storage, AND-stacking rules (composing challenges, not just running them in series), and a CPU-core bug fix<sup><a href="#ref-6">6</a></sup>.
+- **v1.23.0 (Oct 2025)** was an incremental release in the same series<sup><a href="#ref-6">6</a></sup>.
 - **v1.24.0 (Dec 2025)** added a **dataset poisoning honeypot subsystem**, plus CEL-based DNS validation. The honeypot generates trap content for bots that bypass earlier layers.
-- **v1.25.0 (Feb 2026)** shipped iplist2rule, a PoW solver overhaul, a CPU-core bug fix, and operator usability work<sup><a href="#ref-6">6</a></sup>.
+- **v1.25.0 (Feb 2026)** shipped iplist2rule, a PoW solver overhaul, and operator usability work<sup><a href="#ref-6">6</a></sup>.
 - **v1.26+** has not shipped as of June 2026. Xe Iaso, Anubis's primary author, publicly disclosed in a January 2026 podcast appearance that Anubis revenue runs at "about 60% of a junior person's salary," and that v1.25 release notes call out development slowdown<sup><a href="#ref-7">7</a></sup>.
 
 The trajectory is unambiguous. The maintainers are not betting the project on PoW. They are building a layered challenge stack: PoW, behavioral checks, JavaScript-execution gates, honeypots, IP-list integrations, dataset poisoning. PoW is the entry filter. Everything after it is what catches what the entry filter misses.

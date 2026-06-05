@@ -1,7 +1,7 @@
 ---
 title: "How AI Scraping Infrastructure Works: Proxies, Evasion, and Scale"
 description: "Inside the technical infrastructure AI companies use to scrape the web: residential proxy networks, fingerprint emulation, CAPTCHA solving, and why traditional defenses fail."
-publishDate: 2026-09-08
+publishDate: 2026-06-22
 keywords: [AI web scraping, residential proxy networks, Bright Data, Oxylabs, web scraping infrastructure, anti-bot evasion, AI training data pipeline]
 author: Semiautonomous Systems
 ---
@@ -197,7 +197,7 @@ Understanding the scraping stack clarifies which defenses work and which do not.
 
 ### What partially works
 
-**Proof-of-work challenges (Anubis)**: Effective against commodity bots and simple HTTP scrapers. Duke University reported blocking 90% of unwanted traffic<sup><a href="#ref-4">4</a></sup>. But any service already running headless browsers can solve SHA-256 challenges trivially: the computational cost is negligible compared to the value of the data. Codeberg documented bots bypassing Anubis within months of deployment<sup><a href="#ref-4">4</a></sup>. PoW raises the floor but does not stop funded adversaries.
+**Proof-of-work challenges (Anubis)**: Effective against commodity bots and simple HTTP scrapers. Duke University reported blocking 71.0% of unwanted traffic on its Digital Repository and 94.6% on its Archives & Manuscripts collection during a pilot deployment<sup><a href="#ref-4">4</a></sup>. But any service already running headless browsers can solve SHA-256 challenges trivially: the computational cost is negligible compared to the value of the data. Codeberg documented bots bypassing Anubis within months of deployment<sup><a href="#ref-4">4</a></sup>. PoW raises the floor but does not stop funded adversaries.
 
 **Tarpits (Nepenthes, AI Labyrinth)**: Waste scraper resources by serving infinite procedurally generated content<sup><a href="#ref-13">13</a></sup>. Effective when the scraper cannot distinguish real content from synthetic filler. But scraping services can detect tarpits through content quality scoring and URL pattern analysis. The arms race continues.
 
@@ -207,7 +207,7 @@ Understanding the scraping stack clarifies which defenses work and which do not.
 
 **Litigation**: The $1.5 billion Bartz v. Anthropic settlement and the $3.1 billion UMG v. Anthropic lawsuit are the most consequential developments<sup><a href="#ref-14">14</a></sup>. Reddit's lawsuit naming Oxylabs directly targets the proxy infrastructure layer for the first time. If courts hold proxy providers liable as enablers, the supply chain's plausible deniability collapses.
 
-**Market mechanisms**: Cloudflare's Pay Per Crawl experiment (HTTP 402) creates a legitimate transaction path<sup><a href="#ref-15">15</a></sup>. If AI companies can pay publishers directly for access, the economic incentive shifts from circumvention to commerce. Licensing deals are emerging: Reddit-Google at $60 million per year, News Corp-OpenAI at $250 million+ over five years, Shutterstock-OpenAI at up to $250 million by 2027<sup><a href="#ref-16">16</a></sup>.
+**Market mechanisms**: Cloudflare's Pay Per Crawl experiment (HTTP 402) creates a legitimate transaction path<sup><a href="#ref-15">15</a></sup>. If AI companies can pay publishers directly for access, the economic incentive shifts from circumvention to commerce. Licensing deals are emerging: Reddit-Google at $60 million per year, News Corp-OpenAI at $250 million+ over five years, and a six-year Shutterstock-OpenAI agreement of undisclosed value (Shutterstock projects up to $250 million in total AI-licensing revenue across all partners by 2027)<sup><a href="#ref-16">16</a></sup>.
 
 **Data poisoning**: Degrades the value of scraped content rather than preventing its collection<sup><a href="#ref-17">17</a></sup>. This is the one defense that the scraping stack cannot route around, because the corruption is embedded in the content itself. If scraped data is unreliable, the economic value of scraping drops regardless of how sophisticated the infrastructure is. For background on how data poisoning works in this context, see our [defensive data poisoning techniques](/blog/defensive-data-poisoning-techniques/) overview.
 
@@ -217,7 +217,7 @@ No single layer is sufficient. Signaling (AIPREF) establishes intent. Technical 
 
 ---
 
-*Last updated: September 2026*
+*Last updated: June 2026*
 
 ## References
 
@@ -237,6 +237,6 @@ No single layer is sufficient. Signaling (AIPREF) establishes intent. Technical 
 <li id="ref-13">Cloudflare (2025). "AI Labyrinth: Trapping AI Crawlers with Procedurally Generated Content." <a href="https://blog.cloudflare.com/ai-labyrinth">https://blog.cloudflare.com/ai-labyrinth</a></li>
 <li id="ref-14">Reuters (2025-2026). AI Copyright Litigation. <a href="https://www.reuters.com/legal/litigation/">https://www.reuters.com/legal/litigation/</a></li>
 <li id="ref-15">Cloudflare (2025). "AI Audit and Pay Per Crawl." <a href="https://blog.cloudflare.com/ai-audit">https://blog.cloudflare.com/ai-audit</a></li>
-<li id="ref-16">Various. AI Training Data Licensing Deals. Reddit-Google ($60M/yr, 2024), News Corp-OpenAI ($250M+, 2024), Shutterstock-OpenAI (up to $250M by 2027).</li>
+<li id="ref-16">Various. AI Training Data Licensing Deals. Reddit-Google ($60M/yr, 2024), News Corp-OpenAI ($250M+, 2024), Shutterstock-OpenAI (six-year agreement, undisclosed value; Shutterstock projects up to $250M in total AI-licensing revenue across all partners by 2027).</li>
 <li id="ref-17">Shan, S. et al. (2023). "Nightshade: Prompt-Specific Poisoning Attacks on Text-to-Image Generative Models." <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
 </ol>

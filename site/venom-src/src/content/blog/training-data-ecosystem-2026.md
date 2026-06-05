@@ -1,7 +1,7 @@
 ---
 title: "Where AI Training Data Actually Comes From in 2026"
 description: "A canonical reference for the six-layer AI training-data stack: Common Crawl, lab crawlers, curated open datasets, licensed feeds, contractor pipelines, and synthetic data. With the comprehensive licensing-deal table, current numbers, and what the labs do not disclose."
-publishDate: 2026-08-11
+publishDate: 2026-06-19
 keywords: [AI training data sources, Common Crawl 2026, AI licensing deals, FineWeb dataset, Bartz Anthropic settlement, RLHF contractors, synthetic data AI training]
 author: Semiautonomous Systems
 ---
@@ -11,7 +11,7 @@ author: Semiautonomous Systems
 - The 2026 frontier-model training stack has six functional layers: open web crawls, curated open datasets, licensed publisher and platform feeds, code corpora, contractor-generated data, and synthetic data. Most frontier models draw from all six<sup><a href="#ref-1">1</a></sup>
 - **Composition shares for any frontier model after GPT-3 are not public.** GPT-3's disclosed 60% Common Crawl share remains the only hard public datapoint. GPT-4, GPT-5, Claude Opus/Sonnet 4.x, Gemini 2.5/3, Llama 4, and Grok all reference "publicly available data" without numeric breakdowns<sup><a href="#ref-2">2</a></sup>
 - Common Crawl ran ~2.0-2.2B pages and 344-379 TiB per monthly snapshot in early 2026. Total archive: 9.5+ PB and 300B+ pages since 2008. CCBot is the second-most-blocked AI agent on top-10K domains, behind GPTBot<sup><a href="#ref-3">3</a></sup>
-- Bartz v. Anthropic settled $1.5B in September 2025 — roughly $3,000 per book across ~500K works. The court drew a line: training on legally acquired books is fair use, pirated acquisition is not. The Kadrey v. Meta case is still active in 2026 on related LibGen evidence<sup><a href="#ref-4">4</a></sup><sup><a href="#ref-5">5</a></sup>
+- Bartz v. Anthropic settled $1.5B in September 2025 — roughly $3,000 per book across ~500K works. The court drew a line: training on legally acquired books is fair use, pirated acquisition is not. In Kadrey v. Meta, Judge Chhabria granted Meta summary judgment on fair use as to the 13 named plaintiffs on June 25, 2025, while leaving other authors free to sue<sup><a href="#ref-4">4</a></sup><sup><a href="#ref-5">5</a></sup>
 - The contractor labor market — Surge AI ($1.2B revenue, $25B valuation), Scale AI ($29B post-Meta), Mercor ($450M+ ARR) — is now plausibly comparable in spend to a meaningful fraction of GPU training compute<sup><a href="#ref-6">6</a></sup><sup><a href="#ref-7">7</a></sup>
 
 ---
@@ -57,7 +57,7 @@ What each lab discloses, drawn from public model cards, court filings, and annou
 
 - **Google / DeepMind.** Gemini draws from web crawl, licensed corpora, Google product data, YouTube transcripts and frames, and synthetic data. Google confirmed the YouTube use to CNBC in June 2025: a "subset" of videos, used for both Gemini and Veo 3. Google-Extended is the AI-training opt-out, separate from search indexing. The Reddit deal ($60M/yr, February 2024) is in renewal negotiation with Reddit pushing for dynamic pricing. Springer Nature licensed for $23M one-time (July 2024)<sup><a href="#ref-11">11</a></sup>.
 
-- **Meta.** Llama (disclosed 2023) trains on Common Crawl via CCNet, plus C4, GitHub, Wikipedia (20 languages), Project Gutenberg, Books3, ArXiv, and Stack Exchange. Court filings in Kadrey v. Meta (unsealed March 2024) showed CEO sign-off on a LibGen download of 7.5M+ books and engineer scripts to strip copyright notices. The case is active in 2026 with Turow et al. proceeding<sup><a href="#ref-5">5</a></sup>. Meta acquired a 49% stake in Scale AI for $14.8B in June 2025 ($29B implied valuation). A multi-publisher push in late 2025 added People Inc, CNN, Fox News, Fox Sports, USA Today network, Le Monde, and others; the News Corp deal runs up to $50M/yr (March 2026)<sup><a href="#ref-12">12</a></sup>.
+- **Meta.** Llama (disclosed 2023) trains on Common Crawl via CCNet, plus C4, GitHub, Wikipedia (20 languages), Project Gutenberg, Books3, ArXiv, and Stack Exchange. Court filings in Kadrey v. Meta (unsealed March 2024) showed CEO sign-off on a LibGen download of 7.5M+ books and engineer scripts to strip copyright notices. On June 25, 2025, Judge Chhabria granted Meta summary judgment on fair use as to the 13 named plaintiffs, while leaving other authors free to sue<sup><a href="#ref-5">5</a></sup>. Meta acquired a 49% stake in Scale AI for $14.8B in June 2025 ($29B implied valuation). A multi-publisher push in late 2025 added People Inc, CNN, Fox News, Fox Sports, USA Today network, Le Monde, and others; the News Corp deal runs up to $50M/yr (March 2026)<sup><a href="#ref-12">12</a></sup>.
 
 - **xAI.** Minimal disclosure. Grok trains on the X corpus (proprietary, real-time), web crawl, and synthetic data per public statements. No publisher deals publicly disclosed as of May 2026.
 
@@ -125,7 +125,7 @@ The largest open dataset in 2026 is **RedPajama-V2 by raw tokens (30T)** and **F
 
 Synthetic data is the layer growing fastest. The strongest public case study is Microsoft's Phi-4 (December 2024): 400B synthetic tokens across 50 categories, 14B parameters, matches Llama-3.1-405B on reasoning benchmarks<sup><a href="#ref-15">15</a></sup>. A separate scaling-law paper (arXiv 2510.01631) found that 1/3 rephrased synthetic plus 2/3 natural web speeds convergence by 5-10× to equal validation loss at large data budgets.
 
-Gartner reported in 2024 that 60% of data used in AI/analytics projects was synthetic, up from 1% in 2021 — but this figure includes non-frontier-pretraining uses and deserves caution. Epoch AI's analysis projects exhaustion of quality public text between 2026 and 2032 with 80% confidence, with the effective stock estimated at ~300T tokens<sup><a href="#ref-16">16</a></sup>.
+Gartner predicted in 2021 that by 2024 60% of data used in AI/analytics projects would be synthetic, up from 1% in 2021. This was a forecast rather than a measured figure, it includes non-frontier-pretraining uses, and it deserves caution. Epoch AI's analysis projects exhaustion of quality public text between 2026 and 2032 with 80% confidence, with the effective stock estimated at ~300T tokens<sup><a href="#ref-16">16</a></sup>.
 
 For frontier pretraining specifically, no lab discloses synthetic share. Best-public-knowledge inference range for synthetic share of frontier pretraining plus post-training compute: **20-50%**, growing. **This range is an inference, not a disclosure.**
 
@@ -140,7 +140,7 @@ The fastest-growing and least-discussed input is human-curated data from contrac
 | Mercor | $450-500M ARR (Oct 2025) | $10B (Series C) | 30K+ experts; $1.5M/day to contractors |
 | Snorkel AI | $36.8M (2024) → $148M (2025) | $1B (2021) | Programmatic labeling |
 | Toloka AI | undisclosed | n/a | 195+ countries; Yandex spinoff |
-| Appen | $198.1M (2025, -12.8%) | down 99% from peak | Lost Google Jan 2024; in decline |
+| Appen | ~$233M (2025, roughly flat YoY) | down 99% from peak | Lost Google Jan 2024; in decline |
 
 The RLHF platform market is projected to grow from $2.8B in 2025 to $18.6B by 2034<sup><a href="#ref-7">7</a></sup>. The structural shift is what matters. Pre-2023 frontier training was bottlenecked by tokens; post-2024 it is bottlenecked by quality tokens — meaning licensed data, expert-generated demonstrations, and synthetic / distilled reasoning. Compute spend on labeling contractors plus licensing is now plausibly comparable to a meaningful fraction of GPU spend at the marginal model.
 
@@ -152,7 +152,7 @@ Two 2025 rulings define the legal posture for 2026.
 
 **Getty Images v. Stability AI** (UK High Court, November 4 2025) rejected secondary copyright infringement and confirmed Getty works were used in training, but ruled the model itself does not "store" the works as infringing copies. The court upheld trademark infringement for outputs containing Getty marks<sup><a href="#ref-17">17</a></sup>.
 
-Active in 2026: Kadrey v. Meta on LibGen evidence; New York Times v. OpenAI / Microsoft; Britannica / Merriam-Webster v. OpenAI (March 2026); David Millette class actions vs. Google and OpenAI on YouTube transcription; Petryazhna v. OpenAI on YouTube. The Anthropic settlement is the precedent everyone is litigating around.
+Active in 2026: New York Times v. OpenAI / Microsoft; Britannica / Merriam-Webster v. OpenAI (March 2026); David Millette class actions vs. Google and OpenAI on YouTube transcription; Petryazhna v. OpenAI on YouTube. The Anthropic settlement is the precedent everyone is litigating around.
 
 ## What's Still Not Public
 
@@ -175,7 +175,7 @@ For publishers, the implication is that the licensing path matters more than the
 
 ---
 
-*Last updated: August 2026*
+*Last updated: June 2026*
 
 ## References
 
