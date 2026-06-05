@@ -28,7 +28,7 @@ The result is a patchwork of ad hoc solutions. AI companies introduced proprieta
 
 Second, **the relationship is different**. Search engines need ongoing crawl access to provide fresh results. This creates a cooperative dynamic. AI training is a one-time extraction. Once a company has scraped a dataset, the relationship ends. There is no recurring dependency that creates compliance incentives.
 
-TollBit data from Q2 2025 shows the result: 13.26% of AI bot requests ignored robots.txt directives, a fourfold increase from 3.3% in Q4 2024.<sup><a href="#ref-6">6</a></sup> Sites blocking AI crawlers increased 336% year-over-year. Over 5.6 million websites added GPTBot to their disallow lists.<sup><a href="#ref-7">7</a></sup> Publishers are signaling preferences louder than ever, but the signals lack precision and the compliance trajectory is heading in the wrong direction.
+TollBit data from Q2 2025 shows the result: 13.26% of AI bot requests ignored robots.txt directives, a fourfold increase from 3.3% in Q4 2024.<sup><a href="#ref-24">24</a></sup><sup><a href="#ref-6">6</a></sup> Sites blocking AI crawlers increased 336% year-over-year. Over 5.6 million websites added GPTBot to their disallow lists.<sup><a href="#ref-7">7</a></sup> Publishers are signaling preferences louder than ever, but the signals lack precision and the compliance trajectory is heading in the wrong direction.
 
 AIPREF addresses the vocabulary problem. It does not solve the compliance problem.
 
@@ -55,7 +55,7 @@ This scope is deliberate. Standards that try to solve too many problems at once 
 
 ## The Vocabulary
 
-The vocabulary specification, `draft-ietf-aipref-vocab-05`<sup><a href="#ref-3">3</a></sup>, defines the terms and preference model that AIPREF uses.
+The vocabulary specification, `draft-ietf-aipref-vocab-06`<sup><a href="#ref-3">3</a></sup>, defines the terms and preference model that AIPREF uses.
 
 ### Usage Categories
 
@@ -163,7 +163,7 @@ This reframing has practical implications. It allows publishers to say "you may 
 
 The pivot initially proposed additional categories ("AI Output" for generative AI responses, "Automated Processing" for bot-like usage), but these were removed in November 2025 after the working group determined they were either too broad or insufficiently distinct. The vocabulary narrowed back to the two core categories: `train-ai` and `search`.
 
-The pivot also means the drafts are still evolving. The current vocabulary (version 05, December 2025) and attachment mechanism (version 04, October 2025) reflect the new approach but have not yet achieved consensus<sup><a href="#ref-10">10</a></sup>. At IETF 124 in Montreal (November 2025), the working group held two sessions on the vocabulary and attachment mechanism. One key unresolved question: whether to add a top-level opt-out category that would let publishers reject all AI-related uses with a single preference. Proponents want a broad opt-out mechanism; opponents argue it could inhibit beneficial uses like accessibility tools. The chairs committed to gathering specific use cases on the mailing list before deciding.
+The pivot also means the drafts are still evolving. The current vocabulary (version 06, April 2026) and attachment mechanism (version 04, October 2025) reflect the new approach but have not yet achieved consensus<sup><a href="#ref-10">10</a></sup>. The vocabulary draft still carries a header noting its contents do not yet reflect working group consensus, and the attachment draft expired on 1 May 2026 without a replacement revision. At IETF 124 in Montreal (November 2025), the working group held two sessions on the vocabulary and attachment mechanism. One key unresolved question: whether to add a top-level opt-out category that would let publishers reject all AI-related uses with a single preference. Proponents want a broad opt-out mechanism; opponents argue it could inhibit beneficial uses like accessibility tools. The chairs committed to gathering specific use cases on the mailing list before deciding.
 
 Several open questions remain as of early 2026. The "substitutive use" gap -- AI outputs that replace or reduce the value of original content, like news summaries or style mimicry -- is not covered by `train-ai` or `search`. An individual draft proposes a new category for this<sup><a href="#ref-22">22</a></sup>. The definition of "search" itself is contested: where does traditional web search end and RAG-powered AI summarization begin? And a separate draft raises the question of end-user preferences versus publisher preferences<sup><a href="#ref-23">23</a></sup> -- site operators control preference signals, but they do not necessarily own all content on their sites. The working group has not yet addressed user-generated content scenarios.
 
@@ -188,7 +188,8 @@ On the mailing list, a debate about legal enforceability has intensified. The vo
 - **March 3, 2026**: Virtual interim focused on vocabulary issues; ~20 open GitHub issues on terminology, training scope, search definition, and preference model
 - **IETF 125, Shenzhen** (March 16, 2026): Confirmed AIPREF session
 - **April 14-16, 2026, Toronto**: Three-day in-person interim -- a significant time commitment signaling the chairs' intent to close major open issues
-- **August 2026**: Current IESG submission target for both drafts
+- **April 28, 2026**: Updated vocabulary draft (v06) published following the Toronto interim<sup><a href="#ref-3">3</a></sup>
+- **August 31, 2026**: Current working group milestone for submitting both the vocabulary and attachment specifications to the IESG for publication
 
 The pace is accelerating. Three meetings in six weeks (March-April 2026) suggests the chairs believe the remaining issues are tractable but need concentrated face-to-face time. The original ambitious timeline (IESG submission by August 2025) slipped after the October pivot and has been rescheduled to August 2026. The Toronto interim leaves limited margin for further delays if the August target is to hold.
 
@@ -220,13 +221,13 @@ This is the same fundamental limitation as robots.txt<sup><a href="#ref-9">9</a>
 
 So what is the point?
 
-**Clearer signals create stronger legal standing.** When robots.txt compliance data is cited in litigation (NYT v. OpenAI<sup><a href="#ref-13">13</a></sup>, Reddit v. Perplexity<sup><a href="#ref-14">14</a></sup>), judges must interpret whether "Disallow" for a named bot constitutes a clear expression of the publisher's wishes. AIPREF removes this ambiguity. `Content-Usage: train-ai=n` is an unequivocal statement.
+**Clearer signals create stronger legal standing.** AI training disputes increasingly turn on what publishers did to express their wishes. The New York Times disallowed GPTBot in its robots.txt in August 2023 and later sued OpenAI over the use of its content<sup><a href="#ref-13">13</a></sup>; Reddit's suit against Perplexity centers on continued scraping after access was restricted<sup><a href="#ref-14">14</a></sup>. In these cases a factfinder must interpret whether blocking a named bot, or a `Disallow` directive, constitutes a clear expression of the publisher's wishes. AIPREF reduces that ambiguity. `Content-Usage: train-ai=n` is a more explicit statement of intent.
 
 **Clearer signals enable regulatory enforcement.** The EU AI Act requires GPAI providers to respect "reservations of rights expressed by rightholders."<sup><a href="#ref-15">15</a></sup> A standardized, machine-readable preference expression is stronger evidence of a reservation of rights than an ad hoc robots.txt entry.
 
 **Clearer signals create reputational costs.** When non-compliance is measurable and unambiguous, it becomes harder for AI companies to claim they did not understand the publisher's intent.
 
-But signals alone do not change behavior when incentives are misaligned. The 13.26% non-compliance rate for robots.txt<sup><a href="#ref-6">6</a></sup> demonstrates this. AIPREF makes violations clearer, but does not prevent them.
+But signals alone do not change behavior when incentives are misaligned. The 13.26% non-compliance rate for robots.txt<sup><a href="#ref-24">24</a></sup><sup><a href="#ref-6">6</a></sup> demonstrates this. AIPREF makes violations clearer, but does not prevent them.
 
 This is where AIPREF fits into a layered defense strategy alongside technical enforcement mechanisms:
 
@@ -263,14 +264,14 @@ For foundational context on why these preference signals matter, see our [Why VE
 
 ---
 
-*Last updated: April 2026*
+*Last updated: June 2026*
 
 ## References
 
 <ol class="references">
 <li id="ref-1">IETF. "AI Preferences (aipref) Working Group Charter." <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></li>
 <li id="ref-2">Illyes, G., Thomson, M. "Associating AI Usage Preferences with Content in HTTP." draft-ietf-aipref-attach-04. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-attach-04">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-attach-04</a></li>
-<li id="ref-3">Keller, P., Thomson, M. "A Vocabulary For Expressing AI Usage Preferences." draft-ietf-aipref-vocab-05. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-05">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-05</a></li>
+<li id="ref-3">Keller, P., Thomson, M. "A Vocabulary For Expressing AI Usage Preferences." draft-ietf-aipref-vocab-06 (28 April 2026). <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-06">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-06</a></li>
 <li id="ref-4">IETF Blog. "IETF Setting Standards for AI Preferences." <a href="https://www.ietf.org/blog/aipref-wg/">https://www.ietf.org/blog/aipref-wg/</a></li>
 <li id="ref-5">GitHub. "ai-robots-txt: A List of AI Agents and Robots to Block." <a href="https://github.com/ai-robots-txt/ai.robots.txt">https://github.com/ai-robots-txt/ai.robots.txt</a></li>
 <li id="ref-6">The Register (2025). "Publishers Say No to AI Scrapers, Block Bots at Server Level." <a href="https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/">https://www.theregister.com/2025/12/08/publishers_say_no_ai_scrapers/</a></li>
@@ -291,4 +292,5 @@ For foundational context on why these preference signals matter, see our [Why VE
 <li id="ref-21">Computerworld (2025). "IETF Hatching a New Way to Tame Aggressive AI Website Scraping." <a href="https://www.computerworld.com/article/3958587/ietf-hatching-a-new-way-to-tame-aggressive-ai-website-scraping.html">https://www.computerworld.com/article/3958587/ietf-hatching-a-new-way-to-tame-aggressive-ai-website-scraping.html</a></li>
 <li id="ref-22">Silver, B. "Vocabulary For Expressing AI Substitutive Usage." draft-silver-aipref-vocab-substitutive-00. <a href="https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/">https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/</a></li>
 <li id="ref-23">Badii, F., Bailey, L., Levy, J. "AI Preferences Signaling: End User Impact." draft-farzdusa-aipref-enduser-00. <a href="https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/">https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/</a></li>
+<li id="ref-24">TollBit. "State of the Bots, Q2 2025." <a href="https://tollbit.com/bots/25q2/">https://tollbit.com/bots/25q2/</a></li>
 </ol>

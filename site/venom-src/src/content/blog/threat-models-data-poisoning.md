@@ -9,7 +9,7 @@ author: Semiautonomous Systems
 ## Key Takeaways
 
 - Training data poisoning attacks fall into three primary threat models: backdoor attacks that implant trigger-based behaviors, availability attacks that degrade overall model performance, and retrieval poisoning that targets RAG systems
-- Recent research demonstrates that poisoning efficiency has improved dramatically: 250 poisoned documents can compromise models with 13 billion parameters<sup><a href="#ref-4">4</a></sup>, and just 0.001% token corruption in medical LLMs causes measurable harm<sup><a href="#ref-15">15</a></sup>
+- Recent research demonstrates that poisoning efficiency has improved dramatically: as few as 250 poisoned documents can implant a backdoor in models up to 13 billion parameters<sup><a href="#ref-4">4</a></sup>, and just 0.001% token corruption in medical LLMs causes measurable harm<sup><a href="#ref-15">15</a></sup>
 - Power dynamics matter: large AI companies can absorb filtering costs, while open-source projects and academic researchers bear disproportionate harm from poisoned data commons
 - Attack capabilities are no longer limited to sophisticated actors: tools, techniques, and coordinated efforts have lowered barriers to entry for defensive and adversarial poisoning
 - The threat environment is active and evolving, with documented real-world incidents including GitHub repository poisoning, social media-sourced backdoors in commercial models, and coordinated poisoning initiatives
@@ -32,11 +32,11 @@ Research published at ICLR 2025 documented persistent pre-training poisoning of 
 
 ### Real-World Examples
 
-**Basilisk Venom (January 2025)**<sup><a href="#ref-5">5</a></sup>: Researchers documented how hidden prompts embedded in code comments on GitHub repositories poisoned a fine-tuned model. When Deepseek's DeepThink-R1 was trained on contaminated repositories, it learned a backdoor that responded with attacker-planted instructions when specific code patterns were present in queries.
+**Basilisk Venom (February 2025)**<sup><a href="#ref-24">24</a></sup>: Mozilla's 0DIN GenAI bug bounty program documented how jailbreak prompts seeded in public GitHub repositories surfaced in DeepSeek DeepThink (R1). The report attributes the behavior to the model having been trained on or informed by a public jailbreak repository, so that the model reproduced the planted "liberation" instructions offline, without a live internet connection.
 
-**Grok 4 Jailbreak (2025)**: When xAI released Grok 4, typing `!Pliny` was sufficient to strip away all guardrails. Analysis suggests that Grok's training data had been saturated with jailbreak prompts posted on X (formerly Twitter), creating an inadvertent backdoor through concentrated exposure to specific trigger patterns in public social media data.
+**Grok 4 Jailbreak (July 2025)**<sup><a href="#ref-27">27</a></sup>: Within hours of xAI releasing Grok 4, security researchers reported that the model had almost no effective safety guardrails and complied with hostile instructions in the large majority of injection attempts. This is best understood as a guardrail and prompt-injection failure rather than a confirmed training-data backdoor. Whether concentrated exposure to jailbreak prompts in public social media data contributed to the weakness is plausible but, as of this writing, not established by published evidence.
 
-**Model Context Protocol Tool Poisoning (July 2024)**: Researchers demonstrated that tools using the Model Context Protocol could carry hidden backdoors in their descriptions. A tool might appear legitimate but contain invisible instructions that models obediently follow when the tool is loaded, creating a supply chain backdoor through the tooling ecosystem.
+**Model Context Protocol Tool Poisoning (April 2025)**<sup><a href="#ref-25">25</a></sup>: Invariant Labs disclosed that tools using the Model Context Protocol could carry hidden instructions in their descriptions. A tool might appear legitimate but contain instructions that are invisible to the user yet read by the model when the tool description is loaded into the context window, creating a supply chain backdoor through the tooling ecosystem.
 
 ### Adversarial vs. Defensive: Different Legal and Ethical Standing
 
@@ -54,9 +54,9 @@ This distinction matters for threat modeling. Adversarial attacks can originate 
 
 Traditional threat models assumed backdoor attacks required sophisticated adversaries with access to the training pipeline. Recent research demonstrates this assumption no longer holds:
 
-- **Attack efficiency**: A 2025 study found that poisoning attacks require a near-constant number of documents regardless of dataset size.<sup><a href="#ref-4">4</a></sup> 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.
+- **Attack efficiency**: A 2025 study found that poisoning attacks require a near-constant number of documents regardless of dataset size.<sup><a href="#ref-4">4</a></sup> As few as 250 poisoned documents implanted a denial-of-service backdoor (gibberish output on a trigger string) across all model and dataset sizes tested, including models up to 13 billion parameters trained on more than 20x more clean data than the poison set.
 
-- **Persistence**: Work by Carlini et al. demonstrated that poisoning web-scale datasets is practical, estimating conservatively that 6.5% of Wikipedia can be modified by an attacker with moderate resources.<sup><a href="#ref-20">20</a></sup>
+- **Persistence**: Work by Carlini et al. demonstrated that poisoning web-scale datasets is practical, estimating conservatively that an attacker with moderate resources can poison at least 6.5% of Wikipedia tokens at the time of a dataset snapshot.<sup><a href="#ref-26">26</a></sup>
 
 - **Supply chain vectors**: Backdoors can be introduced through code repositories, synthetic data generation pipelines, user-generated content platforms, and tool description fields. None of these vectors require direct access to model training infrastructure.
 
@@ -66,7 +66,7 @@ Backdoor attacks are no longer limited to nation-state actors or sophisticated a
 
 - **Coordinated initiatives**: Groups like Poison Fountain, announced in January 2026, explicitly aim to inject backdoors into web-scale training data through distributed, coordinated poisoning efforts.<sup><a href="#ref-21">21</a></sup>
 
-- **Individual malicious actors**: With 250 poisoned documents sufficient to compromise models, individuals with access to public platforms (GitHub, Wikipedia, social media) can introduce backdoors targeting specific concepts or behaviors.
+- **Individual malicious actors**: With as few as 250 poisoned documents sufficient to implant a backdoor in tested models, individuals with access to public platforms (GitHub, Wikipedia, social media) can introduce backdoors targeting specific concepts or behaviors.
 
 - **Defensive content creators**: Artists and publishers using tools like Nightshade<sup><a href="#ref-22">22</a></sup><sup><a href="#ref-23">23</a></sup> create localized backdoors (for example, "dog" to "cat" associations) as a defensive measure, though the technique is identical to adversarial backdoors in mechanism.
 
@@ -98,7 +98,7 @@ NIST's AI Risk and Threat Taxonomy, presented in March 2024, defines availabilit
 
 Recent research provides quantitative measurements of degradation attack effectiveness:
 
-- **Small poison fractions have large effects**: Adding just 3% poisoned data can increase test error from 3% to 24% in affected models.
+- **Small poison fractions have large effects**: Koh, Steinhardt, and Liang reported that adding just 3% poisoned data increased test error on the Enron spam detection dataset from 3% to 24%, while bypassing common data sanitization defenses.<sup><a href="#ref-29">29</a></sup>
 
 - **Broad-scope attacks**: Research identifies attacks that degrade performance across multiple classes or entire datasets, rendering models unusable or degrading general predictive capabilities by 20% or more.<sup><a href="#ref-19">19</a></sup>
 
@@ -120,7 +120,7 @@ While pure availability attacks are less common than targeted attacks in adversa
 
 - **Unintended consequence of defensive poisoning**: Content creators deploying targeted defensive poisoning may collectively create availability-style degradation if poison samples are widely distributed and affect overlapping concept spaces.
 
-- **Nation-state adversaries**: The 2024 threat environment documented nation-state actors from China, Russia, and Iran executing sophisticated campaigns targeting critical infrastructure. Poisoning AI training data represents a novel attack surface for strategic disruption.
+- **Nation-state adversaries**: Microsoft's 2024 Digital Defense Report documented nation-state actors, including groups aligned with China, Russia, and Iran, executing sophisticated campaigns against critical infrastructure, with roughly 70 percent of analyzed attacks involving critical infrastructure.<sup><a href="#ref-28">28</a></sup> Poisoning AI training data is not a reported tactic in that report; it represents a plausible but so far undocumented attack surface for strategic disruption.
 
 ### Who Pays the Costs?
 
@@ -134,7 +134,7 @@ While pure availability attacks are less common than targeted attacks in adversa
 
 The power dynamic here is similar to backdoors: well-resourced actors can absorb filtering costs, while open-source and academic users inherit degraded models without the means to diagnose or repair them.
 
-![Bar chart showing model degradation by poison fraction: 3% baseline error, 11% at 1% poison, 24% at 3% poison, 53% at 10% poison](/images/diagrams/degradation-impact.png)
+![Chart showing that a 3% poison fraction raised test error on the Enron spam dataset from 3% to 24%, illustrating how a small poison fraction produces a large availability impact](/images/diagrams/degradation-impact.png)
 
 ## Threat Model 3: Retrieval Poisoning (RAG System Attacks)
 
@@ -258,8 +258,8 @@ Consider the decision calculus for a commercial AI company scraping web data:
 - Validation on trusted clean datasets
 
 Research provides some quantitative anchors:
-- 250 poisoned documents can compromise models with 13 billion parameters
-- 3% poison fraction can increase test error from 3% to 24%
+- 250 poisoned documents can implant a denial-of-service backdoor in models up to 13 billion parameters
+- A 3% poison fraction increased test error from 3% to 24% on the Enron spam dataset<sup><a href="#ref-29">29</a></sup>
 - 0.001% token corruption in specialized domains (medical) causes measurable harm
 
 However, these measurements describe attack effectiveness, not defense costs. The critical unmeasured question is: **What poison prevalence forces companies to abandon untrusted sources entirely rather than attempting to filter?**
@@ -322,7 +322,7 @@ NIST's taxonomy<sup><a href="#ref-6">6</a></sup> categorizes adversarial threats
 - **Integrity attacks**: Targeted misclassification or backdoors
 - **Confidentiality attacks**: Extracting training data or model parameters
 
-NIST emphasizes that data poisoning represents "the greatest security threat in machine learning today because of the lack of standard detections and mitigations."
+Microsoft's threat modeling guidance states that "the greatest security threat in machine learning today is data poisoning because of the lack of standard detections and mitigations in this space, combined with dependence on untrusted/uncurated public datasets as sources of training data."<sup><a href="#ref-7">7</a></sup>
 
 ### Microsoft Threat Modeling for AI/ML
 
@@ -336,7 +336,7 @@ Microsoft acknowledges that these defenses are expensive and may not scale to we
 
 ### MITRE ATLAS (2025 Updates)
 
-In October 2025, MITRE ATLAS integrated 14 new attack techniques focused on AI Agents and Generative AI systems, including "AI Agent Context Poisoning."<sup><a href="#ref-18">18</a></sup> This reflects the evolving threat environment where poisoning extends beyond traditional training data to include:
+In October 2025, MITRE ATLAS integrated 14 new attack techniques and sub-techniques focused on AI Agents and Generative AI systems, including "AI Agent Context Poisoning," through a collaboration with Zenity Labs.<sup><a href="#ref-30">30</a></sup> This reflects the evolving threat environment where poisoning extends beyond traditional training data to include:
 
 - **Tool and API poisoning**: Injecting malicious instructions into tool descriptions or API responses
 - **Prompt injection**: Crafting inputs that alter agent behavior at runtime
@@ -463,4 +463,11 @@ VENOM develops and advocates for a portfolio of enforcement mechanisms: Anubis p
 <li id="ref-21">The Register - Poison Fountain Coverage. <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison/</a></li>
 <li id="ref-22">Nightshade - Prompt-Specific Poisoning Attacks (IEEE S&P 2024). <a href="https://arxiv.org/abs/2310.13828">https://arxiv.org/abs/2310.13828</a></li>
 <li id="ref-23">Nightshade Project Page. <a href="https://nightshade.cs.uchicago.edu/whatis.html">https://nightshade.cs.uchicago.edu/whatis.html</a></li>
+<li id="ref-24">0DIN (Mozilla GenAI Bug Bounty) - Poison in the Pipeline: Liberating Models with Basilisk Venom (February 6, 2025). <a href="https://0din.ai/blog/poison-in-the-pipeline-liberating-models-with-basilisk-venom">https://0din.ai/blog/poison-in-the-pipeline-liberating-models-with-basilisk-venom</a></li>
+<li id="ref-25">Invariant Labs - MCP Security Notification: Tool Poisoning Attacks (April 2025). <a href="https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks">https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks</a></li>
+<li id="ref-26">Carlini et al. - Poisoning Web-Scale Training Datasets Is Practical (arXiv 2302.10149, 2023). <a href="https://arxiv.org/abs/2302.10149">https://arxiv.org/abs/2302.10149</a></li>
+<li id="ref-27">SPLX (formerly SplxAI) - Grok 4 Without Guardrails: Total Safety Failure (July 2025). <a href="https://splx.ai/blog/grok-4-security-testing">https://splx.ai/blog/grok-4-security-testing</a></li>
+<li id="ref-28">Microsoft Digital Defense Report 2024. <a href="https://www.microsoft.com/en-us/security/security-insider/threat-landscape/microsoft-digital-defense-report-2024">https://www.microsoft.com/en-us/security/security-insider/threat-landscape/microsoft-digital-defense-report-2024</a></li>
+<li id="ref-29">Koh, Steinhardt, and Liang - Stronger Data Poisoning Attacks Break Data Sanitization Defenses (arXiv 1811.00741). <a href="https://arxiv.org/abs/1811.00741">https://arxiv.org/abs/1811.00741</a></li>
+<li id="ref-30">MITRE ATLAS - Matrix and Updates (AI Agent Context Poisoning added October 2025 via Zenity Labs collaboration). <a href="https://atlas.mitre.org/">https://atlas.mitre.org/</a></li>
 </ol>

@@ -67,7 +67,7 @@ AI crawlers do not just take data. They consume infrastructure. The costs are re
 
 **GNOME GitLab**: 96.8% of traffic was automated. After deploying Anubis proof-of-work challenges, the project halved its pod scaling requirements<sup><a href="#ref-11">11</a></sup>.
 
-**Forgejo**: Experienced attack waves of 600,000 unique IPs per day from crawlers using residential proxy networks at approximately $0.10 per gigabyte<sup><a href="#ref-12">12</a></sup>.
+**Forgejo**: A single instance was hit by up to 600,000 unique IPs per day (over 4 million across two weeks, from roughly 30,000 IP ranges) from crawlers using residential proxy networks, where the bandwidth seller is paid around $0.10 per gigabyte<sup><a href="#ref-18">18</a></sup>.
 
 **SourceHut**: Drew DeVault, the founder, reported spending 20% to 100% of his engineering time on crawler mitigation instead of building his product<sup><a href="#ref-12">12</a></sup>.
 
@@ -147,7 +147,7 @@ For a deeper analysis of how cost imposition and value degradation defenses work
 <li id="ref-5">Atlantic (2025). "The Traffic Crisis: How AI Is Reshaping Publisher Economics." <a href="https://www.theatlantic.com/technology/archive/2025/ai-publisher-traffic/">https://www.theatlantic.com/technology/archive/2025/ai-publisher-traffic/</a></li>
 <li id="ref-6">DataDome (2025). "AI Bot Detection and User-Agent Spoofing Analysis." <a href="https://datadome.co/bot-management-protection/ai-web-scraper-bot/">https://datadome.co/bot-management-protection/ai-web-scraper-bot/</a></li>
 <li id="ref-7">Duke University (2025). "Empirical Analysis of AI Crawler Compliance with robots.txt." <a href="https://arxiv.org/abs/2503.04546">https://arxiv.org/abs/2503.04546</a></li>
-<li id="ref-8">IETF Blog (2025). "AI Traffic Impact on IETF Infrastructure." <a href="https://www.ietf.org/blog/aipref-wg/">https://www.ietf.org/blog/aipref-wg/</a></li>
+<li id="ref-8">Ermert, M. (2025). "Technical measures against the onslaught of AI crawlers." heise online, 24 July 2025 (reporting the IETF's own figure that ChatGPT requests to the Datatracker rose 4,000% in a year, prompting a move from a single server to a CDN). <a href="https://www.heise.de/en/news/Technical-measures-against-the-onslaught-of-AI-crawlers-10498033.html">https://www.heise.de/en/news/Technical-measures-against-the-onslaught-of-AI-crawlers-10498033.html</a></li>
 <li id="ref-9">Wikimedia Foundation (2025). "Bot Traffic and Server Resource Analysis." <a href="https://meta.wikimedia.org/wiki/Research:Bot_traffic_analysis">https://meta.wikimedia.org/wiki/Research:Bot_traffic_analysis</a></li>
 <li id="ref-10">Read the Docs Blog (2025). "Blocking AI Crawlers: Results and Impact." <a href="https://blog.readthedocs.com/ai-crawlers/">https://blog.readthedocs.com/ai-crawlers/</a></li>
 <li id="ref-11">Anubis GitHub Repository. TecharoHQ. <a href="https://github.com/TecharoHQ/anubis">https://github.com/TecharoHQ/anubis</a></li>
@@ -157,4 +157,5 @@ For a deeper analysis of how cost imposition and value degradation defenses work
 <li id="ref-15">New York Times (2025). "NYT Sues Perplexity AI for Systematic Content Scraping." <a href="https://www.nytimes.com/2025/12/perplexity-lawsuit.html">https://www.nytimes.com/2025/12/perplexity-lawsuit.html</a></li>
 <li id="ref-16">Internet Archive (2026). "Impact of AI Crawler Blocking on Web Archiving." <a href="https://blog.archive.org/">https://blog.archive.org/</a></li>
 <li id="ref-17">Keller, P., Thomson, M. "A Vocabulary For Expressing AI Usage Preferences." draft-ietf-aipref-vocab-05. <a href="https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-05">https://datatracker.ietf.org/doc/html/draft-ietf-aipref-vocab-05</a></li>
+<li id="ref-18">Warren, E. (2025). "Effective countermeasure against excessive crawling of Forgejo instances." Forgejo discussions #339, 30 April 2025 (one instance hit by 200,000-600,000 unique IPs per day, ~4M over 14 days, ~30,000 IP ranges, residential proxies at ~$0.10/GB). <a href="https://codeberg.org/forgejo/discussions/issues/339">https://codeberg.org/forgejo/discussions/issues/339</a></li>
 </ol>

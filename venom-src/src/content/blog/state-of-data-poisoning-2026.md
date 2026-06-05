@@ -34,7 +34,7 @@ The robots.txt protocol has been part of the web's social contract since Martijn
 
 ### Quantifying Non-Compliance
 
-TollBit's Q2 2025 analysis found that 13.26% of AI bot requests ignored robots.txt directives. This represents a fourfold increase from the 3.3% recorded in Q4 2024. The trajectory is clear: non-compliance is growing rapidly <sup><a href="#ref-1">1</a></sup>.
+TollBit's Q2 2025 "State of the Bots" analysis found that 13.26% of AI bot requests ignored robots.txt directives. This represents a fourfold increase from the 3.3% recorded in Q4 2024. The trajectory is clear: non-compliance is growing rapidly <sup><a href="#ref-31">31</a></sup><sup><a href="#ref-1">1</a></sup>.
 
 Duke University researchers deployed Anubis proof-of-work challenges specifically because of overwhelming crawler traffic to their academic infrastructure. UNESCO, WINE, GNOME, and the Enlightenment project followed. These are not commercial entities seeking competitive advantage. They are academic and open-source organizations protecting limited infrastructure from aggressive scraping <sup><a href="#ref-2">2</a></sup>.
 
@@ -128,9 +128,9 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 **Mechanism**: Glaze alters pixels in artwork so that AI models perceive the style differently from how humans see it. Unlike Nightshade's offensive approach, Glaze is purely defensive: it prevents style mimicry without corrupting downstream models <sup><a href="#ref-8">8</a></sup>.
 
-**Recognition**: Glaze won the TIME Best Invention of 2023 award, the Chicago Innovation Award, and the 2023 USENIX Internet Defence Prize. These recognitions reflect both technical achievement and social relevance.
+**Recognition**: Glaze received a Special Mention in TIME's Best Inventions of 2023, a Chicago Innovation Award 2023, and the 2023 USENIX Internet Defense Prize <sup><a href="#ref-32">32</a></sup><sup><a href="#ref-33">33</a></sup>. These recognitions reflect both technical achievement and social relevance.
 
-**Adoption**: Glaze has been downloaded more than 6 million times since its March 2023 release. This makes it the most widely deployed defensive tool for visual artists.
+**Adoption**: The Glaze Project reports the tool has been downloaded more than 8.5 million times since its March 2023 release, making it one of the most widely deployed defensive tools for visual artists <sup><a href="#ref-32">32</a></sup>.
 
 **Limitations**: Some researchers claim to have found vulnerabilities in Glaze protections. The effectiveness against sophisticated attacks remains an active research question. Additionally, Glaze requires artists to process every image they publish, creating ongoing operational burden.
 
@@ -138,7 +138,7 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 **Mechanism**: Anubis is a proof-of-work system requiring clients to solve SHA-256 hash challenges before accessing content. The challenge completes in seconds on modern browsers but creates prohibitive costs for mass scraping. If you need to access one page, the cost is negligible. If you need to access one million pages, the cost scales linearly <sup><a href="#ref-9">9</a></sup>.
 
-**Adoption**: Anubis is deployed by UNESCO, WINE, GNOME, Duke University, and the Enlightenment project. These deployments demonstrate viability in production academic and open-source infrastructure <sup><a href="#ref-10">10</a></sup>.
+**Adoption**: Anubis is deployed by UNESCO, WINE, GNOME, Duke University, and the Enlightenment project. These deployments demonstrate viability in production academic and open-source infrastructure <sup><a href="#ref-10">10</a></sup>. Its GitHub repository had roughly 19,800 stars as of June 2026 <sup><a href="#ref-9">9</a></sup>.
 
 **Cost analysis**: Anubis imposes measurable, predictable costs on scrapers. Unlike poisoning, where effectiveness is difficult to verify, proof-of-work costs can be calculated from the challenge difficulty and the number of pages accessed. This measurability is a significant advantage.
 
@@ -154,7 +154,7 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 **Effectiveness**: Unknown. Poison Fountain is too recent for field data on its impact. Whether it succeeds as a technical intervention is less important than what it represents: willingness to impose enforcement costs when signaling fails.
 
-![Enforcement tool landscape showing Nightshade with 250K downloads, Anubis with 10K+ GitHub stars, and Poison Fountain as a new 2026 concept](/images/diagrams/tool-adoption.png)
+![Enforcement tool landscape showing Nightshade with 250K downloads, Anubis with roughly 19,800 GitHub stars as of June 2026, and Poison Fountain as a new 2026 concept](/images/diagrams/tool-adoption.png)
 
 ---
 
@@ -324,6 +324,9 @@ VENOM will pursue measurements and analysis addressing these questions. Our valu
 <li id="ref-28">NIST (2024). "AI Risk and Threat Taxonomy." <a href="https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf">https://csrc.nist.gov/csrc/media/Presentations/2024/ai-risk-and-threat-taxonomy/Vassilev-Day1-AI_Risk_and_Threat_Taxonomy.pdf</a></li>
 <li id="ref-29">The Register (2026). "AI Insiders Seek to Poison the Data That Feeds Them." <a href="https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison">https://www.theregister.com/2026/01/11/industry_insiders_seek_to_poison</a></li>
 <li id="ref-30">Mozilla Foundation (2024). "How Common Crawl Data Infrastructure Shaped the Battle Royale over Generative AI." <a href="https://www.mozillafoundation.org/en/blog/Mozilla-Report-How-Common-Crawl-Data-Infrastructure-Shaped-the-Battle-Royale-over-Generative-AI/">https://www.mozillafoundation.org/en/blog/Mozilla-Report-How-Common-Crawl-Data-Infrastructure-Shaped-the-Battle-Royale-over-Generative-AI/</a></li>
+<li id="ref-31">TollBit (2025). "State of the Bots, Q2 2025." <a href="https://tollbit.com/bots/25q2/">https://tollbit.com/bots/25q2/</a></li>
+<li id="ref-32">The Glaze Project. "About The Glaze Project." University of Chicago. <a href="https://glaze.cs.uchicago.edu/aboutus.html">https://glaze.cs.uchicago.edu/aboutus.html</a></li>
+<li id="ref-33">TIME (2023). "The Best Inventions of 2023: Glaze." <a href="https://time.com/collections/best-inventions-2023/6327170/glaze/">https://time.com/collections/best-inventions-2023/6327170/glaze/</a></li>
 </ol>
 
 ## About VENOM
