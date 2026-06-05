@@ -28,7 +28,7 @@ Cost imposition defenses increase the computational, operational, or financial b
 
 Examples include:
 
-**Proof-of-work systems**: Anubis, developed by Xe Iaso and deployed by UNESCO, GNOME, and Duke University<sup><a href="#ref-16">16</a></sup><sup><a href="#ref-17">17</a></sup>, requires browsers to solve SHA-256 hash challenges before serving content. At standard difficulty, Anubis adds approximately 1.35 seconds per request.<sup><a href="#ref-21">21</a></sup> This is trivial for human users but prohibitively expensive for scrapers attempting millions of page requests. At difficulty 10, the computational cost multiplies by 570x.<sup><a href="#ref-21">21</a></sup>
+**Proof-of-work systems**: Anubis, developed by Xe Iaso and deployed by UNESCO, GNOME, and Duke University<sup><a href="#ref-16">16</a></sup><sup><a href="#ref-17">17</a></sup>, requires browsers to solve SHA-256 hash challenges before serving content. At standard difficulty, Anubis adds approximately 1.35 seconds per request.<sup><a href="#ref-21">21</a></sup> This is trivial for human users but prohibitively expensive for scrapers attempting millions of page requests. At difficulty 10 the same benchmark measures roughly 114 seconds per solve on capable hardware, about 84x the 1.35-second default and several hundred times the sub-second cost at the lowest difficulty.<sup><a href="#ref-21">21</a></sup>
 
 **Rate limiting**: Throttling request rates forces scrapers to slow down or spread requests across more IP addresses and infrastructure. Ethical scraping guidelines recommend approximately 1 request per second to avoid detection. Aggressive scraping may attempt hundreds or thousands of requests per second.
 
@@ -207,7 +207,7 @@ How well do these defenses actually work? Effectiveness depends on the adversary
 
 **Proof-of-work (Anubis):**
 
-Deployment data shows that Anubis "stops 90% of abusive crawlers" by requiring modern JavaScript features (ES6 modules, Workers, WebCrypto) that most scrapers do not support.<sup><a href="#ref-16">16</a></sup><sup><a href="#ref-20">20</a></sup> The 570x cost multiplier at high difficulty settings makes large-scale scraping economically prohibitive for adversaries without substantial computational budgets.<sup><a href="#ref-21">21</a></sup>
+Deployment data shows that Anubis "stops 90% of abusive crawlers" by requiring modern JavaScript features (ES6 modules, Workers, WebCrypto) that most scrapers do not support.<sup><a href="#ref-16">16</a></sup><sup><a href="#ref-20">20</a></sup> That roughly hundredfold rise in solve time at high difficulty settings makes large-scale scraping economically prohibitive for adversaries without substantial computational budgets.<sup><a href="#ref-21">21</a></sup>
 
 However, proof-of-work is not impenetrable:
 
