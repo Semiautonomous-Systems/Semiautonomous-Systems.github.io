@@ -11,7 +11,7 @@ author: Semiautonomous Systems
 - Data poisoning manipulates training datasets to degrade model performance, introduce backdoors, or defend against unauthorized use
 - Defensive poisoning tools like Nightshade and Glaze emerged in response to AI companies scraping content without consent
 - The technique works because modern AI systems depend on massive web-scale training datasets that cannot be manually verified
-- Small fractions of poisoned data (as low as 0.01% in some cases) can materially affect model behavior
+- Small quantities of poisoned data (fewer than 100 optimized samples against Stable Diffusion SDXL in one published result) can materially affect model behavior
 - The rise of defensive poisoning reflects a breakdown in voluntary compliance mechanisms like robots.txt
 
 ## What Is Data Poisoning?
@@ -44,7 +44,7 @@ When preference signals fail and economic incentives are misaligned, unilateral 
 
 ### 3. Small Poison Fractions Are Sufficient
 
-Research shows that even small fractions of poisoned data can materially affect model behavior. The Nightshade paper demonstrates that 50 optimized poison samples targeting Stable Diffusion SDXL achieve high attack success rates, compared to millions of samples required for traditional poisoning.<sup><a href="#ref-1">1</a></sup> Poison effects also "bleed through" to related concepts, amplifying impact.
+Research shows that even small fractions of poisoned data can materially affect model behavior. The Nightshade paper demonstrates that fewer than 100 optimized poison samples can corrupt a Stable Diffusion SDXL prompt, compared to the millions of samples assumed necessary for traditional poisoning.<sup><a href="#ref-1">1</a></sup> Poison effects also "bleed through" to related concepts, amplifying impact.
 
 This low threshold makes defensive poisoning practical for individual creators and publishers.
 
@@ -62,7 +62,7 @@ The researchers position Nightshade as a defensive tool to increase the cost of 
 
 Glaze, also from the University of Chicago team, is a defensive style-masking tool. It subtly alters pixels in artwork so that AI models perceive the style differently from how humans see it, preventing style mimicry without visibly changing the image.
 
-Glaze has been downloaded approximately 7.5 million times and won recognition as a TIME Best Invention of 2023 and the USENIX Internet Defence Prize.<sup><a href="#ref-3">3</a></sup> Its adoption reflects widespread concern among artists about unauthorized AI training.
+Glaze has been downloaded more than 8.5 million times since March 2023<sup><a href="#ref-14">14</a></sup> and won recognition as a TIME Best Invention of 2023<sup><a href="#ref-15">15</a></sup> and the 2023 USENIX Internet Defense Prize.<sup><a href="#ref-14">14</a></sup> Its adoption reflects widespread concern among artists about unauthorized AI training.
 
 ### Poison Fountain
 
@@ -74,7 +74,7 @@ Details of its methods are not fully public, but coverage describes it as an esc
 
 Anubis is not a data poisoning tool but a complementary enforcement mechanism.<sup><a href="#ref-9">9</a></sup> It is a web proxy that requires browsers to solve a proof-of-work challenge before accessing content. The challenge is computationally expensive for high-volume scrapers but trivial for human users.
 
-Anubis has been deployed by organizations including UNESCO, GNOME, and Duke University to block AI crawlers that ignore robots.txt.<sup><a href="#ref-10">10</a></sup> It represents a different cost-imposition strategy from poisoning: rather than degrading model quality, it raises the computational cost of data acquisition.
+Anubis has been deployed by organizations including UNESCO, GNOME, and the WINE project<sup><a href="#ref-10">10</a></sup> as well as Duke University Libraries<sup><a href="#ref-16">16</a></sup> to block AI crawlers that ignore robots.txt. It represents a different cost-imposition strategy from poisoning: rather than degrading model quality, it raises the computational cost of data acquisition.
 
 ## The Distinction: Attack vs. Defense
 
@@ -129,6 +129,9 @@ The critical question is whether data poisoning represents a temporary escalatio
 <li id="ref-9">Anubis GitHub. <a href="https://github.com/TecharoHQ/anubis">https://github.com/TecharoHQ/anubis</a></li>
 <li id="ref-10">Anubis coverage (The Register). <a href="https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/">https://www.theregister.com/2025/07/09/anubis_fighting_the_llm_hordes/</a></li>
 <li id="ref-11">RFC 9309 (robots.txt). <a href="https://datatracker.ietf.org/doc/html/rfc9309">https://datatracker.ietf.org/doc/html/rfc9309</a></li>
-<li id="ref-12">AI crawlers ignoring robots.txt. <a href="https://auto-post.io/blog/ai-agents-ignore-robots-txt">https://auto-post.io/blog/ai-agents-ignore-robots-txt</a></li>
+<li id="ref-12">Cloudflare, "Perplexity is using stealth, undeclared crawlers to evade website no-crawl directives." <a href="https://blog.cloudflare.com/perplexity-is-using-stealth-undeclared-crawlers-to-evade-website-no-crawl-directives/">https://blog.cloudflare.com/perplexity-is-using-stealth-undeclared-crawlers-to-evade-website-no-crawl-directives/</a></li>
 <li id="ref-13">IETF AIPREF working group. <a href="https://datatracker.ietf.org/wg/aipref/about/">https://datatracker.ietf.org/wg/aipref/about/</a></li>
+<li id="ref-14">Glaze project page (download count and USENIX Internet Defense Prize). <a href="https://glaze.cs.uchicago.edu/aboutus.html">https://glaze.cs.uchicago.edu/aboutus.html</a></li>
+<li id="ref-15">TIME Best Inventions of 2023: Glaze. <a href="https://time.com/collections/best-inventions-2023/6327170/glaze/">https://time.com/collections/best-inventions-2023/6327170/glaze/</a></li>
+<li id="ref-16">Duke University Libraries, Anubis Pilot Project Report (June 2025). <a href="https://dukespace-7.lib.duke.edu/items/a99a4736-6542-4ef1-8492-41c80e58e1be">https://dukespace-7.lib.duke.edu/items/a99a4736-6542-4ef1-8492-41c80e58e1be</a></li>
 </ol>

@@ -54,7 +54,7 @@ This distinction matters for threat modeling. Adversarial attacks can originate 
 
 Traditional threat models assumed backdoor attacks required sophisticated adversaries with access to the training pipeline. Recent research demonstrates this assumption no longer holds:
 
-- **Attack efficiency**: A 2024 study found that poisoning attacks require a near-constant number of documents regardless of dataset size.<sup><a href="#ref-4">4</a></sup> 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.
+- **Attack efficiency**: A 2025 study found that poisoning attacks require a near-constant number of documents regardless of dataset size.<sup><a href="#ref-4">4</a></sup> 250 poisoned documents can similarly compromise models across all model and dataset sizes, including models up to 13 billion parameters trained on datasets 20x larger than the poison set.
 
 - **Persistence**: Work by Carlini et al. demonstrated that poisoning web-scale datasets is practical, estimating conservatively that 6.5% of Wikipedia can be modified by an attacker with moderate resources.<sup><a href="#ref-20">20</a></sup>
 
@@ -66,7 +66,7 @@ Backdoor attacks are no longer limited to nation-state actors or sophisticated a
 
 - **Coordinated initiatives**: Groups like Poison Fountain, announced in January 2026, explicitly aim to inject backdoors into web-scale training data through distributed, coordinated poisoning efforts.<sup><a href="#ref-21">21</a></sup>
 
-- **Individual malicious actors**: With 250-500 poisoned documents sufficient to compromise models, individuals with access to public platforms (GitHub, Wikipedia, social media) can introduce backdoors targeting specific concepts or behaviors.
+- **Individual malicious actors**: With 250 poisoned documents sufficient to compromise models, individuals with access to public platforms (GitHub, Wikipedia, social media) can introduce backdoors targeting specific concepts or behaviors.
 
 - **Defensive content creators**: Artists and publishers using tools like Nightshade<sup><a href="#ref-22">22</a></sup><sup><a href="#ref-23">23</a></sup> create localized backdoors (for example, "dog" to "cat" associations) as a defensive measure, though the technique is identical to adversarial backdoors in mechanism.
 

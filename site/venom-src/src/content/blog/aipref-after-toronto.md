@@ -12,7 +12,7 @@ author: Semiautonomous Systems
 - Working consensus formed on the **AI training** term, now scoped to "training of any AI model, be it initial training, fine-tuning, or any other process that modifies the model's weights," with explicit exclusion of training models used solely in a search pipeline<sup><a href="#ref-2">2</a></sup>
 - **AI search** wording received the bulk of floor time but is not yet locked; the contested **AI input** category was deferred entirely<sup><a href="#ref-2">2</a></sup>
 - `draft-ietf-aipref-vocab-06` was published 2026-04-27, almost certainly carrying the Toronto-driven changes, but still bears the "DO NOT REFLECT CONSENSUS" boilerplate. No Working Group Last Call has been issued<sup><a href="#ref-3">3</a></sup>
-- The companion attach draft (`draft-ietf-aipref-attach`) remains expired since October 2025. The August 2026 IESG milestone is reachable but no longer comfortable<sup><a href="#ref-4">4</a></sup>
+- The companion attach draft (`draft-ietf-aipref-attach`) remains expired since October 2025<sup><a href="#ref-4">4</a></sup>. The August 2026 IESG milestone is reachable but no longer comfortable<sup><a href="#ref-1">1</a></sup>
 
 ---
 

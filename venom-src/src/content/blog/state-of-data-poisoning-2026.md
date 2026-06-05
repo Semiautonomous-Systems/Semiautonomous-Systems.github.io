@@ -8,7 +8,7 @@ author: Semiautonomous Systems
 
 **A VENOM Flagship Report**
 
-*January 2026*
+*February 2026*
 
 ---
 
@@ -16,7 +16,7 @@ author: Semiautonomous Systems
 
 The voluntary compliance framework that governed web crawling for thirty years is breaking down. Robots.txt, formalized as RFC 9309 in 2022, depends on crawlers choosing to respect preference signals. That choice is increasingly rare. TollBit data shows 13.26% of AI bot requests ignored robots.txt directives in Q2 2025, a fourfold increase from Q4 2024. Cloudflare documented AI crawlers using stealth tactics: rotating IPs, spoofing user agents, and operating undeclared scrapers that bypassed preference signals entirely.
 
-Content creators face a structural disadvantage. AI companies scrape first and litigate later. Detection is difficult. Model weights carry no provenance. Attribution requires expensive forensic analysis or years of litigation. The New York Times has spent over $10.8 million in legal costs pursuing OpenAI.
+Content creators face a structural disadvantage. AI companies scrape first and litigate later. Detection is difficult. Model weights carry no provenance. Attribution requires expensive forensic analysis or years of litigation. The New York Times disclosed over $10.8 million in litigation costs against OpenAI for 2024 alone.
 
 Into this gap, enforcement mechanisms have emerged. Nightshade lets artists add perturbations to images that corrupt AI models during training. It has been downloaded over 250,000 times. Anubis imposes computational costs on scrapers through proof-of-work challenges. Poison Fountain distributes poisoned datasets designed to degrade language model capabilities. These tools represent a shift from requesting compliance to imposing costs.
 
@@ -76,7 +76,7 @@ Understanding the current situation requires distinguishing between signaling an
 
 Signaling mechanisms communicate preferences but rely on voluntary compliance. They include:
 
-**Robots.txt directives**: The original preference signal, now formalized as RFC 9309. Effective only when responders choose to comply.
+**Robots.txt directives**: The original preference signal, now formalized as RFC 9309 <sup><a href="#ref-27">27</a></sup>. Effective only when responders choose to comply.
 
 **HTTP headers**: AIPREF's proposed Content-Usage field extends robots.txt with AI-specific vocabulary. Still requires voluntary reading and compliance.
 
@@ -88,7 +88,7 @@ AI training is different. Once you have scraped a dataset, the relationship ends
 
 ### Enforcement Mechanisms
 
-Enforcement mechanisms impose direct costs on non-compliant actors. They do not require cooperation. They work by making undesired behavior expensive, unreliable, or actively harmful.
+Enforcement mechanisms impose direct costs on non-compliant actors. They do not require cooperation. They work by making undesired behavior expensive, unreliable, or actively harmful. NIST's AI risk and threat taxonomy classifies data poisoning among the adversarial techniques that target the training pipeline directly <sup><a href="#ref-28">28</a></sup>.
 
 **Data poisoning**: Tools like Nightshade, Glaze, and Poison Fountain modify content so that models trained on it exhibit degraded or incorrect behavior. The cost falls on anyone who trains on poisoned data without detection and filtering.
 
@@ -146,7 +146,7 @@ Four tools represent the current state of defensive enforcement: Nightshade for 
 
 ### Poison Fountain
 
-**Mechanism**: Poison Fountain is an anonymous initiative distributing poisoned datasets specifically designed to sabotage language models. Website operators can embed URLs to these datasets, causing crawlers to ingest poisoned data. The datasets reportedly contain subtle logic errors designed to degrade code generation and reasoning capabilities <sup><a href="#ref-12">12</a></sup>.
+**Mechanism**: Poison Fountain is an anonymous initiative distributing poisoned datasets specifically designed to sabotage language models. Website operators can embed URLs to these datasets, causing crawlers to ingest poisoned data. The datasets reportedly contain subtle logic errors designed to degrade code generation and reasoning capabilities <sup><a href="#ref-12">12</a></sup>. Reporting indicates the effort draws on AI industry insiders who view poisoning as a response to unchecked data collection <sup><a href="#ref-29">29</a></sup>.
 
 **Inspiration**: Poison Fountain's creators cite Anthropic's October 2025 research showing that only 250 malicious documents can backdoor language models regardless of size. If poisoning requires a fixed, small number of documents rather than a percentage of training data, coordinated poisoning becomes far more practical <sup><a href="#ref-13">13</a></sup>.
 
@@ -178,7 +178,7 @@ Honest assessment of defensive poisoning requires distinguishing measured result
 
 **Behavioral response to poisoning.** No published evidence demonstrates that poisoning has caused AI companies to reduce scraping, increase compliance with preference signals, or change their data acquisition practices. We have theoretical cost models but no observed deterrence.
 
-**Collateral damage quantification.** Defensive poisoning affects all downstream users of contaminated datasets. We lack measurements of how severely this impacts open-source projects, academic researchers, and beneficial applications that rely on public datasets. These costs are real but unquantified.
+**Collateral damage quantification.** Defensive poisoning affects all downstream users of contaminated datasets. We lack measurements of how severely this impacts open-source projects, academic researchers, and beneficial applications that rely on shared public datasets such as Common Crawl, which underpins much of the generative AI training ecosystem <sup><a href="#ref-30">30</a></sup>. These costs are real but unquantified.
 
 **Threshold effects.** At what poison prevalence do major AI companies abandon scraping untrusted sources entirely? At what coordination level does poisoning become effective deterrence? These thresholds determine strategic viability but remain unmeasured.
 
@@ -338,4 +338,4 @@ For more information, visit [semiautonomous.systems/venom](https://semiautonomou
 
 *State of Defensive Data Poisoning 2026*
 *VENOM Flagship Report*
-*January 2026*
+*February 2026*

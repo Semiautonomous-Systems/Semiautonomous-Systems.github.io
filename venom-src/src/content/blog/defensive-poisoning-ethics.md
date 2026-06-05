@@ -16,7 +16,7 @@ author: Semiautonomous Systems
 
 ## The Context: Why Defensive Poisoning Emerged
 
-Data poisoning is not new. Academic research has documented poisoning attacks in machine learning for over 15 years, covering untargeted attacks that degrade model performance, targeted attacks that cause specific misclassifications, and backdoor attacks that inject hidden behaviors. A 2022 survey in ACM Computing Surveys reviewed over 100 papers on the subject <sup><a href="#ref-1">1</a></sup>.
+Data poisoning is not new. Academic research has documented poisoning attacks in machine learning for over 15 years, covering untargeted attacks that degrade model performance, targeted attacks that cause specific misclassifications, and backdoor attacks that inject hidden behaviors <sup><a href="#ref-14">14</a></sup>. A 2023 survey in ACM Computing Surveys reviewed over 100 papers on the subject <sup><a href="#ref-1">1</a></sup>.
 
 What is new is the application of these techniques as a defense mechanism by content creators.
 
@@ -32,13 +32,13 @@ The most prominent example is Nightshade, developed by researchers at the Univer
 
 The key insight is prompt-specific targeting: rather than broadly degrading a model, Nightshade poisons specific concepts. For example, poisoned images of dogs might cause a model to generate cats when prompted for "dog," while leaving other prompts unaffected. This makes detection and filtering more difficult, as the poisoned samples appear normal to human observers and automated filters.
 
-Nightshade is the offensive companion to Glaze, a style-masking tool by the same team that has seen approximately 7.5 million downloads and was recognized as a TIME Best Invention of 2023 <sup><a href="#ref-6">6</a></sup>. While Glaze aims to protect individual artists by cloaking their style, Nightshade aims to impose systemic costs on AI companies that train on unlicensed data.
+Nightshade is the offensive companion to Glaze, a style-masking tool by the same team that has seen approximately 7.5 million downloads and was recognized as a TIME Best Invention of 2023 <sup><a href="#ref-6">6</a></sup>. While Glaze aims to protect individual artists by cloaking their style, Nightshade aims to impose systemic costs on AI companies that train on unlicensed data <sup><a href="#ref-15">15</a></sup>.
 
 ## Poison Fountain: From Individual Defense to Coordinated Action
 
 ![Escalation ladder from voluntary compliance to coordinated poisoning](/images/diagrams/escalation-ladder.png)
 
-In January 2026, a group of AI industry insiders announced Poison Fountain, an initiative to coordinate data poisoning across multiple content sources <sup><a href="#ref-7">7</a></sup> <sup><a href="#ref-8">8</a></sup>.
+In January 2026, a group of AI industry insiders announced Poison Fountain, an initiative to coordinate data poisoning across multiple content sources <sup><a href="#ref-7">7</a></sup> <sup><a href="#ref-8">8</a></sup> <sup><a href="#ref-16">16</a></sup>.
 
 The shift from individual tools like Nightshade to coordinated initiatives like Poison Fountain marks an important escalation. Individual poisoning can be filtered or diluted by large training datasets. Coordinated poisoning at scale changes the threat model: it makes scraping indiscriminately more costly and forces AI companies to invest in data provenance, quality verification, and permission systems.
 
@@ -92,7 +92,7 @@ Defensive poisoning is not the only available response to unauthorized scraping.
 
 ### Proof-of-Work: Anubis
 
-Anubis, developed by Xe Iaso and adopted by organizations including UNESCO, GNOME, and Duke University, uses browser-based proof-of-work to impose computational costs on scrapers <sup><a href="#ref-10">10</a></sup> <sup><a href="#ref-11">11</a></sup>.
+Anubis, developed by Xe Iaso and adopted by organizations including UNESCO, GNOME, and Duke University, uses browser-based proof-of-work to impose computational costs on scrapers <sup><a href="#ref-10">10</a></sup> <sup><a href="#ref-11">11</a></sup> <sup><a href="#ref-17">17</a></sup>.
 
 The system requires browsers to solve SHA-256 hash challenges before content is served. Humans browsing with JavaScript-enabled browsers solve the challenge once and proceed normally. Scrapers attempting to collect large volumes of content face linear cost scaling: every page requires computational work.
 

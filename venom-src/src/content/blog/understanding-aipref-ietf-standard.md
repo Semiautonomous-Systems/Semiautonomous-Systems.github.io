@@ -36,7 +36,7 @@ AIPREF addresses the vocabulary problem. It does not solve the compliance proble
 
 ## What AIPREF Is (and Isn't)
 
-The IETF chartered the AI Preferences (AIPREF) Working Group in January 2025<sup><a href="#ref-1">1</a></sup> with a specific scope: standardize building blocks for expressing preferences about how content is collected and processed for AI model development, deployment, and use.
+The IETF chartered the AI Preferences (AIPREF) Working Group in January 2025<sup><a href="#ref-1">1</a></sup><sup><a href="#ref-20">20</a></sup><sup><a href="#ref-21">21</a></sup> with a specific scope: standardize building blocks for expressing preferences about how content is collected and processed for AI model development, deployment, and use.
 
 The charter explicitly defines what AIPREF covers:
 
@@ -174,7 +174,7 @@ On the mailing list, a debate about legal enforceability has intensified. The vo
 ![AIPREF timeline from January 2025 charter through Brussels, Bangkok, London, Madrid, WGLC, Zurich pivot, IETF 124 Montreal, to IETF 125 Shenzhen](/images/diagrams/aipref-timeline.png)
 
 - **January 2025**: IETF charters the AIPREF Working Group<sup><a href="#ref-1">1</a></sup>
-- **IETF 122, Bangkok**: First official WG meeting
+- **IETF 122, Bangkok** (March 2025): First official WG meeting
 - **April 2025, Brussels**: Interim meeting; group converges on simple vocabulary plus robots.txt/HTTP attachment<sup><a href="#ref-11">11</a></sup>
 - **June 2025**: Online meeting to resolve outstanding issues; group reports near completion of chartered goals
 - **July 2025, London**: Two-day design team meeting for detailed technical work<sup><a href="#ref-11">11</a></sup>
@@ -253,7 +253,7 @@ Content-Usage: /public-data/ train-ai=y
 
 This allows all crawling but disallows AI training by default, with an exception for content you are willing to share.
 
-**2. Add Content-Usage HTTP headers** for per-resource control. This requires server configuration (Nginx, Apache, Cloudflare Workers, etc.) to set headers based on content type or path.
+**2. Add Content-Usage HTTP headers** for per-resource control. This requires server configuration (Nginx, Apache, Cloudflare Workers, etc.) to set headers based on content type or path. Some CDNs also offer managed options; Cloudflare, for example, can inject AIPREF-style preferences via a managed robots.txt feature.<sup><a href="#ref-19">19</a></sup>
 
 The AIPREF Generator at aipref.dev<sup><a href="#ref-18">18</a></sup> provides a tool for generating configurations. Note that the generator's interface currently shows categories from an earlier draft version (including "automated processing" and "generative AI training" which have since been removed). The core `train-ai` and `search` categories remain valid.
 
@@ -263,7 +263,7 @@ For foundational context on why these preference signals matter, see our [Why VE
 
 ---
 
-*Last updated: March 2026*
+*Last updated: April 2026*
 
 ## References
 
@@ -289,6 +289,6 @@ For foundational context on why these preference signals matter, see our [Why VE
 <li id="ref-19">Cloudflare (2025). "Control Content Use for AI Training with Cloudflare's Managed Robots.txt." <a href="https://blog.cloudflare.com/control-content-use-for-ai-training/">https://blog.cloudflare.com/control-content-use-for-ai-training/</a></li>
 <li id="ref-20">APNIC Blog (2025). "IETF Setting Standards for AI Preferences." <a href="https://blog.apnic.net/2025/04/08/ietf-setting-standards-for-ai-preferences/">https://blog.apnic.net/2025/04/08/ietf-setting-standards-for-ai-preferences/</a></li>
 <li id="ref-21">Computerworld (2025). "IETF Hatching a New Way to Tame Aggressive AI Website Scraping." <a href="https://www.computerworld.com/article/3958587/ietf-hatching-a-new-way-to-tame-aggressive-ai-website-scraping.html">https://www.computerworld.com/article/3958587/ietf-hatching-a-new-way-to-tame-aggressive-ai-website-scraping.html</a></li>
-<li id="ref-22">Silver, B. "Substitutive Use Category for AI Preferences Vocabulary." draft-silver-aipref-vocab-substitutive-00. <a href="https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/">https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/</a></li>
-<li id="ref-23">Badii, F., Bailey, L., Levy, J. "End-User Considerations for AI Preferences." draft-farzdusa-aipref-enduser-00. <a href="https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/">https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/</a></li>
+<li id="ref-22">Silver, B. "Vocabulary For Expressing AI Substitutive Usage." draft-silver-aipref-vocab-substitutive-00. <a href="https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/">https://datatracker.ietf.org/doc/draft-silver-aipref-vocab-substitutive/</a></li>
+<li id="ref-23">Badii, F., Bailey, L., Levy, J. "AI Preferences Signaling: End User Impact." draft-farzdusa-aipref-enduser-00. <a href="https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/">https://datatracker.ietf.org/doc/draft-farzdusa-aipref-enduser/</a></li>
 </ol>
