@@ -1,7 +1,7 @@
 ---
 title: "Anubis at One Year: What Production Operators Are Actually Reporting"
 description: "A year of public Anubis deployments yields concrete operator numbers, a Codeberg cautionary tale, and a project trajectory shift toward layered defenses. What the data says about proof-of-work anti-scraping."
-publishDate: 2026-06-10
+publishDate: 2026-06-01
 keywords: [Anubis, proof-of-work anti-scraping, Anubis deployment data, Codeberg AI scraping, AI bot mitigation, TecharoHQ Anubis]
 author: Semiautonomous Systems
 ---

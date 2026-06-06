@@ -1,7 +1,7 @@
 ---
 title: "Scrapling and Crawlee: How Open-Source Scraping Tools Get Detected"
 description: "A technical analysis of Scrapling and Crawlee, two popular open-source scraping frameworks, examining their anti-detection features and the behavioral signals that content-layer defenses can exploit."
-publishDate: 2026-06-25
+publishDate: 2026-06-04
 keywords: [Scrapling, Crawlee, open source web scraping, scraping detection, data poisoning, anti-bot evasion, behavioral fingerprinting, honeypot detection, content-layer defense, defensive data poisoning, Apify, patchright]
 author: Semiautonomous Systems
 ---

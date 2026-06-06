@@ -1,7 +1,7 @@
 ---
 title: "How Much Does It Cost to Scrape the Web at Scale?"
 description: "Bulk residential proxy pricing, Web Unlocker tiers, and headless browser farms put real per-page scraping costs at $0.001-$0.005, not the widely-quoted $0.01. AI training-data licensing deals show why the economics keep working for scrapers."
-publishDate: 2026-06-16
+publishDate: 2026-05-19
 keywords: [web scraping cost, residential proxy pricing 2026, Bright Data pricing, AI training data economics, scraping vs licensing, IPIDEA disruption, Reddit Perplexity lawsuit]
 author: Semiautonomous Systems
 ---

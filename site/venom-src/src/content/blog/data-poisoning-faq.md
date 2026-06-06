@@ -1,7 +1,7 @@
 ---
 title: "Data Poisoning FAQ: Technical, Legal, and Policy Answers"
 description: "Answers to common questions about data poisoning, web crawling, robots.txt, AIPREF, legal status, and enforcement mechanisms for AI training defense."
-publishDate: 2026-06-13
+publishDate: 2026-04-21
 keywords: [data poisoning FAQ, robots.txt AI crawlers, AIPREF explained, Nightshade FAQ, AI training legal]
 author: Semiautonomous Systems
 ---
@@ -458,7 +458,7 @@ The critical open question is whether coordinated poisoning at scale can shift t
 
 ---
 
-*Last updated: June 2026*
+*Last updated: April 2026*
 
 ## References
 

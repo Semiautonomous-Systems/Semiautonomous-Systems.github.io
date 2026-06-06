@@ -1,7 +1,7 @@
 ---
 title: "Where AI Training Data Actually Comes From in 2026"
 description: "A canonical reference for the six-layer AI training-data stack: Common Crawl, lab crawlers, curated open datasets, licensed feeds, contractor pipelines, and synthetic data. With the comprehensive licensing-deal table, current numbers, and what the labs do not disclose."
-publishDate: 2026-06-19
+publishDate: 2026-05-05
 keywords: [AI training data sources, Common Crawl 2026, AI licensing deals, FineWeb dataset, Bartz Anthropic settlement, RLHF contractors, synthetic data AI training]
 author: Semiautonomous Systems
 ---

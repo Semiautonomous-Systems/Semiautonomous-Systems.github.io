@@ -1,7 +1,7 @@
 ---
 title: "AI Crawler Compliance, Mid-2026: The Blocked-but-Cited Trap"
 description: "Publishers that blocked AI crawlers via robots.txt lost 23.1% of monthly traffic on average, and got only weakly correlated reductions in AI citation. The 2026 data inverts the case for blocking-as-defense."
-publishDate: 2026-06-28
+publishDate: 2026-06-02
 keywords: [AI crawler compliance, robots.txt blocked but cited, Zhao Berman publishers, BuzzStream AI citations, Cloudflare Radar 2026, Reddit Perplexity scraping]
 author: Semiautonomous Systems
 ---

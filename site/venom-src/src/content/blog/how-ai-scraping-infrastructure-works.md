@@ -1,7 +1,7 @@
 ---
 title: "How AI Scraping Infrastructure Works: Proxies, Evasion, and Scale"
 description: "Inside the technical infrastructure AI companies use to scrape the web: residential proxy networks, fingerprint emulation, CAPTCHA solving, and why traditional defenses fail."
-publishDate: 2026-06-22
+publishDate: 2026-04-07
 keywords: [AI web scraping, residential proxy networks, Bright Data, Oxylabs, web scraping infrastructure, anti-bot evasion, AI training data pipeline]
 author: Semiautonomous Systems
 ---
@@ -217,7 +217,7 @@ No single layer is sufficient. Signaling (AIPREF) establishes intent. Technical 
 
 ---
 
-*Last updated: June 2026*
+*Last updated: April 2026*
 
 ## References
 
