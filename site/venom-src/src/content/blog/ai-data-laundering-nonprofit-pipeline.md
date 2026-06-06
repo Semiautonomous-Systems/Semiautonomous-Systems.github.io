@@ -1,7 +1,7 @@
 ---
 title: "How AI Data Laundering Uses Non-Profit Research to Shield Commercial Models"
 description: "AI data laundering routes web-scraped content through academic and non-profit datasets so commercial labs can train on material they could not legally collect themselves. The mechanism, the LAION case, the 2025 Hamburg ruling, and why robots.txt cannot reach it."
-publishDate: 2026-10-13
+publishDate: 2026-02-18
 keywords: [AI data laundering, LAION lawsuit, Kneschke v LAION, The Pile dataset, research exception AI training, training data provenance, non-profit AI dataset]
 author: Semiautonomous Systems
 ---
@@ -73,7 +73,7 @@ Two conditions keep the mechanism running. The first is the research exception, 
 
 Common Crawl sharpens the point by contrast. Its crawler, CCBot, respects robots.txt and applies a generous request delay. It is the transparent, robots-compliant baseline of the training-data ecosystem, and it will not knowingly host shadow-library books, Terms-of-Service-violating YouTube transcripts, or non-consented image scrapes. The laundering pipeline exists to supply what the compliant crawler deliberately omits<sup><a href="#ref-9">9</a></sup>. Laundering routes around the compliant crawler, not through it.
 
-The structure is contested. Hamburg protects the upstream non-profit under EU text-and-data-mining law, a posture tracked alongside the broader [EU AI Act GPAI obligations](/blog/eu-ai-act-gpai-2026/). In the United States, where the [training-data litigation](/blog/litigation-tracker-2026/) is still resolving, the Copyright Office has concluded that using copyrighted works to train generative models implicates copyright and that training is not inherently transformative<sup><a href="#ref-8">8</a></sup>. The two signals point in opposite directions. The upstream collection may be lawful in one jurisdiction while the downstream commercial use stays unsettled in another. No single legal system has endorsed the structure end to end.
+The structure is contested. Hamburg protects the upstream non-profit under EU text-and-data-mining law, a posture tracked alongside the broader EU AI Act GPAI obligations. In the United States, where the training-data litigation is still resolving, the Copyright Office has concluded that using copyrighted works to train generative models implicates copyright and that training is not inherently transformative<sup><a href="#ref-8">8</a></sup>. The two signals point in opposite directions. The upstream collection may be lawful in one jurisdiction while the downstream commercial use stays unsettled in another. No single legal system has endorsed the structure end to end.
 
 ## What This Means for Defense
 

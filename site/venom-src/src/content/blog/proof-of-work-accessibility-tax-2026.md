@@ -1,7 +1,7 @@
 ---
 title: "Who Pays the Proof-of-Work Tax: The Accessibility Cost of Anti-Scraping Walls"
 description: "Proof-of-work anti-scraping like Anubis is not a flat fee. It is a regressive tax: at difficulty 5, about 2 seconds on a flagship laptop, up to 2 minutes on an old phone, and a hard wall for non-JS and screen-reader users, while AI scrapers pay near zero."
-publishDate: 2026-11-10
+publishDate: 2026-03-16
 keywords: [proof-of-work accessibility, proof-of-work anti-scraping accessibility, Anubis accessibility, proof-of-work mobile battery, proof-of-work screen reader, JavaScript-required anti-bot, regressive proof-of-work, who pays proof-of-work]
 author: Semiautonomous Systems
 ---

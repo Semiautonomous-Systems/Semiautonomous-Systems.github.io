@@ -1,7 +1,7 @@
 ---
 title: "Who Owns the Residential Proxy Industry That Feeds AI Scraping in 2026"
 description: "A follow-the-ownership map of the residential proxy networks behind AI scraping: the Lithuanian and Israeli conglomerates that sell consumer privacy VPNs and the scraping infrastructure that drains publishers, plus why this structure breaks per-crawler defense."
-publishDate: 2026-08-11
+publishDate: 2026-03-30
 author: "Semiautonomous Systems"
 keywords:
   - residential proxy
@@ -73,7 +73,7 @@ Consent is also thinner than the SDK prompts suggest. Researchers at Trend Micro
 
 ## Why ownership is a defense problem
 
-The legal exposure is now explicit. Reddit's October 2025 suit in the Southern District of New York (1:25-cv-08736) names Oxylabs UAB as a co-defendant alongside Perplexity, SerpApi, and AWM Proxy. It is one of the first major cases to name residential proxy providers directly in an AI data-scraping matter. Reddit's chief legal officer called the conduct industrial-scale data laundering. The docket breaks the alleged collection down per defendant: roughly 2 billion search-result pages via SerpApi, about 781 million via Oxylabs, and about 482 million via AWM Proxy, part of a broader figure of roughly 3 billion across the named intermediaries <sup><a href="#ref-17">17</a></sup><sup><a href="#ref-18">18</a></sup><sup><a href="#ref-19">19</a></sup><sup><a href="#ref-22">22</a></sup>. Reddit filed a First Amended Complaint on February 9, 2026 <sup><a href="#ref-19">19</a></sup>. There is no ruling yet, and Oxylabs denies knowledge of any misuse <sup><a href="#ref-17">17</a></sup><sup><a href="#ref-18">18</a></sup>. Treat the case as live and unresolved (full docket coverage in the [litigation tracker](/blog/litigation-tracker-2026/)).
+The legal exposure is now explicit. Reddit's October 2025 suit in the Southern District of New York (1:25-cv-08736) names Oxylabs UAB as a co-defendant alongside Perplexity, SerpApi, and AWM Proxy. It is one of the first major cases to name residential proxy providers directly in an AI data-scraping matter. Reddit's chief legal officer called the conduct industrial-scale data laundering. The docket breaks the alleged collection down per defendant: roughly 2 billion search-result pages via SerpApi, about 781 million via Oxylabs, and about 482 million via AWM Proxy, part of a broader figure of roughly 3 billion across the named intermediaries <sup><a href="#ref-17">17</a></sup><sup><a href="#ref-18">18</a></sup><sup><a href="#ref-19">19</a></sup><sup><a href="#ref-22">22</a></sup>. Reddit filed a First Amended Complaint on February 9, 2026 <sup><a href="#ref-19">19</a></sup>. There is no ruling yet, and Oxylabs denies knowledge of any misuse <sup><a href="#ref-17">17</a></sup><sup><a href="#ref-18">18</a></sup>. Treat the case as live and unresolved.
 
 The incumbents also litigate each other. The Bright Data versus Oxylabs patent war ran from 2018 through 2025. A 2021 Texas jury awarded Bright Data $7.5M, but the Patent Trial and Appeal Board invalidated the asserted claims as obvious, the Federal Circuit affirmed, and the Supreme Court declined the case, leaving the patents dead <sup><a href="#ref-20">20</a></sup><sup><a href="#ref-21">21</a></sup>. Two of the largest firms spent seven years fighting over the same residential-proxy techniques. That is the signature of a mature, contested, lucrative market.
 
@@ -84,14 +84,14 @@ Value degradation flips the geometry. If the goal is to make scraped data less u
 Enforcement is the open question. Signaling and litigation establish who is responsible; they do not by themselves stop the traffic. Whether Reddit v. Oxylabs produces a ruling that makes proxy providers liable for downstream misuse, and whether that reshapes the SDK supply funnel, is unknown. Verify it the only honest way: watch the docket, and measure on your own properties whether traffic from these networks actually drops after a defensive change, rather than quietly rerouting.
 
 <ol class="references">
-  <li id="ref-1">Tesonet, Wikipedia, accessed 2026-06-05. https://en.wikipedia.org/wiki/Tesonet and Tesonet Companies, https://tesonet.com/companies/</li>
-  <li id="ref-2">Decodo (Smartproxy) About, accessed 2026-06-05. https://smartproxy.com/about and Proxyway, "Smartproxy Review," https://proxyway.com/reviews/smartproxy-proxies</li>
-  <li id="ref-3">Bright Data, Wikipedia, accessed 2026-06-05. https://en.wikipedia.org/wiki/Bright_Data</li>
+  <li id="ref-1">Tesonet, Wikipedia. https://en.wikipedia.org/wiki/Tesonet and Tesonet Companies, https://tesonet.com/companies/</li>
+  <li id="ref-2">Decodo (Smartproxy) About. https://smartproxy.com/about and Proxyway, "Smartproxy Review," https://proxyway.com/reviews/smartproxy-proxies</li>
+  <li id="ref-3">Bright Data, Wikipedia. https://en.wikipedia.org/wiki/Bright_Data</li>
   <li id="ref-4">Semiautonomous Systems research archive, "Oxylabs and the Scraping Industry," 2026-03-03 (industry revenue ranking and geography).</li>
   <li id="ref-5">Calcalist, "Bright Data hits $300M ARR," accessed 2026-06-05. https://www.calcalistech.com/ctechnews/article/sjeyg2ezwe</li>
-  <li id="ref-6">Owler company profile, Oxylabs, accessed 2026-06-05. https://www.owler.com/company/oxylabs</li>
-  <li id="ref-7">GetLatka company profile, Apify, accessed 2026-06-05. https://getlatka.com/companies/apify</li>
-  <li id="ref-8">Crunchbase, NetNut, accessed 2026-06-05. https://www.crunchbase.com/organization/netnut and NetNut About, https://netnut.io/about/</li>
+  <li id="ref-6">Owler company profile, Oxylabs. https://www.owler.com/company/oxylabs</li>
+  <li id="ref-7">GetLatka company profile, Apify. https://getlatka.com/companies/apify</li>
+  <li id="ref-8">Crunchbase, NetNut. https://www.crunchbase.com/organization/netnut and NetNut About, https://netnut.io/about/</li>
   <li id="ref-9">Bright Data blog, "Data for AI is fueling massive growth at Bright Data," accessed 2026-06-05. https://brightdata.com/blog/general/data-for-ai-is-fueling-massive-growth-at-bright-data</li>
   <li id="ref-10">Oxylabs blog, "Oxylabs acquires Webshare Software company," accessed 2026-06-05. https://oxylabs.io/blog/oxylabs-acquires-webshare-software-company</li>
   <li id="ref-11">ScrapingBee blog, "ScrapingBee acquisition," accessed 2026-06-05. https://www.scrapingbee.com/blog/scrapingbee-acquisition/</li>
@@ -103,7 +103,7 @@ Enforcement is the open question. Signaling and litigation establish who is resp
   <li id="ref-17">CNBC, "Reddit sues Perplexity and others over scraping," 2025-10-23. https://www.cnbc.com/2025/10/23/reddit-user-data-battle-ai-industry-sues-perplexity-scraping-posts.html</li>
   <li id="ref-18">Dataconomy, "Reddit sues Perplexity over alleged large-scale data scraping," 2025-10-23. https://dataconomy.com/2025/10/23/reddit-sues-perplexity-over-alleged-large-scale-data-scraping/</li>
   <li id="ref-19">ChatGPT Is Eating the World, "Reddit files 1st amended complaint v. SerpApi, Oxylabs, AWMProxy, Perplexity AI," 2026-02-09. https://chatgptiseatingtheworld.com/2026/02/09/reddit-files-1st-amended-complaint-v-serpapi-oxylabs-awmproxy-perplexity-ai/</li>
-  <li id="ref-20">Oxylabs Legal Timeline, accessed 2026-06-05. https://oxylabs.io/legal-timeline</li>
+  <li id="ref-20">Oxylabs Legal Timeline. https://oxylabs.io/legal-timeline</li>
   <li id="ref-21">USA Herald, "Supreme Court leaves Bright Data patent invalidation ruling intact," accessed 2026-06-05. https://usaherald.com/supreme-court-leaves-bright-data-patent-invalidation-ruling-intact/</li>
-  <li id="ref-22">Reddit Inc. v. SerpApi LLC et al., S.D.N.Y. 1:25-cv-08736, CourtListener docket (per-defendant collection volumes), accessed 2026-06-05. https://www.courtlistener.com/docket/71720563/reddit-inc-v-serpapi-llc/</li>
+  <li id="ref-22">Reddit Inc. v. SerpApi LLC et al., S.D.N.Y. 1:25-cv-08736, CourtListener docket (per-defendant collection volumes). https://www.courtlistener.com/docket/71720563/reddit-inc-v-serpapi-llc/</li>
 </ol>
